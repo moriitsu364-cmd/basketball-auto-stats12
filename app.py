@@ -16,6 +16,9 @@ with st.sidebar:
     3. 選手名、得点、アシスト、リバウンドなどの統計データを取得
     """)
     st.info("💡 画像は鮮明で、文字がはっきり読める状態が理想的です")
+    
+    # 利用可能なモデル情報を表示（APIキー設定後）
+    st.divider()
 
 # APIキーの取得（複数の方法を試す）
 api_key = None
@@ -32,8 +35,41 @@ if api_key:
         # API設定
         genai.configure(api_key=api_key)
         
-        # 最新の推奨モデル名を使用
-        model = genai.GenerativeModel('gemini-1.5-flash')
+        # 利用可能なモデルのリストを取得して、画像対応モデルを選択
+        available_models = []
+        try:
+            for m in genai.list_models():
+                if 'generateContent' in m.supported_generation_methods:
+                    available_models.append(m.name)
+        except Exception as e:
+            st.warning(f"モデルリストの取得に失敗: {e}")
+        
+        # 優先順位でモデルを選択
+        model_name = None
+        priority_models = [
+            'models/gemini-1.5-pro-latest',
+            'models/gemini-1.5-pro',
+            'models/gemini-1.5-flash-latest', 
+            'models/gemini-1.5-flash',
+            'models/gemini-pro-vision',
+            'models/gemini-pro'
+        ]
+        
+        for preferred in priority_models:
+            if preferred in available_models:
+                model_name = preferred
+                break
+        
+        if not model_name and available_models:
+            # どれもマッチしない場合は最初の利用可能なモデルを使用
+            model_name = available_models[0]
+        
+        if not model_name:
+            st.error("利用可能なモデルが見つかりません")
+            st.stop()
+        
+        st.sidebar.success(f"使用モデル: {model_name}")
+        model = genai.GenerativeModel(model_name)
         
         # ファイルアップローダー
         uploaded_file = st.file_uploader(
@@ -200,7 +236,9 @@ Output in well-organized Markdown format.
                             st.write(f"エラー詳細: {e}")
                             st.write(f"画像サイズ: {image.size}")
                             st.write(f"画像フォーマット: {image.format}")
-                            st.write(f"モデル名: gemini-1.5-flash")
+                            st.write(f"使用モデル: {model_name if 'model_name' in locals() else '未設定'}")
+                            if available_models:
+                                st.write(f"利用可能なモデル: {', '.join(available_models[:5])}")
                             
     except Exception as e:
         st.error(f"❌ 初期化エラー: {str(e)}")
