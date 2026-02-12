@@ -28,7 +28,7 @@ def check_password():
     """編集者権限の確認"""
     def password_entered():
         """パスワードが入力されたかチェック"""
-        if hashlib.sha256(st.session_state["password"].encode()).hexdigest() == st.secrets.get("ADMIN_PASSWORD_HASH", hashlib.sha256(“tsukuba1872".encode()).hexdigest()):
+        if hashlib.sha256(st.session_state["password"].encode()).hexdigest() == st.secrets.get("ADMIN_PASSWORD_HASH", hashlib.sha256("tsukuba1872".encode()).hexdigest()):
             st.session_state["password_correct"] = True
             del st.session_state["password"]
         else:
