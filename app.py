@@ -10,8 +10,10 @@ import os
 from auth import check_password
 from stats import calculate_stats
 from charts import create_bar_chart
+from charts import create_nba_chart
 from ai import setup_gemini
 from styles import load_css
+
 
 # ========================================
 # ページ設定
@@ -23,7 +25,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-
+load_css()
 # ========================================
 # データベース関連
 # ========================================
