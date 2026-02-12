@@ -12,7 +12,7 @@ import plotly.graph_objects as go
 # ページ設定と初期化
 # ========================================
 st.set_page_config(
-    page_title="Pro Basketball Stats Analyzer",
+    page_title="TSUKUBA HS Basketball Stats Analyzer",
     page_icon="🏀",
     layout="wide",
     initial_sidebar_state="expanded"
