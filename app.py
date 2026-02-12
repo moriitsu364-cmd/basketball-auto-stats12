@@ -3,8 +3,10 @@ import pandas as pd
 import base64
 from openai import OpenAI
 
-# OpenAIの設定
-client = OpenAI(api_key="YOUR_OPENAI_API_KEY")
+import os
+# StreamlitのSecretsから読み込む設定
+api_key = st.secrets["OPENAI_API_KEY"]
+client = OpenAI(api_key=api_key)
 
 def analyze_stats_image(image_file):
     base64_image = base64.b64encode(image_file.getvalue()).decode('utf-8')
