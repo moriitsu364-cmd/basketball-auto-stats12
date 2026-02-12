@@ -1,341 +1,200 @@
-# 🏀 筑波バスケットボール統計システム
-## Tsukuba Basketball Statistics System
+# 🏀 Tsukuba Basketball Stats
 
-NBA.comとBリーグのデザインを融合したプロフェッショナルなバスケットボール統計管理システム
+筑波大学附属高校 男子バスケットボール統計システム
 
----
+NBA.comスタイルの洗練されたUIで、試合統計を管理・分析するWebアプリケーションです。
 
-## 🎯 主な機能
+## ✨ 機能
 
-### 1. **NBA風デザイン**
-- NBA.com/Bリーグ風のモダンなUI
-- 日本語・英語バイリンガル対応
-- レスポンシブデザイン
-- プロフェッショナルなカラースキーム（筑波ブルー #1d428a & レッド #c8102e）
+### 📊 統計分析
+- **シーズン統計**: チーム全体のパフォーマンス、勝敗記録、平均得点
+- **選手統計**: 個人のシーズン平均、パフォーマンスグラフ、ゲームログ
+- **試合統計**: 試合ごとのボックススコア、チーム統計
+- **選手比較**: 2選手間の詳細な統計比較
 
-### 2. **新機能**
+### 🤖 AI機能
+- Gemini AIによるスコアシート画像の自動読み取り
+- CSV形式でのデータ自動抽出
 
-#### データ管理
-- ✅ クォーター数対応（4Q公式戦/2Q練習試合）
-- ✅ シーズン別データ管理
-- ✅ 対戦相手統計分析
-- ✅ 詳細な試合履歴
+### 📈 可視化
+- Plotlyによるインタラクティブなグラフ
+- リーダーボード（得点王、リバウンド王、アシスト王）
+- パフォーマンストレンド分析
 
-#### チーム情報
-- ✅ 選手プロフィール（画像・ポジション・身体情報）
-- ✅ スタッフ情報管理
-- ✅ シーズン別チーム情報
+## 🚀 セットアップ
 
-#### データ比較
-- ✅ 複数選手比較（2-5人）
-- ✅ レーダーチャート
-- ✅ シーズン間比較
-- ✅ チーム戦績比較（4Q vs 2Q）
-
-#### グラフ改善
-- ✅ 棒グラフ（見やすいデザイン）
-- ✅ 円グラフ（貢献度表示）
-- ✅ 折れ線グラフ（推移分析）
-- ✅ レーダーチャート（能力比較）
-
-### 3. **セキュリティ強化**
-- ✅ 2段階権限（エディター/管理者）
-- ✅ 画像アップロード認証
-- ✅ データ管理権限制御
-
----
-
-## 📦 必要なパッケージ
+### 1. リポジトリをクローン
 
 ```bash
-pip install streamlit
-pip install google-generativeai
-pip install pillow
-pip install pandas
-pip install plotly
+git clone https://github.com/moriitsu364-cmd/basketball-auto-stats12.git
+cd basketball-auto-stats12
 ```
 
----
+### 2. 依存パッケージをインストール
 
-## ⚙️ セットアップ
+```bash
+pip install -r requirements.txt
+```
 
-### 1. secrets.toml の設定
+### 3. シークレット設定
 
-`.streamlit/secrets.toml` ファイルを作成:
+```bash
+# .streamlitディレクトリを作成（存在しない場合）
+mkdir -p .streamlit
+
+# secrets.tomlを作成
+cp .streamlit/secrets.toml.example .streamlit/secrets.toml
+```
+
+`.streamlit/secrets.toml`を編集してAPIキーを設定：
 
 ```toml
-# Gemini API Key (必須)
-GEMINI_API_KEY = "your-gemini-api-key-here"
-
-# パスワード設定（オプション）
-# エディター権限（データ入力可能）
-EDITOR_PASSWORD_HASH = "ハッシュ値"  # デフォルト: tsukuba1872
-
-# 管理者権限（全機能利用可能）
-ADMIN_PASSWORD_HASH = "ハッシュ値"  # デフォルト: admin2024
+GEMINI_API_KEY = "your-actual-api-key-here"
+ADMIN_PASSWORD_HASH = "your-password-hash"
 ```
 
-### 2. パスワードハッシュの生成
-
-```python
-import hashlib
-
-# エディター用
-password = "your-editor-password"
-hash_value = hashlib.sha256(password.encode()).hexdigest()
-print(f"EDITOR_PASSWORD_HASH = \"{hash_value}\"")
-
-# 管理者用
-admin_password = "your-admin-password"
-admin_hash = hashlib.sha256(admin_password.encode()).hexdigest()
-print(f"ADMIN_PASSWORD_HASH = \"{admin_hash}\"")
-```
-
-### 3. アプリケーション起動
+### 4. dataディレクトリを作成
 
 ```bash
-streamlit run basketball_stats_complete.py
+mkdir -p data
+touch data/.gitkeep
 ```
 
----
+### 5. アプリを起動
 
-## 📊 データ構造
-
-### スコアシートデータ (basketball_stats.csv)
-```csv
-No,PlayerName,GS,PTS,3PM,3PA,3P%,2PM,2PA,2P%,DK,FTM,FTA,FT%,
-OR,DR,TOT,AST,STL,BLK,TO,PF,TF,OF,FO,DQ,MIN,
-GameDate,Season,Opponent,TeamScore,OpponentScore,QuarterType
+```bash
+streamlit run src/app.py
 ```
 
-### 選手情報 (player_info.json)
-```json
-{
-  "選手名": {
-    "name_en": "PLAYER NAME",
-    "position": "PG",
-    "height": "180",
-    "weight": "70",
-    "image": "base64_encoded_image"
-  }
-}
+ブラウザで `http://localhost:8501` にアクセス
+
+## 📁 プロジェクト構造
+
+```
+basketball-auto-stats12/
+├── .streamlit/
+│   ├── config.toml              # Streamlit設定
+│   └── secrets.toml.example     # シークレット設定例
+├── src/
+│   ├── pages/                   # 各タブのページ
+│   │   ├── __init__.py
+│   │   ├── season_stats.py     # シーズン統計
+│   │   ├── player_stats.py     # 選手統計
+│   │   ├── game_stats.py       # 試合統計
+│   │   ├── compare.py          # 選手比較
+│   │   └── data_input.py       # データ入力
+│   ├── app.py                   # メインアプリ
+│   ├── config.py                # 設定定数
+│   ├── database.py              # データベース操作
+│   ├── stats.py                 # 統計計算
+│   ├── charts.py                # グラフ作成
+│   ├── components.py            # UIコンポーネント
+│   ├── auth.py                  # 認証
+│   ├── ai.py                    # AI機能
+│   └── styles.py                # CSSスタイル
+├── data/
+│   ├── .gitkeep
+│   └── basketball_stats.csv     # 統計データ（自動生成）
+├── .gitignore
+├── requirements.txt
+└── README.md
 ```
 
-### チーム情報 (team_info.json)
-```json
-{
-  "2024-25": {
-    "description": "シーズン概要",
-    "achievements": ["大会名"]
-  }
-}
+## 🔑 環境変数
+
+### Gemini APIキー
+
+1. [Google AI Studio](https://makersuite.google.com/app/apikey)でAPIキーを取得
+2. `.streamlit/secrets.toml`に設定
+
+```toml
+GEMINI_API_KEY = "your-api-key"
 ```
 
----
+### 管理者パスワード
 
-## 🎨 カスタマイズ
+デフォルトパスワード: `tsukuba1872`
 
-### カラースキーム変更
+カスタムパスワードを設定する場合：
 
-CSSセクションで以下の値を変更:
-
-```css
-/* メインカラー */
---primary-color: #1d428a;  /* 筑波ブルー */
---secondary-color: #c8102e; /* 筑波レッド */
-
-/* アクセントカラー */
---accent-blue: #2563eb;
---accent-red: #dc2626;
+```bash
+# パスワードのハッシュを生成
+python -c "import hashlib; print(hashlib.sha256('your-password'.encode()).hexdigest())"
 ```
 
-### チーム名変更
+生成されたハッシュを`secrets.toml`に設定：
 
-ヘッダー部分を編集:
-
-```python
-st.markdown("""
-<div class="nba-header">
-    <h1>🏀 あなたのチーム名</h1>
-    <p class="subtitle">Your Team Name</p>
-</div>
-""", unsafe_allow_html=True)
+```toml
+ADMIN_PASSWORD_HASH = "generated-hash"
 ```
 
----
+## 📖 使い方
 
-## 🔐 権限レベル
+### データ入力
 
-### エディター (Editor)
-- データ入力
-- 試合記録追加
-- データエクスポート/インポート
-- 個別試合削除
+1. **DATA INPUT**タブに移動
+2. 管理者パスワードを入力（デフォルト: `tsukuba1872`）
+3. 試合情報を入力（日付、シーズン、対戦相手、スコア）
+4. スコアシート画像をアップロード
+5. **ANALYZE WITH AI**をクリック
+6. 抽出されたデータを確認・編集
+7. **SAVE DATA**をクリック
 
-### 管理者 (Admin)
-- エディター権限 + 以下
-- 選手情報編集（画像アップロード含む）
-- スタッフ情報管理
-- システム設定変更
+### 統計の閲覧
 
----
+- **SEASON STATS**: シーズンを選択して全体統計を表示
+- **PLAYER STATS**: 選手を選択して個人統計を表示
+- **GAME STATS**: 試合を選択してボックススコアを表示
+- **COMPARE**: 2選手を選択して比較
 
-## 📱 使い方
+### データのエクスポート/インポート
 
-### 1. シーズン統計
-- シーズン選択
-- 試合形式フィルター（4Q/2Q）
-- リーダーボード表示
-- チーム統計グラフ
+- **エクスポート**: DATA INPUTタブの「DOWNLOAD ALL DATA」
+- **インポート**: DATA INPUTタブでCSVファイルをアップロード
 
-### 2. 選手統計
-- 選手選択
-- シーズンフィルター
-- 個人成績表示
-- パフォーマンスグラフ
+## 🎨 デザイン
 
-### 3. 試合統計
-- 試合選択
-- ボックススコア
-- 貢献度分析
-- チーム統計
+- NBA.com風の洗練されたUI
+- レスポンシブデザイン対応
+- インタラクティブなグラフとチャート
+- 直感的なナビゲーション
 
-### 4. データ比較
-- **選手比較**: 2-5人の選手を比較
-- **シーズン比較**: 複数シーズンの成績比較
-- **チーム比較**: 4Q vs 2Q戦績分析
+## 🛠️ 技術スタック
 
-### 5. チーム紹介
-- 選手一覧（画像付き）
-- スタッフ情報
-- シーズン情報
+- **フレームワーク**: Streamlit
+- **AI**: Google Gemini API
+- **データ処理**: Pandas
+- **可視化**: Plotly
+- **画像処理**: Pillow
 
-### 6. 対戦相手分析
-- 相手別戦績
-- 対戦履歴
-- 得点推移
+## 📝 データ形式
 
-### 7. データ入力
-- AI画像解析（Gemini使用）
-- 手動データ編集
-- CSVインポート/エクスポート
+CSVファイルには以下のカラムが含まれます：
 
----
-
-## 🖼️ 画像管理
-
-### 推奨画像サイズ
-
-- **選手画像**: 800x800px (正方形)
-- **スタッフ画像**: 600x600px (正方形)
-- **ランキングアイコン**: 200x200px (正方形)
-
-### 画像形式
-- PNG (推奨・透過対応)
-- JPEG
-- WebP
-
----
-
-## 🚀 パフォーマンス最適化
-
-### データ量が多い場合
-
-```python
-# データフィルタリング
-@st.cache_data
-def load_filtered_data(season, quarter_type):
-    df = pd.read_csv(DATA_FILE)
-    if season != "All":
-        df = df[df['Season'] == season]
-    if quarter_type != "All":
-        df = df[df['QuarterType'] == quarter_type]
-    return df
+```
+No, PlayerName, GS, PTS, 3PM, 3PA, 3P%, 2PM, 2PA, 2P%, DK, 
+FTM, FTA, FT%, OR, DR, TOT, AST, STL, BLK, TO, PF, TF, OF, 
+FO, DQ, MIN, GameDate, Season, Opponent, TeamScore, OpponentScore
 ```
 
-### 画像圧縮
+## 🤝 貢献
 
-```python
-from PIL import Image
-
-def compress_image(image_file, max_size=(800, 800)):
-    img = Image.open(image_file)
-    img.thumbnail(max_size, Image.Resampling.LANCZOS)
-    return img
-```
-
----
-
-## 📝 データバックアップ
-
-### 自動バックアップ（推奨）
-
-```python
-import shutil
-from datetime import datetime
-
-def backup_data():
-    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-    shutil.copy('basketball_stats.csv', f'backup/stats_{timestamp}.csv')
-    shutil.copy('player_info.json', f'backup/player_{timestamp}.json')
-```
-
----
-
-## 🐛 トラブルシューティング
-
-### よくある問題
-
-**Q: Gemini APIエラーが出る**
-```
-A: secrets.tomlにGEMINI_API_KEYが正しく設定されているか確認
-```
-
-**Q: 画像が表示されない**
-```
-A: Base64エンコードが正しいか、画像サイズが大きすぎないか確認
-```
-
-**Q: データが保存されない**
-```
-A: ファイル書き込み権限があるか確認
-```
-
-**Q: パスワードが合わない**
-```
-A: ハッシュ値を再生成し、secrets.tomlを更新
-```
-
----
+プルリクエストを歓迎します！大きな変更の場合は、まずissueを開いて変更内容を議論してください。
 
 ## 📄 ライセンス
 
-このプロジェクトは教育目的で作成されています。
+MIT
 
----
+## 👨‍💻 作者
+
+- GitHub: [@moriitsu364-cmd](https://github.com/moriitsu364-cmd)
 
 ## 🙏 謝辞
 
-- NBA.com - デザインインスピレーション
-- Bリーグ - UIレイアウト参考
-- Streamlit - フレームワーク
-- Google Gemini - AI画像解析
+- デザインインスピレーション: NBA.com
+- AI技術: Google Gemini API
+- フレームワーク: Streamlit
 
 ---
 
-## 📞 サポート
-
-問題が発生した場合は、以下を確認してください:
-
-1. Streamlitバージョン: `streamlit --version`
-2. Pythonバージョン: `python --version`
-3. エラーログの確認
-4. secrets.toml設定の確認
-
----
-
-**開発者**: Claude AI Assistant  
-**バージョン**: 2.0 Pro  
-**最終更新**: 2024年
-
-🏀 Let's Go Tsukuba! 🏀
+**質問や問題がある場合は、[Issues](https://github.com/moriitsu364-cmd/basketball-auto-stats12/issues)を開いてください。**
