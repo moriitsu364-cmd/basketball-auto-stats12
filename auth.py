@@ -1,6 +1,9 @@
 import streamlit as st
 import hashlib
 
+# ========================================
+# 認証機能
+# ========================================
 def check_password():
     """編集者権限の確認"""
     def password_entered():
