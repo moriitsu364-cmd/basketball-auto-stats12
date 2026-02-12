@@ -1,77 +1,68 @@
 import streamlit as st
 import pandas as pd
-import base64
-from openai import OpenAI
+import google.generativeai as genai
+from PIL import Image
+import io
 
-import os
-# StreamlitのSecretsから読み込む設定
-api_key = st.secrets["OPENAI_API_KEY"]
-client = OpenAI(api_key=api_key)
+# ページ設定
+st.set_page_config(page_title="バスケスタッツ自動記録", layout="wide")
+st.title("🏀 バスケスコアシート解析・記録システム")
 
-def analyze_stats_image(image_file):
-    base64_image = base64.b64encode(image_file.getvalue()).decode('utf-8')
+# サイドバーでAPIキーを設定（StreamlitのSecretsから取得、なければ入力）
+api_key = st.secrets.get("GOOGLE_API_KEY") or st.sidebar.text_input("Google API Keyを入力してください", type="password")
+
+if api_key:
+    genai.configure(api_key=api_key)
+    model = genai.GenerativeModel('gemini-1.5-flash') # 無料枠で高速なモデル
+else:
+    st.warning("Google API Keyを設定してください。")
+
+# 画像アップロード
+uploaded_file = st.file_uploader("スコアシートの画像をアップロードしてください", type=['png', 'jpg', 'jpeg'])
+
+if uploaded_file and api_key:
+    image = Image.open(uploaded_file)
+    st.image(image, caption="アップロードされたスコアシート", use_container_width=True)
     
-    # この画像形式に特化したプロンプト
-    prompt = """
-    バスケットボールのボックススコア画像を解析してください。
-    以下の項目を抽出し、JSON形式で出力してください。
-    項目：選手名(選手名), PTS(得点), 3PM(3P成功数), TOT(リバウンド合計), AST(アシスト), F(ファウルPF)
-    
-    【ルール】
-    - 「TOTALS」や「Team/Coaches」の行は除外してください。
-    - 数値が空欄や「0」の場合は 0 としてください。
-    - 出力例: [{"選手名": "森 一希", "PTS": 16, "3PM": 2, "TOT": 21, "AST": 1, "F": 3}]
-    """
+    if st.button("画像を解析してスタッツを抽出"):
+        with st.spinner("Geminiが画像を解析中..."):
+            # 画像をバイトデータに変換
+            img_byte_arr = io.BytesIO()
+            image.save(img_byte_arr, format='JPEG')
+            img_data = img_byte_arr.getvalue()
 
-    response = client.chat.completions.create(
-        model="gpt-4o",
-        messages=[
-            {
-                "role": "user",
-                "content": [
-                    {"type": "text", "text": prompt},
-                    {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{base64_image}"}}
-                ],
-            }
-        ],
-        response_format={ "type": "json_object" }
-    )
-    import json
-    # JSONのキー名はAIが返すものに合わせる
-    res_data = json.loads(response.choices[0].message.content)
-    # リスト形式で返す
-    return res_data.get("stats", res_data) if isinstance(res_data, dict) else res_data
-
-# --- Streamlit UI ---
-st.title("🏀 筑波大附スタッツ解析システム")
-
-uploaded_file = st.file_uploader("節分カップのスタッツ画像をアップロード", type=['jpg', 'jpeg', 'png'])
-
-if uploaded_file:
-    st.image(uploaded_file, caption="アップロードされたスコアシート", use_column_width=True)
-    
-    if st.button("AI解析を実行"):
-        with st.spinner("画像からデータを抽出中..."):
+            prompt = """
+            このバスケットボールのスコアシートから、選手ごとのスタッツを抽出して、
+            以下の形式のJSONデータ（Markdownのコードブロックなし）で出力してください。
+            [
+              {"選手名": "名前1", "得点": 10, "AS": 2, "REB": 5, "ST": 1},
+              {"選手名": "名前2", "得点": 5, "AS": 0, "REB": 3, "ST": 2}
+            ]
+            数値が不明な場合は0にしてください。
+            """
+            
             try:
-                extracted_data = analyze_stats_image(uploaded_file)
-                # リストが辞書の中に入っている場合への対応
-                if isinstance(extracted_data, dict):
-                    for key in extracted_data:
-                        if isinstance(extracted_data[key], list):
-                            extracted_data = extracted_data[key]
-                            break
+                # Geminiで解析
+                response = model.generate_content([prompt, {"mime_type": "image/jpeg", "data": img_data}])
                 
-                st.session_state['temp_df'] = pd.DataFrame(extracted_data)
-                st.success("解析完了！内容を確認してください。")
+                # テキストからJSON部分を抽出（簡易的な処理）
+                import json
+                text_response = response.text.replace('```json', '').replace('```', '').strip()
+                data = json.loads(text_response)
+                
+                st.session_state['stats_data'] = data
+                st.success("解析が完了しました！内容を確認・修正してください。")
             except Exception as e:
                 st.error(f"エラーが発生しました: {e}")
 
-if 'temp_df' in st.session_state:
-    st.subheader("データの確認・修正")
-    # ユーザーが手動で直せるようにする
-    edited_df = st.data_editor(st.session_state['temp_df'], num_rows="dynamic")
+# データ編集エリア
+if 'stats_data' in st.session_state:
+    st.subheader("スタッツの確認・修正")
+    df = pd.DataFrame(st.session_state['stats_data'])
     
-    if st.button("シーズン記録に保存"):
-        # ここでCSV等に保存する処理を追加可能
-        st.balloons()
-        st.success("保存しました！")
+    # ユーザーが表を直接編集できる
+    edited_df = st.data_editor(df, num_rows="dynamic")
+    
+    if st.button("データを保存（CSVダウンロード）"):
+        csv = edited_df.to_csv(index=False).encode('utf-8-sig')
+        st.download_button("CSVファイルをダウンロード", csv, "stats.csv", "text/csv")
