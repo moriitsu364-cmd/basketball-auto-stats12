@@ -15,7 +15,7 @@ if api_key:
     
     # 【重要】2026年現在の最新・安定モデル名を使用
     # もし404が出る場合は 'gemini-1.5-flash' に戻してください
-    model = genai.GenerativeModel('gemini-2.0-flash')
+    model = genai.GenerativeModel('gemini-1.5-flash')
 
     uploaded_file = st.file_uploader("スコアシート画像をアップロード", type=['png', 'jpg', 'jpeg'])
 
