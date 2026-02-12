@@ -1,272 +1,109 @@
 import streamlit as st
 import google.generativeai as genai
 from PIL import Image
+import pandas as pd
 import io
 
-# ページ設定
-st.set_page_config(page_title="バスケ解析", layout="wide")
-st.title("🏀 バスケスコア自動解析")
+# --- ③ デザインの設定 (スタイリング) ---
+st.set_page_config(page_title="Pro Basket Stats Analyzer", layout="wide")
+st.markdown("""
+    <style>
+    .main { background-color: #f8f9fa; }
+    .stButton>button { width: 100%; border-radius: 5px; height: 3em; background-color: #ff4b4b; color: white; }
+    .stMetric { background-color: white; padding: 15px; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+    h1 { color: #1e3a8a; border-bottom: 2px solid #1e3a8a; }
+    </style>
+    """, unsafe_allow_html=True)
 
-# サイドバーに説明を追加
-with st.sidebar:
-    st.header("使い方")
-    st.markdown("""
-    1. バスケットボールのスコアシート画像をアップロード
-    2. 「AI解析を実行」ボタンをクリック
-    3. 選手名、得点、アシスト、リバウンドなどの統計データを取得
-    """)
-    st.info("💡 画像は鮮明で、文字がはっきり読める状態が理想的です")
-    
-    # 利用可能なモデル情報を表示（APIキー設定後）
-    st.divider()
+st.title("🏀 Pro Basket Stats Analyzer")
 
-# APIキーの取得（複数の方法を試す）
-api_key = None
-try:
-    # Streamlit Cloudの場合
-    api_key = st.secrets["GEMINI_API_KEY"]
-except (KeyError, FileNotFoundError):
-    # ローカル環境の場合、入力フォームを表示
-    st.warning("⚠️ APIキーが設定されていません")
-    api_key = st.text_input("Gemini APIキーを入力してください:", type="password")
+# APIキーの設定
+api_key = st.secrets.get("GEMINI_API_KEY")
+
+# --- ② データベースのシミュレーション ---
+# 本来はDBを使いますが、今回は簡易的にセッション(一時保存)とCSVで管理します
+if 'database' not in st.session_state:
+    st.session_state['database'] = pd.DataFrame()
+
+# サイドメニュー
+menu = st.sidebar.selectbox("メニュー", ["画像解析・記録", "シーズン集計・選手分析"])
 
 if api_key:
-    try:
-        # API設定
-        genai.configure(api_key=api_key)
+    genai.configure(api_key=api_key)
+    model = genai.GenerativeModel('gemini-1.5-flash')
+
+    if menu == "画像解析・記録":
+        st.header("① スコアシート画像解析")
         
-        # 利用可能なモデルのリストを取得して、画像対応モデルを選択
-        available_models = []
-        try:
-            for m in genai.list_models():
-                if 'generateContent' in m.supported_generation_methods:
-                    available_models.append(m.name)
-        except Exception as e:
-            st.warning(f"モデルリストの取得に失敗: {e}")
+        col1, col2 = st.columns([1, 2])
         
-        # 優先順位でモデルを選択
-        model_name = None
-        priority_models = [
-            'models/gemini-1.5-pro-latest',
-            'models/gemini-1.5-pro',
-            'models/gemini-1.5-flash-latest', 
-            'models/gemini-1.5-flash',
-            'models/gemini-pro-vision',
-            'models/gemini-pro'
-        ]
-        
-        for preferred in priority_models:
-            if preferred in available_models:
-                model_name = preferred
-                break
-        
-        if not model_name and available_models:
-            # どれもマッチしない場合は最初の利用可能なモデルを使用
-            model_name = available_models[0]
-        
-        if not model_name:
-            st.error("利用可能なモデルが見つかりません")
-            st.stop()
-        
-        st.sidebar.success(f"使用モデル: {model_name}")
-        model = genai.GenerativeModel(model_name)
-        
-        # ファイルアップローダー
-        uploaded_file = st.file_uploader(
-            "スコアシート画像をアップロード", 
-            type=['png', 'jpg', 'jpeg', 'webp'],
-            help="PNG, JPG, JPEG, WEBP形式の画像ファイルに対応"
-        )
-        
+        with col1:
+            game_date = st.date_input("試合日")
+            season = st.selectbox("シーズン", ["2023-24", "2024-25", "2025-26"])
+            uploaded_file = st.file_uploader("スコアシートをアップ", type=['png', 'jpg', 'jpeg'])
+
         if uploaded_file:
-            # 画像を表示
             image = Image.open(uploaded_file)
-            
-            col1, col2 = st.columns([1, 1])
-            
-            with col1:
-                st.subheader("📸 アップロードされた画像")
-                st.image(image, caption="解析対象の画像", use_container_width=True)
-            
-            with col2:
-                st.subheader("⚙️ 解析オプション")
-                
-                # 詳細度の選択
-                detail_level = st.radio(
-                    "解析の詳細度:",
-                    ["基本統計のみ", "詳細統計", "フル解析（コメント付き）"],
-                    help="詳細度を上げると、より多くの情報を抽出しますが時間がかかります"
-                )
-                
-                # 言語選択
-                output_lang = st.selectbox(
-                    "出力言語:",
-                    ["日本語", "English"],
-                    help="解析結果の表示言語を選択"
-                )
-            
-            # 解析ボタン
-            if st.button("🚀 AI解析を実行", type="primary", use_container_width=True):
-                with st.spinner("🤖 AIが画像を解析中... しばらくお待ちください"):
+            st.image(image, caption="アップロード画像", use_container_width=True)
+
+            if st.button("AI解析を実行"):
+                with st.spinner("AIが全スタッツを抽出中..."):
+                    # プロンプトを強化（②のために構造化データを要求）
+                    prompt = """
+                    このバスケのスコアシートから全員分のスタッツを抽出し、以下のCSV形式で出力してください。
+                    No,選手名,PTS,3PM,3PA,2PM,2PA,FTM,FTA,OR,DR,TOT,AST,STL,BLK,TO,PF,MIN
+                    ※ヘッダーのみで、説明文は不要です。
+                    """
+                    response = model.generate_content([prompt, image])
+                    
                     try:
-                        # プロンプトの構築
-                        if output_lang == "日本語":
-                            if detail_level == "基本統計のみ":
-                                prompt = """
-この画像からバスケットボールの試合統計を抽出してください。
-以下の情報を表形式で出力してください：
-- 選手名
-- 得点（Points）
-- アシスト（Assists）
-- リバウンド（Rebounds）
-
-表はMarkdown形式で出力してください。
-"""
-                            elif detail_level == "詳細統計":
-                                prompt = """
-この画像からバスケットボールの詳細な試合統計を抽出してください。
-以下の情報を表形式で出力してください：
-- 選手名
-- 得点（Points）
-- フィールドゴール成功/試投（FG）
-- 3ポイント成功/試投（3P）
-- フリースロー成功/試投（FT）
-- リバウンド（Rebounds）
-- アシスト（Assists）
-- スティール（Steals）
-- ブロック（Blocks）
-- ターンオーバー（Turnovers）
-
-表はMarkdown形式で出力してください。
-"""
-                            else:  # フル解析
-                                prompt = """
-この画像からバスケットボールの試合統計を完全に解析してください。
-
-1. チーム情報（チーム名、最終スコアなど）
-2. 各選手の詳細統計（利用可能なすべてのデータ）
-3. 試合の特徴的なポイントや注目選手のコメント
-
-表はMarkdown形式で、見やすく整理して出力してください。
-"""
-                        else:  # English
-                            if detail_level == "基本統計のみ":
-                                prompt = """
-Extract basketball game statistics from this image.
-Please provide the following information in table format:
-- Player Name
-- Points
-- Assists
-- Rebounds
-
-Output the table in Markdown format.
-"""
-                            elif detail_level == "詳細統計":
-                                prompt = """
-Extract detailed basketball game statistics from this image.
-Please provide the following information in table format:
-- Player Name
-- Points
-- Field Goals Made/Attempted (FG)
-- 3-Pointers Made/Attempted (3P)
-- Free Throws Made/Attempted (FT)
-- Rebounds
-- Assists
-- Steals
-- Blocks
-- Turnovers
-
-Output the table in Markdown format.
-"""
-                            else:  # Full analysis
-                                prompt = """
-Fully analyze the basketball game statistics from this image.
-
-1. Team information (team names, final scores, etc.)
-2. Detailed statistics for each player (all available data)
-3. Notable points and player highlights
-
-Output in well-organized Markdown format.
-"""
-                        
-                        # 画像をバイト形式に変換
-                        img_byte_arr = io.BytesIO()
-                        image.save(img_byte_arr, format=image.format if image.format else 'PNG')
-                        img_byte_arr = img_byte_arr.getvalue()
-                        
-                        # API呼び出し
-                        response = model.generate_content([prompt, image])
-                        
-                        # 結果の表示
-                        st.divider()
-                        st.subheader("📊 解析結果")
-                        
-                        if response.text:
-                            st.markdown(response.text)
-                            st.success("✅ 解析が完了しました！")
-                            
-                            # 結果をダウンロード可能にする
-                            st.download_button(
-                                label="📥 解析結果をダウンロード",
-                                data=response.text,
-                                file_name="basketball_stats_analysis.md",
-                                mime="text/markdown"
-                            )
-                        else:
-                            st.warning("⚠️ 解析結果が空です。画像を確認して再度お試しください。")
-                        
+                        # 解析結果をDataFrameに変換
+                        df = pd.read_csv(io.StringIO(response.text))
+                        df['試合日'] = game_date
+                        df['シーズン'] = season
+                        st.session_state['current_stats'] = df
                     except Exception as e:
-                        st.error(f"❌ エラーが発生しました: {str(e)}")
-                        st.info("""
-**考えられる原因:**
-- 画像が不鮮明で文字が読み取れない
-- スコアシートの形式が特殊
-- API通信エラー
-- APIキーが無効
+                        st.error("解析データの形式変換に失敗しました。もう一度お試しください。")
+                        st.write(response.text)
 
-**対処法:**
-- より鮮明な画像を使用する
-- 画像の向きを確認する
-- APIキーが正しいか確認する
-- しばらく待ってから再試行する
-                        """)
-                        
-                        # デバッグ情報
-                        with st.expander("🔍 デバッグ情報"):
-                            st.write(f"エラー詳細: {e}")
-                            st.write(f"画像サイズ: {image.size}")
-                            st.write(f"画像フォーマット: {image.format}")
-                            st.write(f"使用モデル: {model_name if 'model_name' in locals() else '未設定'}")
-                            if available_models:
-                                st.write(f"利用可能なモデル: {', '.join(available_models[:5])}")
-                            
-    except Exception as e:
-        st.error(f"❌ 初期化エラー: {str(e)}")
-        st.info("APIキーが正しいか確認してください。Gemini APIキーは https://makersuite.google.com/app/apikey から取得できます。")
+        # 解析結果の編集と保存
+        if 'current_stats' in st.session_state:
+            st.subheader("解析結果の確認・修正")
+            edited_df = st.data_editor(st.session_state['current_stats'], num_rows="dynamic")
+            
+            if st.button("この試合のスタッツをデータベースに記録"):
+                st.session_state['database'] = pd.concat([st.session_state['database'], edited_df], ignore_index=True)
+                st.success("データベースに保存しました！")
+
+    elif menu == "シーズン集計・選手分析":
+        st.header("② シーズン・選手別データ分析")
+        
+        if st.session_state['database'].empty:
+            st.warning("まだデータが記録されていません。解析ページからデータを追加してください。")
+        else:
+            db = st.session_state['database']
+            
+            # フィルター
+            target_season = st.selectbox("シーズン選択", db['シーズン'].unique())
+            target_player = st.selectbox("選手選択", db['選手名'].unique())
+            
+            # --- 年間通算スタッツ ---
+            st.subheader(f"📊 {target_player} 選手の {target_season} シーズン通算")
+            player_season_data = db[(db['選手名'] == target_player) & (db['シーズン'] == target_season)]
+            
+            m1, m2, m3, m4 = st.columns(4)
+            m1.metric("総得点", player_season_data['PTS'].sum())
+            m2.metric("平均得点", round(player_season_data['PTS'].mean(), 1))
+            m3.metric("総リバウンド", player_season_data['TOT'].sum())
+            m4.metric("総アシスト", player_season_data['AST'].sum())
+            
+            # --- 試合ごとの推移 ---
+            st.subheader("📅 試合ごとのスタッツ履歴")
+            st.table(player_season_data[['試合日', 'PTS', 'AST', 'TOT', 'STL', 'BLK', 'MIN']])
+            
+            # 全体データのダウンロード
+            csv = db.to_csv(index=False).encode('utf-8-sig')
+            st.download_button("全データをCSVでエクスポート", csv, "all_stats.csv", "text/csv")
+
 else:
-    st.info("""
-### 🔑 APIキーの設定方法
-
-**Streamlit Cloudにデプロイする場合:**
-1. Streamlit Cloudのダッシュボードにアクセス
-2. アプリの設定 → Secrets
-3. 以下の内容を追加:
-```
-GEMINI_API_KEY = "your-api-key-here"
-```
-
-**ローカルで実行する場合:**
-1. `.streamlit/secrets.toml` ファイルを作成
-2. 以下の内容を追加:
-```
-GEMINI_API_KEY = "your-api-key-here"
-```
-
-または、上記の入力欄にAPIキーを直接入力してください。
-
-**APIキーの取得:** https://makersuite.google.com/app/apikey
-    """)
-
-# フッター
-st.divider()
-st.caption("🏀 バスケットボールスコア自動解析システム | Powered by Google Gemini AI")
+    st.error("APIキーを設定してください。")
