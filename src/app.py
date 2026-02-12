@@ -2,7 +2,7 @@
 import streamlit as st
 from database import StatsDatabase
 from styles import load_css
-from pages import season_stats, player_stats, game_stats, compare, data_input
+from .pages import season_stats, player_stats, game_stats, compare, data_input
 
 
 # ========================================
