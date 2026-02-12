@@ -28,7 +28,7 @@ def check_password():
     """編集者権限の確認"""
     def password_entered():
         """パスワードが入力されたかチェック"""
-        if hashlib.sha256(st.session_state["password"].encode()).hexdigest() == st.secrets.get("ADMIN_PASSWORD_HASH", hashlib.sha256("admin123".encode()).hexdigest()):
+        if hashlib.sha256(st.session_state["password"].encode()).hexdigest() == st.secrets.get("ADMIN_PASSWORD_HASH", hashlib.sha256("tsukuba1872".encode()).hexdigest()):
             st.session_state["password_correct"] = True
             del st.session_state["password"]
         else:
@@ -54,7 +54,7 @@ def check_password():
         if "password_correct" in st.session_state and not st.session_state["password_correct"]:
             st.error("❌ Incorrect password")
         
-        st.info("💡 Default password: admin123")
+        st.info("💡 Default password: tsukuba1872")
         st.caption("Set ADMIN_PASSWORD_HASH in secrets.toml for custom password")
     
     return False
