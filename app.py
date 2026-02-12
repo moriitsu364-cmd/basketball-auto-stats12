@@ -12,7 +12,7 @@ if api_key:
     
     # 2026年最新の 2.0 モデルを指定
     # もしこれでも404なら 'gemini-1.5-flash-8b' に変更してください
-    model_name = 'gemini-2.0-flash-exp' 
+    model_name = 'gemini-1.5-flash-8b'  
     
     try:
         model = genai.GenerativeModel(model_name)
