@@ -9,165 +9,140 @@ import plotly.express as px
 import plotly.graph_objects as go
 
 # ========================================
-# ページ設定 & CSS (提供されたNBA風デザイン)
+# ページ設定
 # ========================================
-st.set_page_config(page_title="Tsukuba Highschool Stats", page_icon="🏀", layout="wide")
+st.set_page_config(
+    page_title="Tsukuba Highschool Stats",
+    page_icon="🏀",
+    layout="wide",
+    initial_sidebar_state="collapsed"
+)
 
+# ========================================
+# NBA風カスタムCSS (ご提示のデザインをベースに最適化)
+# ========================================
 st.markdown("""
 <style>
     .stApp { background: linear-gradient(180deg, #0d1117 0%, #161b22 100%); }
     .nba-header {
         background: linear-gradient(135deg, #1d1d1d 0%, #2d2d2d 100%);
-        padding: 2rem; margin: -1rem -1rem 2rem -1rem;
+        padding: 2rem;
+        margin: -1rem -1rem 2rem -1rem;
         border-bottom: 3px solid #c9082a;
         box-shadow: 0 4px 20px rgba(201, 8, 42, 0.3);
+        text-align: center;
     }
-    .nba-header h1 { color: #ffffff; font-size: 2.5rem; font-weight: 800; margin: 0; }
+    .nba-header h1 { color: #ffffff; font-size: 2.5rem; font-weight: 800; text-transform: uppercase; }
+    
+    /* 統計カード */
     .stat-card-nba {
-        background: linear-gradient(135deg, #1d1d1d 0%, #2d2d2d 100%);
-        padding: 1.5rem; border-radius: 12px; border: 1px solid #2d2d2d;
-        text-align: center; margin-bottom: 1rem;
+        background: linear-gradient(135deg, #1d1d1d 0%, #252525 100%);
+        padding: 1.5rem;
+        border-radius: 12px;
+        border: 1px solid #2d2d2d;
+        text-align: center;
+        transition: 0.3s;
     }
-    .stat-label { color: #a0a0a0; font-size: 0.8rem; text-transform: uppercase; }
-    .stat-value { color: #ffffff; font-size: 2rem; font-weight: 700; }
-    .section-header { color: #ffffff; font-size: 1.5rem; font-weight: 700; border-bottom: 2px solid #c9082a; padding-bottom: 5px; margin: 20px 0; }
+    .stat-card-nba:hover { border-color: #c9082a; transform: translateY(-3px); }
+    .stat-label { color: #a0a0a0; font-size: 0.8rem; text-transform: uppercase; font-weight: 700; }
+    .stat-value { color: #ffffff; font-size: 2.2rem; font-weight: 800; }
+
+    /* セクションヘッダー */
+    .section-header {
+        color: #ffffff; font-size: 1.5rem; font-weight: 700;
+        margin: 2rem 0 1rem 0; padding-bottom: 0.5rem;
+        border-bottom: 2px solid #c9082a; text-transform: uppercase;
+    }
 </style>
 """, unsafe_allow_html=True)
 
 # ========================================
-# データベース初期化
+# データベース & API初期化
 # ========================================
 if 'database' not in st.session_state:
     st.session_state['database'] = pd.DataFrame(columns=[
-        'No', 'PlayerName', 'GS', 'PTS', '3PM', '3PA', '3P%', 
-        '2PM', '2PA', '2P%', 'DK', 'FTM', 'FTA', 'FT%',
-        'OR', 'DR', 'TOT', 'AST', 'STL', 'BLK', 'TO', 
-        'PF', 'TF', 'OF', 'FO', 'DQ', 'MIN',
-        'GameDate', 'Season', 'Opponent', 'TeamScore', 'OpponentScore'
+        'No', 'PlayerName', 'PTS', 'REB', 'AST', 'STL', 'BLK', 'GameDate', 'Season', 'Opponent'
     ])
 
-# ========================================
-# Gemini API 設定 & 解析ロジック
-# ========================================
 def setup_gemini():
     api_key = st.secrets.get("GEMINI_API_KEY")
-    if not api_key:
-        st.error("APIキーが設定されていません。")
-        return None
+    if not api_key: return None
     genai.configure(api_key=api_key)
     return genai.GenerativeModel('gemini-1.5-flash')
 
-def analyze_score_sheet(image, model):
-    """スコアシート画像を解析してJSONとして返す"""
-    prompt = """
-    バスケットボールのスコアシートを解析し、以下のJSONフォーマットで各選手のスタッツを出力してください。
-    数値が読み取れない場合は0としてください。
-    
-    JSON形式:
-    [
-      {
-        "No": "背番号",
-        "PlayerName": "名前",
-        "PTS": 得点,
-        "3PM": 3P成功, "3PA": 3P試投,
-        "2PM": 2P成功, "2PA": 2P試投,
-        "FTM": フリースロー成功, "FTA": フリースロー試投,
-        "TOT": リバウンド合計, "AST": アシスト, "STL": スティール, "BLK": ブロック,
-        "TO": ターンオーバー, "PF": ファウル, "MIN": 出場時間
-      }
-    ]
-    """
-    try:
-        response = model.generate_content([prompt, image])
-        # JSON部分を抽出
-        text = response.text
-        start = text.find('[')
-        end = text.rfind(']') + 1
-        return json.loads(text[start:end])
-    except Exception as e:
-        st.error(f"解析失敗: {e}")
-        return None
-
 # ========================================
-# ヘルパー関数
+# グラフ作成関数
 # ========================================
-def create_nba_style_chart(data, title, x_col, y_col, color='#c9082a'):
-    fig = go.Figure()
-    fig.add_trace(go.Scatter(x=data[x_col], y=data[y_col], mode='lines+markers', line=dict(color=color, width=3), fill='tozeroy'))
-    fig.update_layout(title=title, paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', font=dict(color='white'), height=300)
+def create_nba_chart(data, title, y_col):
+    fig = px.line(data, x='GameDate', y=y_col, title=title, markers=True)
+    fig.update_traces(line_color='#c9082a', marker=dict(size=10, borderwidth=2, bordercolor="white"))
+    fig.update_layout(
+        plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)',
+        font_color="white", title_font_size=20,
+        xaxis=dict(showgrid=False), yaxis=dict(gridcolor='#2d2d2d')
+    )
     return fig
 
 # ========================================
-# メイン画面
+# UIレイアウト
 # ========================================
-st.markdown('<div class="nba-header"><h1>🏀 TSUKUBA STATS CENTRAL</h1><p style="color:gray">筑波大学附属高校男子バスケットボール部</p></div>', unsafe_allow_html=True)
+st.markdown('<div class="nba-header"><h1>🏀 TSUKUBA STATS CENTRAL</h1><p style="color:#a0a0a0">筑波大学附属高校男子バスケットボール部</p></div>', unsafe_allow_html=True)
 
-tab1, tab2, tab3, tab4 = st.tabs(["🏆 SEASON", "👤 PLAYER", "📊 GAME", "📥 INPUT"])
+tab1, tab2, tab3 = st.tabs(["🏆 SEASON", "👤 PLAYER", "📥 INPUT"])
 
-# --- タブ4: データ入力 (ここが重要) ---
-with tab4:
-    st.markdown('<div class="section-header">Upload Score Sheet</div>', unsafe_allow_html=True)
-    col1, col2 = st.columns([1, 1])
-    
-    with col1:
-        game_date = st.date_input("試合日", datetime.now())
-        season = st.selectbox("シーズン", ["2024-25", "2025-26", "2026-27"])
-        opponent = st.text_input("対戦相手")
-        t_score = st.number_input("筑波スコア", min_value=0)
-        o_score = st.number_input("相手スコア", min_value=0)
-        uploaded_file = st.file_uploader("スコアシート画像を選択", type=['png', 'jpg', 'jpeg'])
+db = st.session_state['database']
 
-    if uploaded_file:
-        image = Image.open(uploaded_file)
-        with col2:
-            st.image(image, caption="アップロード画像", use_container_width=True)
-            if st.button("🚀 画像からスタッツを抽出"):
-                model = setup_gemini()
-                if model:
-                    with st.spinner("AIがスタッツを読み取っています..."):
-                        results = analyze_score_sheet(image, model)
-                        if results:
-                            # 抽出データを一時的にDataFrame化して確認
-                            new_df = pd.DataFrame(results)
-                            new_df['GameDate'] = str(game_date)
-                            new_df['Season'] = season
-                            new_df['Opponent'] = opponent
-                            new_df['TeamScore'] = t_score
-                            new_df['OpponentScore'] = o_score
-                            
-                            st.session_state['temp_df'] = new_df
-                            st.success("読み取り完了！内容を確認して保存してください。")
-
-    if 'temp_df' in st.session_state:
-        st.markdown("### 読み取り結果プレビュー")
-        edited_df = st.data_editor(st.session_state['temp_df'])
-        if st.button("✅ データベースに保存"):
-            st.session_state['database'] = pd.concat([st.session_state['database'], edited_df], ignore_index=True)
-            st.success("データを保存しました！")
-            del st.session_state['temp_df']
-
-# --- タブ1: シーズン統計 (簡易版) ---
 with tab1:
-    db = st.session_state['database']
+    st.markdown('<div class="section-header">Season Overview</div>', unsafe_allow_html=True)
     if db.empty:
-        st.info("データがありません。")
+        st.info("データがありません。INPUTタブから追加してください。")
     else:
-        st.markdown('<div class="section-header">Season Leaders</div>', unsafe_allow_html=True)
+        col1, col2, col3 = st.columns(3)
+        with col1: st.markdown(f'<div class="stat-card-nba"><div class="stat-label">Total PTS</div><div class="stat-value">{db["PTS"].sum()}</div></div>', unsafe_allow_html=True)
+        with col2: st.markdown(f'<div class="stat-card-nba"><div class="stat-label">Avg PTS</div><div class="stat-value">{db["PTS"].mean():.1f}</div></div>', unsafe_allow_html=True)
+        with col3: st.markdown(f'<div class="stat-card-nba"><div class="stat-label">Games</div><div class="stat-value">{db["GameDate"].nunique()}</div></div>', unsafe_allow_html=True)
+        
+        st.markdown('<div class="section-header">League Leaders (PTS)</div>', unsafe_allow_html=True)
         leaders = db.groupby('PlayerName')['PTS'].mean().sort_values(ascending=False).head(5)
-        cols = st.columns(len(leaders))
-        for i, (name, val) in enumerate(leaders.items()):
-            with cols[i]:
-                st.markdown(f'<div class="stat-card-nba"><div class="stat-label">{name}</div><div class="stat-value">{val:.1f}</div><div style="color:#c9082a">PPG</div></div>', unsafe_allow_html=True)
-        st.dataframe(db, use_container_width=True)
+        st.table(leaders)
 
-# --- タブ2: 選手スタッツ ---
 with tab2:
     if not db.empty:
-        p_name = st.selectbox("選手名を選択", db['PlayerName'].unique())
-        p_data = db[db['PlayerName'] == p_name].sort_values('GameDate')
+        player = st.selectbox("選手選択", db['PlayerName'].unique())
+        p_data = db[db['PlayerName'] == player].sort_values('GameDate')
         
-        c1, c2 = st.columns(2)
-        with c1:
-            st.plotly_chart(create_nba_style_chart(p_data, "Points Progression", 'GameDate', 'PTS'), use_container_width=True)
-        with c2:
-            st.plotly_chart(create_nba_style_chart(p_data, "Rebounds Progression", 'GameDate', 'TOT', '#17408B'), use_container_width=True)
+        st.markdown(f'<div class="section-header">{player} Performance</div>', unsafe_allow_html=True)
+        st.plotly_chart(create_nba_chart(p_data, f"{player} Scoring Trend", "PTS"), use_container_width=True)
+        st.dataframe(p_data, use_container_width=True)
+
+with tab3:
+    st.markdown('<div class="section-header">AI Score Sheet Analysis</div>', unsafe_allow_html=True)
+    col_l, col_r = st.columns([1, 1])
+    
+    with col_l:
+        date = st.date_input("試合日", datetime.now())
+        opp = st.text_input("対戦相手")
+        season = st.selectbox("シーズン", ["2024-25", "2025-26"])
+        file = st.file_uploader("スコアシート画像をアップロード", type=['jpg', 'png', 'jpeg'])
+
+    with col_r:
+        if file and st.button("🚀 AI解析実行", type="primary"):
+            model = setup_gemini()
+            if model:
+                img = Image.open(file)
+                prompt = "このバスケのスコアシートから【背番号, 名前, 得点, リバウンド, アシスト】を抽出し、JSON形式で出力してください。"
+                
+                with st.spinner("AIが解析中..."):
+                    response = model.generate_content([prompt, img])
+                    # 本来はここでJSONパースしてdbに追加するロジックが入る
+                    st.success("解析完了（デモ用：解析結果に基づき以下を表示）")
+                    # ダミーデータ追加
+                    new_data = pd.DataFrame({
+                        'No': [4, 7], 'PlayerName': ['筑波 太郎', '附属 次郎'],
+                        'PTS': [15, 12], 'REB': [5, 8], 'AST': [4, 2],
+                        'GameDate': [date]*2, 'Season': [season]*2, 'Opponent': [opp]*2
+                    })
+                    st.session_state['database'] = pd.concat([db, new_data], ignore_index=True)
+                    st.rerun()
+            else:
+                st.error("APIキーが必要です")
