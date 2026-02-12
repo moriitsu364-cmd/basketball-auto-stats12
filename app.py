@@ -10,7 +10,7 @@ api_key = st.secrets.get("GEMINI_API_KEY")
 
 if api_key:
     genai.configure(api_key=api_key)
-    model = genai.GenerativeModel('gemini-1.5-flash') # 爆速で画像が読めるモデル
+    model = genai.GenerativeModel('models/gemini-1.5-flash') # 爆速で画像が読めるモデル
 
     uploaded_file = st.file_uploader("スコアシート画像をアップ", type=['png', 'jpg', 'jpeg'])
 
