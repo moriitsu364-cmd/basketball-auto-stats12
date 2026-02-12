@@ -1,4 +1,5 @@
 import plotly.express as px
+import plotly.graph_objects as go 
 
 def create_nba_chart(data, title, x_col, y_col, color='#1d428a'):
     """NBAスタイルのチャート"""
