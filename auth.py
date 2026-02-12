@@ -1,43 +1,37 @@
 import streamlit as st
 import hashlib
 
-def check_password(auth_level="editor"):
+def check_password():
+    """編集者権限の確認"""
     def password_entered():
-        password_hash = hashlib.sha256(
-            st.session_state["password"].encode()
-        ).hexdigest()
-
-        admin_hash = hashlib.sha256("admin2024".encode()).hexdigest()
-        editor_hash = hashlib.sha256("tsukuba1872".encode()).hexdigest()
-
-        if auth_level == "admin":
-            if password_hash == admin_hash:
-                st.session_state["admin_authenticated"] = True
-                del st.session_state["password"]
-                return
-
-        if password_hash == editor_hash:
-            st.session_state["editor_authenticated"] = True
+        """パスワードが入力されたかチェック"""
+        if hashlib.sha256(st.session_state["password"].encode()).hexdigest() == st.secrets.get("ADMIN_PASSWORD_HASH", hashlib.sha256("tsukuba1872".encode()).hexdigest()):
+            st.session_state["password_correct"] = True
             del st.session_state["password"]
-            return
+        else:
+            st.session_state["password_correct"] = False
 
-        st.session_state["auth_failed"] = True
+    if st.session_state.get("password_correct", False):
+        return True
 
-    if auth_level == "admin":
-        if st.session_state.get("admin_authenticated", False):
-            return True
-    else:
-        if (
-            st.session_state.get("editor_authenticated", False)
-            or st.session_state.get("admin_authenticated", False)
-        ):
-            return True
-
-    st.text_input(
-        "パスワードを入力",
-        type="password",
-        on_change=password_entered,
-        key="password",
-    )
-
+    st.markdown("""
+    <div style="max-width: 500px; margin: 100px auto; padding: 40px; background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+        <h2 style="color: #1d428a; text-align: center; margin-bottom: 30px;">EDITOR ACCESS</h2>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    col1, col2, col3 = st.columns([1, 2, 1])
+    with col2:
+        st.text_input(
+            "Enter Password",
+            type="password",
+            on_change=password_entered,
+            key="password",
+        )
+        if "password_correct" in st.session_state and not st.session_state["password_correct"]:
+            st.error("❌ Incorrect password")
+        
+        st.info("💡 Default password: tsukuba1872")
+        st.caption("Set ADMIN_PASSWORD_HASH in secrets.toml for custom password")
+    
     return False
