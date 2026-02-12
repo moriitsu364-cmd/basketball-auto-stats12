@@ -44,7 +44,7 @@ if api_key:
                                 ],
                             }
                         ],
-                        model="llama-3.2-11b-vision-preview",
+                        model="llama-3.2-11b-vision",
                         response_format={"type": "json_object"}
                     )
                     
