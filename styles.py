@@ -1,13 +1,12 @@
+"""スタイル定義"""
 import streamlit as st
+
 
 def load_css():
     """CSSスタイルを読み込む"""
-    # ========================================
-    # NBA.comスタイルのカスタムCSS
-    # ========================================
     st.markdown("""
     <style>
-        /* 全体の背景を白に */
+        /* 全体の背景 */
         .stApp {
             background: #f5f5f5;
         }
@@ -48,7 +47,7 @@ def load_css():
             font-weight: 400;
         }
         
-        /* ナビゲーションタブ - NBAスタイル */
+        /* ナビゲーションタブ */
         .stTabs [data-baseweb="tab-list"] {
             gap: 0;
             background: white;
@@ -80,7 +79,7 @@ def load_css():
             background: transparent;
         }
         
-        /* データテーブル - NBAスタイル */
+        /* データテーブル */
         .dataframe {
             background: white !important;
             border: 1px solid #e5e5e5 !important;
@@ -110,7 +109,7 @@ def load_css():
             background: #f8f9fa !important;
         }
         
-        /* 統計カード - NBAスタイル */
+        /* 統計カード */
         .stat-card {
             background: white;
             padding: 1.5rem;
@@ -382,15 +381,6 @@ def load_css():
             color: #dc3545;
         }
         
-        /* テーブルコンテナ */
-        .table-container {
-            background: white;
-            border-radius: 4px;
-            border: 1px solid #e5e5e5;
-            padding: 1.5rem;
-            margin-bottom: 2rem;
-        }
-        
         /* レスポンシブ */
         @media (max-width: 768px) {
             .block-container {
@@ -410,15 +400,6 @@ def load_css():
                 padding: 0.75rem 1rem;
                 font-size: 0.85rem;
             }
-        }
-        
-        /* データ削除確認ダイアログ */
-        .delete-confirmation {
-            background: #fff3cd;
-            border: 1px solid #ffc107;
-            border-radius: 4px;
-            padding: 1rem;
-            margin: 1rem 0;
         }
     </style>
     """, unsafe_allow_html=True)
