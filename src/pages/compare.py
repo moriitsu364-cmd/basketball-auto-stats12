@@ -442,13 +442,19 @@ def render_comparison_charts(db, players, stats_list, season):
         for stats in stats_list:
             max_vals = {'PTS': 30, 'REB': 15, 'AST': 10, 'STL': 3, 'BLK': 3}
             values = [
-                min(stats['PTS'] / max_vals['PTS'] * 100, 100),
-                min(stats['REB'] / max_vals['REB'] * 100, 100),
-                min(stats['AST'] / max_vals['AST'] * 100, 100),
-                min(stats['STL'] / max_vals['STL'] * 100, 100),
-                min(stats['BLK'] / max_vals['BLK'] * 100, 100)
-            ]
-            values_list.append(values)
+            # 安全な数値変換
+            pts = float(stats.get('PTS', 0)) if stats.get('PTS') is not None else 0
+            reb = float(stats.get('REB', 0)) if stats.get('REB') is not None else 0
+            ast = float(stats.get('AST', 0)) if stats.get('AST') is not None else 0
+            stl = float(stats.get('STL', 0)) if stats.get('STL') is not None else 0
+            blk = float(stats.get('BLK', 0)) if stats.get('BLK') is not None else 0
+            
+            values = [
+                min(pts / max_vals['PTS'] * 100, 100),
+                min(reb / max_vals['REB'] * 100, 100),
+                min(ast / max_vals['AST'] * 100, 100),
+                min(stl / max_vals['STL'] * 100, 100),
+                min(blk / max_vals['BLK'] * 100, 100)
         
         fig = create_radar_chart(categories, values_list, players, "総合スタッツ比較", "Overall Stats")
         st.plotly_chart(fig, use_container_width=True)
