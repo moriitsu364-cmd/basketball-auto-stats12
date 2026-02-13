@@ -1,6 +1,13 @@
 """改良版比較ページ - 複数選手・シーズン比較対応"""
 import streamlit as st
 import pandas as pd
+import sys
+from pathlib import Path
+
+# パスの設定
+if str(Path(__file__).parent.parent) not in sys.path:
+    sys.path.insert(0, str(Path(__file__).parent.parent))
+
 from database import StatsDatabase
 from stats import calculate_stats
 from charts import create_comparison_chart, create_radar_chart, create_bar_chart
