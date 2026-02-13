@@ -4,6 +4,12 @@ import hashlib
 import time
 from datetime import datetime
 from pathlib import Path
+import sys
+
+# パスの設定
+if str(Path(__file__).parent.parent) not in sys.path:
+    sys.path.insert(0, str(Path(__file__).parent.parent))
+
 from config import ADMIN_SETTINGS, PLAYER_IMAGES_DIR, STAFF_IMAGES_DIR
 
 
