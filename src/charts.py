@@ -61,10 +61,10 @@ def create_line_chart(data, title: str, x_col: str, y_col: str, color: str = Non
         x=data_sorted[x_col],
         y=data_sorted[y_col],
         mode='lines+markers',
-        line=dict(color=color, width=4),
-        marker=dict(size=10, color=color, line=dict(width=2, color='#ffffff')),
+        line=dict(color=color, width=5),
+        marker=dict(size=12, color=color, line=dict(width=3, color='#ffffff')),
         fill='tozeroy',
-        fillcolor=f'rgba{tuple(list(int(color.lstrip("#")[i:i+2], 16) for i in (0, 2, 4)) + [0.1])}'
+        fillcolor=f'rgba{tuple(list(int(color.lstrip("#")[i:i+2], 16) for i in (0, 2, 4)) + [0.15])}'
     ))
     
     # X軸のラベル（試合番号の場合）
@@ -77,33 +77,42 @@ def create_line_chart(data, title: str, x_col: str, y_col: str, color: str = Non
     fig.update_layout(
         title=dict(
             text=full_title,
-            font=dict(size=20, color='#212529', family='Arial'),
+            font=dict(size=24, color='#212529', family='Arial, sans-serif'),
             x=0.5,
-            xanchor='center'
+            xanchor='center',
+            y=0.95,
+            yanchor='top'
         ),
-        plot_bgcolor='#ffffff',
+        plot_bgcolor='#fafbfc',
         paper_bgcolor='#ffffff',
-        font=dict(color='#212529'),
+        font=dict(color='#212529', size=12),
         xaxis=dict(
-            gridcolor='#dee2e6',
+            gridcolor='#e8eaed',
             showgrid=True,
             zeroline=False,
             tickangle=0,
             title=x_axis_title,
-            title_font=dict(size=12, color='#666'),
+            title_font=dict(size=14, color='#495057', family='Arial, sans-serif'),
             color='#212529',
-            dtick=1 if x_col == 'GameNumber' else None  # 試合番号は1刻み
+            dtick=1 if x_col == 'GameNumber' else None,  # 試合番号は1刻み
+            tickfont=dict(size=11)
         ),
         yaxis=dict(
-            gridcolor='#dee2e6',
+            gridcolor='#e8eaed',
             showgrid=True,
             zeroline=False,
             title=None,
-            color='#212529'
+            color='#212529',
+            tickfont=dict(size=11)
         ),
         hovermode='x unified',
-        margin=dict(l=40, r=20, t=80, b=80),
-        height=400
+        margin=dict(l=60, r=40, t=100, b=80),
+        height=450,
+        hoverlabel=dict(
+            bgcolor='white',
+            font_size=13,
+            font_family='Arial, sans-serif'
+        )
     )
     
     return fig
@@ -164,26 +173,35 @@ def create_bar_chart(data, title: str, x_col: str, y_col: str, color: str = None
     fig.update_layout(
         title=dict(
             text=full_title,
-            font=dict(size=20, color='#212529'),
+            font=dict(size=24, color='#212529', family='Arial, sans-serif'),
             x=0.5,
-            xanchor='center'
+            xanchor='center',
+            y=0.95,
+            yanchor='top'
         ),
-        plot_bgcolor='#ffffff',
+        plot_bgcolor='#fafbfc',
         paper_bgcolor='#ffffff',
-        font=dict(color='#212529'),
+        font=dict(color='#212529', size=12),
         xaxis=dict(
-            gridcolor='#dee2e6',
+            gridcolor='#e8eaed',
             showgrid=True,
-            color='#212529'
+            color='#212529',
+            tickfont=dict(size=11)
         ),
         yaxis=dict(
-            gridcolor='#dee2e6',
+            gridcolor='#e8eaed',
             showgrid=True,
-            color='#212529'
+            color='#212529',
+            tickfont=dict(size=11)
         ),
-        margin=dict(l=60, r=20, t=80, b=80),
-        height=400,
-        showlegend=False
+        margin=dict(l=60, r=40, t=100, b=80),
+        height=450,
+        showlegend=False,
+        hoverlabel=dict(
+            bgcolor='white',
+            font_size=13,
+            font_family='Arial, sans-serif'
+        )
     )
     
     return fig
@@ -222,20 +240,29 @@ def create_pie_chart(labels, values, title: str, title_jp: str = ""):
     fig.update_layout(
         title=dict(
             text=full_title,
-            font=dict(size=20, color='#212529'),
+            font=dict(size=24, color='#212529', family='Arial, sans-serif'),
             x=0.5,
-            xanchor='center'
+            xanchor='center',
+            y=0.95,
+            yanchor='top'
         ),
-        plot_bgcolor='#ffffff',
+        plot_bgcolor='#fafbfc',
         paper_bgcolor='#ffffff',
-        font=dict(color='#212529'),
+        font=dict(color='#212529', size=12),
         showlegend=True,
         legend=dict(
-            font=dict(color='#212529'),
-            bgcolor='rgba(255,255,255,0.8)'
+            font=dict(color='#212529', size=12),
+            bgcolor='rgba(255,255,255,0.9)',
+            bordercolor='#e8eaed',
+            borderwidth=1
         ),
-        margin=dict(l=20, r=20, t=80, b=20),
-        height=400
+        margin=dict(l=40, r=40, t=100, b=40),
+        height=450,
+        hoverlabel=dict(
+            bgcolor='white',
+            font_size=13,
+            font_family='Arial, sans-serif'
+        )
     )
     
     return fig
@@ -275,8 +302,8 @@ def create_comparison_chart(data_list, names: list, x_col: str, y_col: str,
             y=data_sorted[y_col],
             mode='lines+markers',
             name=name,
-            line=dict(color=colors[i % len(colors)], width=3),
-            marker=dict(size=8, line=dict(width=2, color='#ffffff'))
+            line=dict(color=colors[i % len(colors)], width=4),
+            marker=dict(size=10, line=dict(width=2, color='#ffffff'))
         ))
     
     # X軸のラベル
@@ -289,34 +316,47 @@ def create_comparison_chart(data_list, names: list, x_col: str, y_col: str,
     fig.update_layout(
         title=dict(
             text=full_title,
-            font=dict(size=20, color='#212529'),
+            font=dict(size=24, color='#212529', family='Arial, sans-serif'),
             x=0.5,
-            xanchor='center'
+            xanchor='center',
+            y=0.95,
+            yanchor='top'
         ),
-        plot_bgcolor='#ffffff',
+        plot_bgcolor='#fafbfc',
         paper_bgcolor='#ffffff',
-        font=dict(color='#212529'),
+        font=dict(color='#212529', size=12),
         xaxis=dict(
-            gridcolor='#dee2e6',
+            gridcolor='#e8eaed',
             showgrid=True,
             color='#212529',
             title=x_axis_title,
-            title_font=dict(size=12, color='#666')
+            title_font=dict(size=14, color='#495057', family='Arial, sans-serif'),
+            tickfont=dict(size=11)
         ),
         yaxis=dict(
-            gridcolor='#dee2e6',
+            gridcolor='#e8eaed',
             showgrid=True,
-            color='#212529'
+            color='#212529',
+            tickfont=dict(size=11)
         ),
         hovermode='x unified',
         legend=dict(
             font=dict(color='#212529', size=12),
-            bgcolor='rgba(255,255,255,0.9)',
-            bordercolor='#dee2e6',
-            borderwidth=2
+            bgcolor='rgba(255,255,255,0.95)',
+            bordercolor='#e8eaed',
+            borderwidth=1,
+            x=1,
+            y=1,
+            xanchor='right',
+            yanchor='top'
         ),
-        margin=dict(l=60, r=20, t=80, b=80),
-        height=450
+        margin=dict(l=60, r=40, t=100, b=80),
+        height=500,
+        hoverlabel=dict(
+            bgcolor='white',
+            font_size=13,
+            font_family='Arial, sans-serif'
+        )
     )
     
     return fig
@@ -358,28 +398,40 @@ def create_radar_chart(categories, values_list, names: list,
                 visible=True,
                 range=[0, 100],
                 color='#212529',
-                gridcolor='#dee2e6'
+                gridcolor='#e8eaed',
+                tickfont=dict(size=11)
             ),
             angularaxis=dict(
                 color='#212529',
-                gridcolor='#dee2e6'
+                gridcolor='#e8eaed',
+                tickfont=dict(size=12)
             ),
-            bgcolor='#ffffff'
+            bgcolor='#fafbfc'
         ),
         showlegend=True,
         legend=dict(
-            font=dict(color='#212529'),
-            bgcolor='rgba(255,255,255,0.9)'
+            font=dict(color='#212529', size=12),
+            bgcolor='rgba(255,255,255,0.95)',
+            bordercolor='#e8eaed',
+            borderwidth=1
         ),
         title=dict(
             text=full_title,
-            font=dict(size=20, color='#212529'),
+            font=dict(size=24, color='#212529', family='Arial, sans-serif'),
             x=0.5,
-            xanchor='center'
+            xanchor='center',
+            y=0.95,
+            yanchor='top'
         ),
         paper_bgcolor='#ffffff',
-        font=dict(color='#212529'),
-        height=500
+        font=dict(color='#212529', size=12),
+        height=550,
+        margin=dict(l=80, r=80, t=100, b=80),
+        hoverlabel=dict(
+            bgcolor='white',
+            font_size=13,
+            font_family='Arial, sans-serif'
+        )
     )
     
     return fig
