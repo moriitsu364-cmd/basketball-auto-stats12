@@ -12,7 +12,7 @@ if str(Path(__file__).parent.parent) not in sys.path:
 from config import *
 
 
-def render():
+def render(db=None):
     """管理者設定ページを表示"""
     
     st.markdown("""
@@ -24,6 +24,7 @@ def render():
     
     # タブで設定を分類
     settings_tabs = st.tabs([
+        "チーム情報 / Team Info",
         "表示設定 / Display",
         "データ管理 / Data",
         "認証設定 / Auth",
@@ -31,9 +32,205 @@ def render():
     ])
     
     # ========================================
-    # 表示設定タブ
+    # チーム情報タブ
     # ========================================
     with settings_tabs[0]:
+        st.subheader("チーム情報設定")
+        
+        st.markdown("### 基本情報 / Basic Information")
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            # セッション状態から現在の値を取得、なければデフォルト値
+            if 'team_name' not in st.session_state:
+                st.session_state.team_name = "筑波大学附属高等学校"
+            if 'team_name_en' not in st.session_state:
+                st.session_state.team_name_en = "Tsukuba Senior High School"
+            if 'team_abbreviation' not in st.session_state:
+                st.session_state.team_abbreviation = "筑附"
+            
+            team_name = st.text_input(
+                "チーム名（日本語）",
+                value=st.session_state.team_name,
+                help="正式なチーム名を入力してください"
+            )
+            
+            team_name_en = st.text_input(
+                "Team Name (English)",
+                value=st.session_state.team_name_en,
+                help="Enter official team name in English"
+            )
+            
+            team_abbreviation = st.text_input(
+                "チーム略称",
+                value=st.session_state.team_abbreviation,
+                help="スコアボードなどで使用される略称"
+            )
+        
+        with col2:
+            if 'team_category' not in st.session_state:
+                st.session_state.team_category = "高校男子"
+            if 'team_level' not in st.session_state:
+                st.session_state.team_level = "インターハイ出場レベル"
+            if 'current_season' not in st.session_state:
+                st.session_state.current_season = "2024-2025"
+            
+            team_category = st.selectbox(
+                "カテゴリー",
+                options=["高校男子", "高校女子", "中学男子", "中学女子", "一般男子", "一般女子"],
+                index=["高校男子", "高校女子", "中学男子", "中学女子", "一般男子", "一般女子"].index(st.session_state.team_category)
+            )
+            
+            team_level = st.selectbox(
+                "競技レベル",
+                options=["インターハイ出場レベル", "都道府県大会レベル", "地区大会レベル", "その他"],
+                index=["インターハイ出場レベル", "都道府県大会レベル", "地区大会レベル", "その他"].index(st.session_state.team_level)
+            )
+            
+            current_season = st.text_input(
+                "現在のシーズン",
+                value=st.session_state.current_season,
+                help="例: 2024-2025"
+            )
+        
+        st.markdown("---")
+        st.markdown("### チームカラー / Team Colors")
+        
+        col3, col4, col5 = st.columns(3)
+        
+        with col3:
+            if 'primary_color' not in st.session_state:
+                st.session_state.primary_color = "#1d428a"
+            
+            primary_color = st.color_picker(
+                "プライマリカラー",
+                value=st.session_state.primary_color,
+                help="チームのメインカラー"
+            )
+        
+        with col4:
+            if 'secondary_color' not in st.session_state:
+                st.session_state.secondary_color = "#c8102e"
+            
+            secondary_color = st.color_picker(
+                "セカンダリカラー",
+                value=st.session_state.secondary_color,
+                help="チームのサブカラー"
+            )
+        
+        with col5:
+            if 'accent_color' not in st.session_state:
+                st.session_state.accent_color = "#ffffff"
+            
+            accent_color = st.color_picker(
+                "アクセントカラー",
+                value=st.session_state.accent_color,
+                help="強調表示用のカラー"
+            )
+        
+        st.markdown("---")
+        st.markdown("### コーチ・スタッフ情報 / Coaching Staff")
+        
+        col6, col7 = st.columns(2)
+        
+        with col6:
+            if 'head_coach' not in st.session_state:
+                st.session_state.head_coach = ""
+            if 'assistant_coach' not in st.session_state:
+                st.session_state.assistant_coach = ""
+            
+            head_coach = st.text_input(
+                "ヘッドコーチ",
+                value=st.session_state.head_coach,
+                help="ヘッドコーチの氏名"
+            )
+            
+            assistant_coach = st.text_input(
+                "アシスタントコーチ",
+                value=st.session_state.assistant_coach,
+                help="アシスタントコーチの氏名（複数の場合はカンマ区切り）"
+            )
+        
+        with col7:
+            if 'team_manager' not in st.session_state:
+                st.session_state.team_manager = ""
+            if 'team_captain' not in st.session_state:
+                st.session_state.team_captain = ""
+            
+            team_manager = st.text_input(
+                "マネージャー",
+                value=st.session_state.team_manager,
+                help="チームマネージャーの氏名"
+            )
+            
+            team_captain = st.text_input(
+                "キャプテン",
+                value=st.session_state.team_captain,
+                help="チームキャプテンの氏名"
+            )
+        
+        st.markdown("---")
+        st.markdown("### その他の情報 / Additional Information")
+        
+        if 'team_slogan' not in st.session_state:
+            st.session_state.team_slogan = ""
+        if 'team_goals' not in st.session_state:
+            st.session_state.team_goals = ""
+        
+        team_slogan = st.text_input(
+            "チームスローガン",
+            value=st.session_state.team_slogan,
+            help="今シーズンのチームスローガン"
+        )
+        
+        team_goals = st.text_area(
+            "シーズン目標",
+            value=st.session_state.team_goals,
+            help="今シーズンの具体的な目標",
+            height=100
+        )
+        
+        st.markdown("---")
+        
+        # 保存ボタン
+        col_save1, col_save2, col_save3 = st.columns([1, 1, 1])
+        
+        with col_save2:
+            if st.button("💾 チーム情報を保存", type="primary", use_container_width=True):
+                # セッション状態に保存
+                st.session_state.team_name = team_name
+                st.session_state.team_name_en = team_name_en
+                st.session_state.team_abbreviation = team_abbreviation
+                st.session_state.team_category = team_category
+                st.session_state.team_level = team_level
+                st.session_state.current_season = current_season
+                st.session_state.primary_color = primary_color
+                st.session_state.secondary_color = secondary_color
+                st.session_state.accent_color = accent_color
+                st.session_state.head_coach = head_coach
+                st.session_state.assistant_coach = assistant_coach
+                st.session_state.team_manager = team_manager
+                st.session_state.team_captain = team_captain
+                st.session_state.team_slogan = team_slogan
+                st.session_state.team_goals = team_goals
+                
+                # データベースに保存する処理を追加する場合
+                if db:
+                    try:
+                        # ここでDBに保存する処理を実装可能
+                        pass
+                    except Exception as e:
+                        st.error(f"データベースへの保存に失敗しました: {e}")
+                        return
+                
+                st.success("✅ チーム情報を保存しました！")
+                st.balloons()
+    
+    # ========================================
+    # 表示設定タブ
+    # ========================================
+    with settings_tabs[1]:
         st.subheader("表示設定")
         
         col1, col2 = st.columns(2)
@@ -82,7 +279,7 @@ def render():
     # ========================================
     # データ管理タブ
     # ========================================
-    with settings_tabs[1]:
+    with settings_tabs[2]:
         st.subheader("データ管理")
         
         col1, col2 = st.columns(2)
@@ -146,7 +343,7 @@ def render():
     # ========================================
     # 認証設定タブ
     # ========================================
-    with settings_tabs[2]:
+    with settings_tabs[3]:
         st.subheader("認証設定")
         
         st.markdown("### 管理者アカウント / Admin Account")
@@ -203,7 +400,7 @@ def render():
     # ========================================
     # 詳細設定タブ
     # ========================================
-    with settings_tabs[3]:
+    with settings_tabs[4]:
         st.subheader("詳細設定")
         
         st.markdown("### デバッグモード / Debug Mode")
