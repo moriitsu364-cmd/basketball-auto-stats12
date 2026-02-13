@@ -16,7 +16,7 @@ def load_css():
         }
         
         .stApp {
-            background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
         }
         
         .main {
@@ -83,15 +83,15 @@ def load_css():
            ============================================ */
         .stTabs [data-baseweb="tab-list"] {
             gap: 0;
-            background: linear-gradient(180deg, #1a1a1a 0%, #0d0d0d 100%);
+            background: linear-gradient(180deg, #ffffff 0%, #f8f9fa 100%);
             border-bottom: 3px solid #c8102e;
             padding: 0;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
         
         .stTabs [data-baseweb="tab"] {
             background: transparent;
-            color: #ffffff;
+            color: #212529;
             font-weight: 700;
             font-size: 1rem;
             padding: 1.2rem 2.5rem;
@@ -110,7 +110,7 @@ def load_css():
             left: 0;
             right: 0;
             bottom: 0;
-            background: linear-gradient(180deg, transparent 0%, rgba(29, 66, 138, 0.2) 100%);
+            background: linear-gradient(180deg, transparent 0%, rgba(29, 66, 138, 0.05) 100%);
             opacity: 0;
             transition: opacity 0.3s ease;
         }
@@ -127,18 +127,18 @@ def load_css():
         .stTabs [aria-selected="true"] {
             color: #ffffff;
             border-bottom-color: #c8102e;
-            background: linear-gradient(180deg, rgba(29, 66, 138, 0.3) 0%, rgba(200, 16, 46, 0.2) 100%);
+            background: linear-gradient(180deg, rgba(29, 66, 138, 0.8) 0%, rgba(200, 16, 46, 0.7) 100%);
         }
         
         /* ============================================
            統計カード - NBA.com風
            ============================================ */
         .stat-card {
-            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
             padding: 2rem 1.5rem;
             border-radius: 8px;
-            border: 2px solid #333;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            border: 2px solid #dee2e6;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
             transition: all 0.3s ease;
             margin-bottom: 1rem;
             text-align: center;
@@ -158,12 +158,12 @@ def load_css():
         
         .stat-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(200, 16, 46, 0.3);
+            box-shadow: 0 8px 25px rgba(200, 16, 46, 0.2);
             border-color: #c8102e;
         }
         
         .stat-card .stat-label {
-            color: #aaaaaa;
+            color: #6c757d;
             font-size: 0.8rem;
             font-weight: 700;
             text-transform: uppercase;
@@ -172,11 +172,11 @@ def load_css():
         }
         
         .stat-card .stat-value {
-            color: #ffffff;
+            color: #212529;
             font-size: 3rem;
             font-weight: 900;
             line-height: 1;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         
         .stat-card.primary .stat-value {
@@ -194,7 +194,7 @@ def load_css():
         }
         
         .stat-card .stat-subtitle {
-            color: #888;
+            color: #6c757d;
             font-size: 0.9rem;
             margin-top: 0.8rem;
             font-weight: 500;
@@ -204,12 +204,12 @@ def load_css():
            選手カード - 半透明画像背景
            ============================================ */
         .player-card {
-            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
             padding: 3rem 2rem;
             border-radius: 12px;
-            border: 2px solid #333;
+            border: 2px solid #dee2e6;
             margin-bottom: 2rem;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
             position: relative;
             overflow: hidden;
         }
@@ -221,7 +221,7 @@ def load_css():
             right: 0;
             bottom: 0;
             width: 50%;
-            background: linear-gradient(90deg, transparent 0%, rgba(29, 66, 138, 0.1) 100%);
+            background: linear-gradient(90deg, transparent 0%, rgba(29, 66, 138, 0.03) 100%);
         }
         
         .player-card-image {
@@ -231,7 +231,7 @@ def load_css():
             transform: translateY(-50%);
             width: 400px;
             height: 400px;
-            opacity: 0.15;
+            opacity: 0.08;
             filter: grayscale(30%);
             z-index: 0;
         }
@@ -242,13 +242,13 @@ def load_css():
         }
         
         .player-card .player-name {
-            color: #ffffff;
+            color: #212529;
             font-size: 3rem;
             font-weight: 900;
             margin-bottom: 0.5rem;
             text-transform: uppercase;
             letter-spacing: 2px;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         
         .player-card .player-number {
@@ -266,11 +266,11 @@ def load_css():
            ランキング行 - 画像アイコン付き
            ============================================ */
         .ranking-row {
-            background: linear-gradient(90deg, #1a1a1a 0%, #2d2d2d 100%);
+            background: linear-gradient(90deg, #ffffff 0%, #f8f9fa 100%);
             padding: 1.2rem 1.5rem;
             border-radius: 8px;
             margin-bottom: 0.8rem;
-            border: 2px solid #333;
+            border: 2px solid #dee2e6;
             transition: all 0.3s ease;
             display: flex;
             align-items: center;
@@ -286,12 +286,12 @@ def load_css():
             top: 0;
             bottom: 0;
             width: 5px;
-            background: #555;
+            background: #adb5bd;
         }
         
         .ranking-row:hover {
             transform: translateX(8px);
-            box-shadow: 0 4px 20px rgba(200, 16, 46, 0.3);
+            box-shadow: 0 4px 20px rgba(200, 16, 46, 0.2);
             border-color: #c8102e;
         }
         
@@ -311,7 +311,7 @@ def load_css():
             width: 50px;
             height: 50px;
             border-radius: 50%;
-            border: 3px solid #555;
+            border: 3px solid #dee2e6;
             margin-right: 1rem;
             object-fit: cover;
         }
@@ -333,7 +333,7 @@ def load_css():
            セクションヘッダー - 日英バイリンガル
            ============================================ */
         .section-header {
-            color: #ffffff;
+            color: #212529;
             font-size: 2rem;
             font-weight: 900;
             margin: 3rem 0 1.5rem 0;
@@ -356,7 +356,7 @@ def load_css():
         
         .section-header-jp {
             font-size: 1rem;
-            color: #888;
+            color: #6c757d;
             font-weight: 500;
             margin-top: 0.5rem;
             letter-spacing: 1px;
@@ -366,15 +366,15 @@ def load_css():
            データテーブル - ダークテーマ
            ============================================ */
         .dataframe {
-            background: #1a1a1a !important;
-            border: 2px solid #333 !important;
+            background: #ffffff !important;
+            border: 2px solid #dee2e6 !important;
             border-radius: 8px;
             font-size: 0.95rem;
         }
         
         .dataframe th {
-            background: linear-gradient(180deg, #2d2d2d 0%, #1a1a1a 100%) !important;
-            color: #ffffff !important;
+            background: linear-gradient(180deg, #f8f9fa 0%, #ffffff 100%) !important;
+            color: #212529 !important;
             font-weight: 700 !important;
             text-transform: uppercase;
             font-size: 0.8rem;
@@ -384,14 +384,14 @@ def load_css():
         }
         
         .dataframe td {
-            background: #1a1a1a !important;
-            color: #ffffff !important;
-            border-bottom: 1px solid #333 !important;
+            background: #ffffff !important;
+            color: #212529 !important;
+            border-bottom: 1px solid #dee2e6 !important;
             padding: 1rem !important;
         }
         
         .dataframe tr:hover td {
-            background: #2d2d2d !important;
+            background: #f8f9fa !important;
         }
         
         /* ============================================
@@ -401,9 +401,9 @@ def load_css():
         .stTextInput > div > div,
         .stNumberInput > div > div,
         .stDateInput > div > div {
-            background: #1a1a1a;
-            border: 2px solid #333;
-            color: #ffffff;
+            background: #ffffff;
+            border: 2px solid #dee2e6;
+            color: #212529;
             border-radius: 6px;
         }
         
@@ -412,7 +412,7 @@ def load_css():
         .stNumberInput > div > div:focus,
         .stDateInput > div > div:focus {
             border-color: #c8102e;
-            box-shadow: 0 0 10px rgba(200, 16, 46, 0.3);
+            box-shadow: 0 0 10px rgba(200, 16, 46, 0.2);
         }
         
         /* ============================================
@@ -452,8 +452,8 @@ def load_css():
            ============================================ */
         .js-plotly-plot {
             border-radius: 8px;
-            background: #1a1a1a;
-            border: 2px solid #333;
+            background: #ffffff;
+            border: 2px solid #dee2e6;
             padding: 1rem;
         }
         
@@ -461,17 +461,17 @@ def load_css():
            ゲームカード
            ============================================ */
         .game-card {
-            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
             padding: 2.5rem 2rem;
             border-radius: 12px;
-            border: 2px solid #333;
+            border: 2px solid #dee2e6;
             margin-bottom: 2rem;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
             text-align: center;
         }
         
         .game-card .game-date {
-            color: #888;
+            color: #6c757d;
             font-size: 1rem;
             font-weight: 700;
             text-transform: uppercase;
@@ -481,7 +481,7 @@ def load_css():
         
         .game-card .teams {
             font-size: 2rem;
-            color: #ffffff;
+            color: #212529;
             font-weight: 700;
             margin-bottom: 1.5rem;
         }
@@ -523,8 +523,8 @@ def load_css():
            ファイルアップローダー
            ============================================ */
         .stFileUploader > div {
-            background: #1a1a1a;
-            border: 3px dashed #555;
+            background: #ffffff;
+            border: 3px dashed #adb5bd;
             border-radius: 8px;
             padding: 3rem;
             transition: all 0.3s ease;
@@ -532,30 +532,30 @@ def load_css():
         
         .stFileUploader > div:hover {
             border-color: #c8102e;
-            background: #2d2d2d;
+            background: #f8f9fa;
         }
         
         /* ============================================
            メッセージ - ダークテーマ
            ============================================ */
         .stSuccess {
-            background: rgba(40, 167, 69, 0.2);
+            background: rgba(40, 167, 69, 0.1);
             border-left: 4px solid #28a745;
-            color: #5cb85c;
+            color: #155724;
             border-radius: 6px;
         }
         
         .stError {
-            background: rgba(220, 53, 69, 0.2);
+            background: rgba(220, 53, 69, 0.1);
             border-left: 4px solid #dc3545;
-            color: #ff6b6b;
+            color: #721c24;
             border-radius: 6px;
         }
         
         .stInfo {
-            background: rgba(23, 162, 184, 0.2);
+            background: rgba(23, 162, 184, 0.1);
             border-left: 4px solid #17a2b8;
-            color: #5bc0de;
+            color: #0c5460;
             border-radius: 6px;
         }
         
