@@ -1,9 +1,9 @@
 """ページモジュール"""
-from pages import season_stats
-from pages import player_stats
-from pages import game_stats
-from pages import compare
-from pages import data_input
+from . import season_stats
+from . import player_stats
+from . import game_stats
+from . import compare
+from . import data_input
 
 __all__ = [
     'season_stats',
