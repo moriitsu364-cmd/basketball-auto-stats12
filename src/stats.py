@@ -1,4 +1,4 @@
-"""統計計算"""
+"""統計計算 - パーセンテージ修正版"""
 import pandas as pd
 
 
@@ -24,6 +24,17 @@ def calculate_stats(df: pd.DataFrame, player_name: str = None) -> dict:
     total_fgm = df['3PM'].sum() + df['2PM'].sum()
     total_fga = df['3PA'].sum() + df['2PA'].sum()
     
+    # パーセンテージは0-1形式で保存されているので、100倍して表示用にする
+    def safe_percentage(made, attempted):
+        """安全なパーセンテージ計算（0-100の範囲で返す）"""
+        if attempted == 0:
+            return 0
+        pct = (made / attempted)
+        # 既に0-1形式なら100倍、0-100形式ならそのまま
+        if pct <= 1:
+            return pct * 100
+        return pct
+    
     stats = {
         'GP': len(df),
         'PTS': df['PTS'].mean(),
@@ -33,9 +44,9 @@ def calculate_stats(df: pd.DataFrame, player_name: str = None) -> dict:
         'BLK': df['BLK'].mean(),
         'TO': df['TO'].mean(),
         'PF': df['PF'].mean(),
-        'FG%': (total_fgm / total_fga * 100) if total_fga > 0 else 0,
-        '3P%': (df['3PM'].sum() / df['3PA'].sum() * 100) if df['3PA'].sum() > 0 else 0,
-        'FT%': (df['FTM'].sum() / df['FTA'].sum() * 100) if df['FTA'].sum() > 0 else 0,
+        'FG%': safe_percentage(total_fgm, total_fga),
+        '3P%': safe_percentage(df['3PM'].sum(), df['3PA'].sum()),
+        'FT%': safe_percentage(df['FTM'].sum(), df['FTA'].sum()),
     }
     
     return stats
@@ -82,13 +93,24 @@ def calculate_team_stats(game_data: pd.DataFrame) -> dict:
     total_fgm = game_data['3PM'].sum() + game_data['2PM'].sum()
     total_fga = game_data['3PA'].sum() + game_data['2PA'].sum()
     
+    # パーセンテージは0-1形式で保存されているので、100倍して表示用にする
+    def safe_percentage(made, attempted):
+        """安全なパーセンテージ計算（0-100の範囲で返す）"""
+        if attempted == 0:
+            return 0
+        pct = (made / attempted)
+        # 既に0-1形式なら100倍、0-100形式ならそのまま
+        if pct <= 1:
+            return pct * 100
+        return pct
+    
     return {
         'total_pts': game_data['PTS'].sum(),
         'total_reb': game_data['TOT'].sum(),
         'total_ast': game_data['AST'].sum(),
-        'fg_pct': (total_fgm / total_fga * 100) if total_fga > 0 else 0,
-        '3p_pct': (game_data['3PM'].sum() / game_data['3PA'].sum() * 100) if game_data['3PA'].sum() > 0 else 0,
-        'ft_pct': (game_data['FTM'].sum() / game_data['FTA'].sum() * 100) if game_data['FTA'].sum() > 0 else 0,
+        'fg_pct': safe_percentage(total_fgm, total_fga),
+        '3p_pct': safe_percentage(game_data['3PM'].sum(), game_data['3PA'].sum()),
+        'ft_pct': safe_percentage(game_data['FTM'].sum(), game_data['FTA'].sum()),
     }
 
 
