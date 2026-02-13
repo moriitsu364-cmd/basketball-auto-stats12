@@ -8,9 +8,9 @@ import sys
 if str(Path(__file__).parent.parent) not in sys.path:
     sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from database import StatsDatabase
-from components import section_header, staff_card
-from config import TEAM_INFO_FILE, TEAM_INFO_COLUMNS, STAFF_IMAGES_DIR
+from ..database import StatsDatabase
+from ..components import section_header, staff_card
+from ..config import TEAM_INFO_FILE, TEAM_INFO_COLUMNS, STAFF_IMAGES_DIR
 
 
 def render(db: StatsDatabase):
