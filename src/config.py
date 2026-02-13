@@ -1,23 +1,40 @@
-"""アプリケーション設定 - 改善版"""
+"""アプリケーション設定 - 改善版（エラーハンドリング強化）"""
 from pathlib import Path
 import os
+import sys
+import hashlib
+
+# デバッグモード（環境変数から取得）
+DEBUG_MODE = os.getenv('DEBUG', 'False').lower() == 'true'
+
+def safe_mkdir(path: Path, description: str = ""):
+    """安全にディレクトリを作成"""
+    try:
+        path.mkdir(parents=True, exist_ok=True)
+        if DEBUG_MODE:
+            print(f"✅ ディレクトリ作成: {path}")
+        return True
+    except (PermissionError, OSError, FileExistsError) as e:
+        if DEBUG_MODE:
+            print(f"⚠️ ディレクトリ作成スキップ ({description}): {e}")
+        return False
 
 # ベースディレクトリの設定
-BASE_DIR = Path(__file__).parent.parent
+try:
+    BASE_DIR = Path(__file__).parent.parent
+except Exception:
+    BASE_DIR = Path.cwd()
+
 DATA_DIR = BASE_DIR / "data"
 IMAGES_DIR = DATA_DIR / "images"
 
 # ディレクトリを確実に作成（エラーを無視）
-try:
-    DATA_DIR.mkdir(parents=True, exist_ok=True)
-    IMAGES_DIR.mkdir(parents=True, exist_ok=True)
-    (IMAGES_DIR / "players").mkdir(parents=True, exist_ok=True)
-    (IMAGES_DIR / "staff").mkdir(parents=True, exist_ok=True)
-except (PermissionError, OSError, FileExistsError):
-    # 読み取り専用ファイルシステムの場合はスキップ
-    pass
+safe_mkdir(DATA_DIR, "データディレクトリ")
+safe_mkdir(IMAGES_DIR, "画像ディレクトリ")
+safe_mkdir(IMAGES_DIR / "players", "選手画像ディレクトリ")
+safe_mkdir(IMAGES_DIR / "staff", "スタッフ画像ディレクトリ")
 
-# データベースファイル
+# データベースファイル（文字列パス）
 DATA_FILE = str(DATA_DIR / "basketball_stats.csv")
 TEAM_INFO_FILE = str(DATA_DIR / "team_info.csv")
 OPPONENT_STATS_FILE = str(DATA_DIR / "opponent_stats.csv")
@@ -31,7 +48,7 @@ STAT_COLUMNS = [
     'OR', 'DR', 'TOT', 'AST', 'STL', 'BLK', 'TO', 
     'PF', 'TF', 'OF', 'FO', 'DQ', 'MIN',
     'GameDate', 'Season', 'Opponent', 'TeamScore', 'OpponentScore',
-    'GameFormat'  # 新規: '4Q', '2Q', 'Other'
+    'GameFormat'
 ]
 
 # チーム情報カラム
@@ -57,12 +74,12 @@ GAME_FORMATS = {
     'Other': 'その他'
 }
 
-# NBAカラー
+# カラー設定
 NBA_COLORS = {
     'primary': '#1d428a',
     'secondary': '#c8102e',
-    'background': '#ffffff',  # 白背景
-    'card_bg': '#f8f9fa',     # カード背景
+    'background': '#ffffff',
+    'card_bg': '#f8f9fa',
     'gold': '#ffd700',
     'silver': '#c0c0c0',
     'bronze': '#cd7f32',
@@ -121,31 +138,27 @@ IMAGE_SETTINGS = {
 
 # 管理者設定
 ADMIN_SETTINGS = {
-    'session_timeout': 3600,  # 1時間
+    'session_timeout': 3600,
     'max_login_attempts': 5,
-    'lockout_duration': 900,   # 15分
-    'default_password': 'tsukuba1872'  # デフォルトパスワード（本番では変更すること）
+    'lockout_duration': 900,
+    'default_password': 'tsukuba1872'
 }
 
 # デフォルトパスワードのハッシュ（SHA-256）
-import hashlib
 DEFAULT_PASSWORD_HASH = hashlib.sha256('tsukuba1872'.encode()).hexdigest()
-
-# デバッグモード
-DEBUG_MODE = os.getenv('DEBUG', 'False').lower() == 'true'
 
 # ロギング設定
 LOGGING_CONFIG = {
-    'enabled': True,
-    'level': 'INFO',
+    'enabled': DEBUG_MODE,
+    'level': 'DEBUG' if DEBUG_MODE else 'INFO',
     'format': '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 }
 
 # パフォーマンス設定
 PERFORMANCE_SETTINGS = {
-    'cache_ttl': 300,  # キャッシュの有効期限（秒）
-    'max_dataframe_size': 10000,  # データフレームの最大行数
-    'chunk_size': 1000  # チャンク処理のサイズ
+    'cache_ttl': 300,
+    'max_dataframe_size': 10000,
+    'chunk_size': 1000
 }
 
 # UI設定
@@ -155,3 +168,12 @@ UI_SETTINGS = {
     'chart_width': 600,
     'animation_duration': 500
 }
+
+# 環境情報をデバッグ出力
+if DEBUG_MODE:
+    print(f"🔍 デバッグモード: 有効")
+    print(f"📁 BASE_DIR: {BASE_DIR}")
+    print(f"📁 DATA_DIR: {DATA_DIR}")
+    print(f"📁 IMAGES_DIR: {IMAGES_DIR}")
+    print(f"🐍 Python: {sys.version}")
+    print(f"📂 作業ディレクトリ: {os.getcwd()}")
