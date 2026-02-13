@@ -37,6 +37,14 @@ def render(db: StatsDatabase):
         season = st.selectbox("Season", SEASONS, index=1)
         opponent = st.text_input("Opponent", "")
         
+        # ゲーム形式選択
+        from config import GAME_FORMATS
+        game_format = st.selectbox(
+            "Game Format / 試合形式",
+            list(GAME_FORMATS.keys()),
+            format_func=lambda x: f"{x} - {GAME_FORMATS[x]}"
+        )
+        
         col_s1, col_s2 = st.columns(2)
         with col_s1:
             team_score = st.number_input("Tsukuba Score", min_value=0, value=0)
@@ -62,6 +70,7 @@ def render(db: StatsDatabase):
                         df['Opponent'] = opponent
                         df['TeamScore'] = team_score
                         df['OpponentScore'] = opponent_score
+                        df['GameFormat'] = game_format  # 追加
                         
                         st.session_state['current_stats'] = df
                         st.success("✅ Analysis complete!")
