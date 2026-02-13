@@ -12,7 +12,7 @@ try:
     from src.config import *
     from src.database import StatsDatabase
     from src.auth import check_password
-    from src.styles import apply_custom_css
+    from src.styles import load_css
     
     # ページモジュールのインポート
     from src.pages import (
@@ -174,7 +174,7 @@ def main():
     
     # カスタムCSSを適用
     try:
-        apply_custom_css()
+        load_css()
     except Exception as e:
         if DEBUG_MODE:
             st.warning(f"CSSの適用に失敗しました: {e}")
