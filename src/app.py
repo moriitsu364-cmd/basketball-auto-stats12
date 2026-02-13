@@ -55,6 +55,7 @@ def show_splash_screen():
         align-items: center;
         z-index: 9999;
         animation: fadeOut 0.5s ease-out 2s forwards;
+        pointer-events: none;
     }
     .splash-title {
         font-size: 5rem;
@@ -65,6 +66,7 @@ def show_splash_screen():
         animation: fadeIn 1s ease-out;
         text-shadow: 0 0 30px rgba(200, 16, 46, 0.5);
         margin-bottom: 1rem;
+        pointer-events: none;
     }
     .splash-subtitle {
         font-size: 1.5rem;
@@ -72,6 +74,7 @@ def show_splash_screen():
         font-weight: 600;
         animation: fadeIn 1.5s ease-out;
         letter-spacing: 0.1rem;
+        pointer-events: none;
     }
     </style>
     <div class="splash-screen" id="splash">
@@ -80,7 +83,10 @@ def show_splash_screen():
     </div>
     <script>
         setTimeout(function() {
-            document.getElementById('splash').style.display = 'none';
+            var splash = document.getElementById('splash');
+            if (splash) {
+                splash.remove();
+            }
         }, 2500);
     </script>
     """
