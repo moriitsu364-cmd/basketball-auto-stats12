@@ -5,17 +5,15 @@ from pathlib import Path
 
 # パスの設定
 BASE_DIR = Path(__file__).parent.parent
-sys.path.insert(0, str(BASE_DIR / "src"))
+SRC_DIR = BASE_DIR / "src"
+sys.path.insert(0, str(SRC_DIR))
 
-# 修正版のモジュールをインポート（存在する場合）
-try:
-    from database_fixed import StatsDatabase
-    from config_fixed import *
-except ImportError:
-    from database import StatsDatabase
-    from config import *
-
+# モジュールのインポート
+from database import StatsDatabase
+from config import *
 from styles import load_css
+
+# ページモジュールを個別にインポート
 from pages import season_stats, player_stats, game_stats, data_input
 from pages import team_info, opponent_stats, compare, admin_settings
 
