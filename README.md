@@ -1,25 +1,45 @@
-# 🏀 Tsukuba Basketball Stats
+# 🏀 Tsukuba Basketball Stats - Advanced Analytics Platform
 
 筑波大学附属高校 男子バスケットボール統計システム
 
-NBA.comスタイルの洗練されたUIで、試合統計を管理・分析するWebアプリケーションです。
+NBA.com + Bリーグ風の洗練されたダークテーマUIで、試合統計を管理・分析する高度なWebアプリケーションです。
 
-## ✨ 機能
+## ✨ 主な機能
 
-### 📊 統計分析
-- **シーズン統計**: チーム全体のパフォーマンス、勝敗記録、平均得点
-- **選手統計**: 個人のシーズン平均、パフォーマンスグラフ、ゲームログ
-- **試合統計**: 試合ごとのボックススコア、チーム統計
-- **選手比較**: 2選手間の詳細な統計比較
+### 📊 統計分析（7つの分析ページ）
+1. **シーズン統計**: チーム全体のパフォーマンス、勝敗記録、リーダーボード
+2. **選手統計**: 個人のシーズン平均、パフォーマンスグラフ、背景画像付き選手カード
+3. **試合統計**: 試合ごとのボックススコア、チーム統計
+4. **データ比較**: 
+   - 複数選手比較（2-4人同時比較）
+   - シーズン間比較
+   - レーダーチャート、折れ線グラフ、棒グラフ
+5. **チーム情報**: シーズン別チーム情報、コーチ・マネージャー紹介（写真付き）
+6. **対戦相手統計**: シーズン別対戦相手分析、対戦成績、平均スタッツ
+7. **管理者設定**: 画像管理、セキュリティ設定、システム統括
+
+### 🎨 デザイン特徴
+- **NBA.com + Bリーグ風**: ダークテーマ、グラデーション、アニメーション
+- **バイリンガル対応**: 英語・日本語併記
+- **半透明背景画像**: 選手カードに格好良い背景画像
+- **小アイコン**: ランキングに選手写真表示
+- **多様なグラフ**: 折れ線、棒、円、レーダーチャート
 
 ### 🤖 AI機能
 - Gemini AIによるスコアシート画像の自動読み取り
 - CSV形式でのデータ自動抽出
 
-### 📈 可視化
-- Plotlyによるインタラクティブなグラフ
-- リーダーボード（得点王、リバウンド王、アシスト王）
-- パフォーマンストレンド分析
+### 🎮 試合形式対応
+- 4クォーター制
+- 2クォーター制（練習試合）
+- その他の形式
+
+### 🔒 セキュリティ
+- 強化された管理者認証システム
+- ログイン試行回数制限（5回）
+- 自動ロックアウト（15分）
+- セッションタイムアウト（1時間）
+- 画像アップロードも管理者権限必要
 
 ## 🚀 セットアップ
 
@@ -36,34 +56,31 @@ cd basketball-auto-stats12
 pip install -r requirements.txt
 ```
 
-### 3. シークレット設定
+### 3. ディレクトリ構造を作成
 
 ```bash
-# .streamlitディレクトリを作成（存在しない場合）
-mkdir -p .streamlit
+mkdir -p data/images/players
+mkdir -p data/images/staff
+```
 
+### 4. シークレット設定
+
+```bash
 # secrets.tomlを作成
 cp .streamlit/secrets.toml.example .streamlit/secrets.toml
 ```
 
-`.streamlit/secrets.toml`を編集してAPIキーを設定：
+`.streamlit/secrets.toml`を編集：
 
 ```toml
 GEMINI_API_KEY = "your-actual-api-key-here"
 ADMIN_PASSWORD_HASH = "your-password-hash"
 ```
 
-### 4. dataディレクトリを作成
-
-```bash
-mkdir -p data
-touch data/.gitkeep
-```
-
 ### 5. アプリを起動
 
 ```bash
-streamlit run src/app.py
+streamlit run src/app_new.py
 ```
 
 ブラウザで `http://localhost:8501` にアクセス
@@ -73,91 +90,128 @@ streamlit run src/app.py
 ```
 basketball-auto-stats12/
 ├── .streamlit/
-│   ├── config.toml              # Streamlit設定
-│   └── secrets.toml.example     # シークレット設定例
+│   ├── config.toml
+│   └── secrets.toml
 ├── src/
-│   ├── pages/                   # 各タブのページ
-│   │   ├── __init__.py
-│   │   ├── season_stats.py     # シーズン統計
-│   │   ├── player_stats.py     # 選手統計
-│   │   ├── game_stats.py       # 試合統計
-│   │   ├── compare.py          # 選手比較
-│   │   └── data_input.py       # データ入力
-│   ├── app.py                   # メインアプリ
-│   ├── config.py                # 設定定数
-│   ├── database.py              # データベース操作
-│   ├── stats.py                 # 統計計算
-│   ├── charts.py                # グラフ作成
-│   ├── components.py            # UIコンポーネント
-│   ├── auth.py                  # 認証
-│   ├── ai.py                    # AI機能
-│   └── styles.py                # CSSスタイル
+│   ├── pages/
+│   │   ├── season_stats.py       # シーズン統計
+│   │   ├── player_stats.py       # 選手統計
+│   │   ├── game_stats.py         # 試合統計
+│   │   ├── compare_new.py        # 比較（複数選手対応）
+│   │   ├── team_info.py          # チーム情報
+│   │   ├── opponent_stats.py     # 対戦相手統計
+│   │   ├── data_input.py         # データ入力
+│   │   └── admin_settings.py     # 管理者設定
+│   ├── app_new.py                # メインアプリ
+│   ├── config.py                 # 設定
+│   ├── database.py               # DB操作
+│   ├── stats.py                  # 統計計算
+│   ├── charts_new.py             # グラフ（棒・円・レーダー）
+│   ├── components_new.py         # UIコンポーネント
+│   ├── auth.py                   # 認証
+│   ├── ai.py                     # AI機能
+│   └── styles_new.py             # NBA風CSS
 ├── data/
-│   ├── .gitkeep
-│   └── basketball_stats.csv     # 統計データ（自動生成）
-├── .gitignore
+│   ├── images/
+│   │   ├── players/              # 選手画像
+│   │   └── staff/                # スタッフ画像
+│   ├── basketball_stats.csv
+│   ├── team_info.csv
+│   └── opponent_stats.csv
 ├── requirements.txt
 └── README.md
 ```
 
-## 🔑 環境変数
+## 🎨 画像アップロード方法
 
-### Gemini APIキー
+### 選手画像
+1. **管理者設定**タブに移動
+2. 管理者パスワードでログイン
+3. **画像管理** → **選手画像**タブ
+4. 選手名を入力し、画像をアップロード
+5. 背景透過PNG推奨（格好良く表示されます）
 
-1. [Google AI Studio](https://makersuite.google.com/app/apikey)でAPIキーを取得
-2. `.streamlit/secrets.toml`に設定
+### スタッフ画像
+1. **管理者設定**タブ → **画像管理** → **スタッフ画像**
+2. スタッフ名・役職を入力し、画像をアップロード
 
-```toml
-GEMINI_API_KEY = "your-api-key"
-```
+### 画像の表示場所
+- **選手カード**: 背景に半透明で大きく表示
+- **ランキング**: 小さいアイコンとして表示
+- **スタッフ紹介**: カード形式で表示
 
-### 管理者パスワード
+## 📊 データ入力方法
 
-デフォルトパスワード: `tsukuba1872`
+### 通常の試合データ
+1. **DATA INPUT**タブに移動
+2. 試合情報を入力：
+   - 試合日
+   - シーズン
+   - 対戦相手
+   - スコア
+   - **試合形式**（4Q / 2Q / その他）← NEW!
+3. スコアシート画像をアップロード
+4. **ANALYZE WITH AI**をクリック
+5. データを確認・編集
+6. **SAVE DATA**
 
-カスタムパスワードを設定する場合：
+### チーム情報の入力
+1. **TEAM INFO**タブに移動
+2. シーズンを選択
+3. チーム情報を入力/編集：
+   - ヘッドコーチ
+   - アシスタントコーチ
+   - マネージャー
+   - ホーム体育館
+   - チームモットー
+   - シーズン目標
 
+## 📈 比較機能の使い方
+
+### 複数選手比較（2-4人）
+1. **COMPARE**タブ → **選手間比較**
+2. 最大4人の選手を選択
+3. グラフタイプを選択：
+   - 折れ線グラフ（推移）
+   - レーダーチャート（総合比較）
+   - 棒グラフ（項目別）
+
+### シーズン比較
+1. **COMPARE**タブ → **シーズン比較**
+2. 2つのシーズンを選択
+3. チーム統計を比較
+
+## 🔐 セキュリティ設定
+
+### デフォルトパスワード
+- パスワード: `tsukuba1872`
+
+### カスタムパスワードの設定
 ```bash
 # パスワードのハッシュを生成
 python -c "import hashlib; print(hashlib.sha256('your-password'.encode()).hexdigest())"
 ```
 
-生成されたハッシュを`secrets.toml`に設定：
+生成されたハッシュを`.streamlit/secrets.toml`に設定
 
-```toml
-ADMIN_PASSWORD_HASH = "generated-hash"
-```
+### セキュリティ機能
+- 最大ログイン試行: 5回
+- ロックアウト時間: 15分
+- セッションタイムアウト: 1時間
 
-## 📖 使い方
+## 🎯 新機能
 
-### データ入力
-
-1. **DATA INPUT**タブに移動
-2. 管理者パスワードを入力（デフォルト: `tsukuba1872`）
-3. 試合情報を入力（日付、シーズン、対戦相手、スコア）
-4. スコアシート画像をアップロード
-5. **ANALYZE WITH AI**をクリック
-6. 抽出されたデータを確認・編集
-7. **SAVE DATA**をクリック
-
-### 統計の閲覧
-
-- **SEASON STATS**: シーズンを選択して全体統計を表示
-- **PLAYER STATS**: 選手を選択して個人統計を表示
-- **GAME STATS**: 試合を選択してボックススコアを表示
-- **COMPARE**: 2選手を選択して比較
-
-### データのエクスポート/インポート
-
-- **エクスポート**: DATA INPUTタブの「DOWNLOAD ALL DATA」
-- **インポート**: DATA INPUTタブでCSVファイルをアップロード
-
-## 🎨 デザイン
-
-- NBA.com風の洗練されたUI
-- レスポンシブデザイン対応
-- インタラクティブなグラフとチャート
-- 直感的なナビゲーション
+### v2.0で追加された機能
+✅ **NBA.com + Bリーグ風デザイン**
+✅ **バイリンガル対応**（英語・日本語）
+✅ **選手・スタッフ画像対応**
+✅ **チーム情報ページ**
+✅ **対戦相手統計ページ**
+✅ **複数選手比較**（2-4人）
+✅ **試合形式対応**（4Q/2Q/その他）
+✅ **改良されたグラフ**（棒・円・レーダー）
+✅ **強化されたセキュリティ**
+✅ **管理者統括設定**
 
 ## 🛠️ 技術スタック
 
@@ -165,23 +219,10 @@ ADMIN_PASSWORD_HASH = "generated-hash"
 - **AI**: Google Gemini API
 - **データ処理**: Pandas
 - **可視化**: Plotly
-- **画像処理**: Pillow
+- **画像処理**: Pillow, Base64
+- **認証**: hashlib, session management
 
-## 📝 データ形式
-
-CSVファイルには以下のカラムが含まれます：
-
-```
-No, PlayerName, GS, PTS, 3PM, 3PA, 3P%, 2PM, 2PA, 2P%, DK, 
-FTM, FTA, FT%, OR, DR, TOT, AST, STL, BLK, TO, PF, TF, OF, 
-FO, DQ, MIN, GameDate, Season, Opponent, TeamScore, OpponentScore
-```
-
-## 🤝 貢献
-
-プルリクエストを歓迎します！大きな変更の場合は、まずissueを開いて変更内容を議論してください。
-
-## 📄 ライセンス
+## 📝 ライセンス
 
 MIT
 
@@ -189,11 +230,10 @@ MIT
 
 - GitHub: [@moriitsu364-cmd](https://github.com/moriitsu364-cmd)
 
-## 🙏 謝辞
+## 🙏 デザインインスピレーション
 
-- デザインインスピレーション: NBA.com
-- AI技術: Google Gemini API
-- フレームワーク: Streamlit
+- NBA.com - スタッツページデザイン
+- Bリーグ公式サイト - バイリンガル対応
 
 ---
 
