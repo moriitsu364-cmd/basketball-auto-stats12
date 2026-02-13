@@ -30,6 +30,69 @@ except ImportError as e:
     st.stop()
 
 
+def show_splash_screen():
+    """スプラッシュスクリーン（フェイドアウト効果付き）"""
+    import time
+    
+    splash_placeholder = st.empty()
+    
+    with splash_placeholder.container():
+        st.markdown("""
+        <style>
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+        
+        .splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(135deg, #1d428a 0%, #c8102e 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            animation: fadeOut 2s ease-in-out forwards;
+            animation-delay: 1s;
+        }
+        
+        .splash-logo {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 6rem;
+            color: white;
+            margin-bottom: 1rem;
+            letter-spacing: 10px;
+            text-transform: uppercase;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        .splash-subtitle {
+            font-size: 1.5rem;
+            color: rgba(255, 255, 255, 0.9);
+            letter-spacing: 4px;
+            text-transform: uppercase;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        </style>
+        
+        <div class="splash-screen">
+            <div class="splash-logo">🏀 BASKETBALL</div>
+            <div class="splash-subtitle">Stats Manager</div>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    time.sleep(3)
+    splash_placeholder.empty()
+
+
 def initialize_session_state():
     """セッション状態の初期化"""
     if 'authenticated' not in st.session_state:
@@ -38,6 +101,8 @@ def initialize_session_state():
         st.session_state.admin_logged_in = False
     if 'current_page' not in st.session_state:
         st.session_state.current_page = "シーズン統計"
+    if 'splash_shown' not in st.session_state:
+        st.session_state.splash_shown = False
     if 'db' not in st.session_state:
         try:
             st.session_state.db = StatsDatabase()
@@ -172,15 +237,21 @@ def main():
         initial_sidebar_state="expanded"
     )
     
+    # セッション状態の初期化
+    initialize_session_state()
+    
+    # スプラッシュスクリーンを表示（初回のみ）
+    if not st.session_state.splash_shown:
+        show_splash_screen()
+        st.session_state.splash_shown = True
+        st.rerun()
+    
     # カスタムCSSを適用
     try:
         load_css()
     except Exception as e:
         if DEBUG_MODE:
             st.warning(f"CSSの適用に失敗しました: {e}")
-    
-    # セッション状態の初期化
-    initialize_session_state()
     
     # データベースの取得
     db = st.session_state.get('db')
