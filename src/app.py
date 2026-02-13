@@ -22,7 +22,7 @@ from pages import team_info, opponent_stats, compare, admin_settings
 # ページ設定
 # ========================================
 st.set_page_config(
-    page_title="🏀 Tsukuba Basketball Stats",
+    page_title="Tsukuba Basketball Stats",
     page_icon="🏀",
     layout="wide",
     initial_sidebar_state="collapsed"
@@ -87,11 +87,11 @@ def main():
             stats = db.get_stats_summary()
             # サイドバーに統計情報を表示
             with st.sidebar:
-                st.markdown("### 📊 データベース統計")
-                st.metric("総試合数", stats['total_games'])
-                st.metric("総選手数", stats['total_players'])
-                st.metric("シーズン数", stats['total_seasons'])
-                st.metric("総レコード数", stats['total_records'])
+                st.markdown("### Database Statistics")
+                st.metric("Total Games", stats['total_games'])
+                st.metric("Total Players", stats['total_players'])
+                st.metric("Seasons", stats['total_seasons'])
+                st.metric("Total Records", stats['total_records'])
     except Exception as e:
         st.error(f"データベースの初期化に失敗しました: {e}")
         st.stop()
@@ -99,22 +99,22 @@ def main():
     # ヘッダー
     st.markdown("""
     <div class="nba-header">
-        <h1>🏀 TSUKUBA BASKETBALL STATS</h1>
-        <p class="subtitle">筑波大学附属高校 男子バスケットボール統計システム / Advanced Analytics Platform</p>
+        <h1>TSUKUBA BASKETBALL</h1>
+        <p class="subtitle">Advanced Analytics Platform / 筑波大学附属高校 男子バスケットボール部</p>
     </div>
     """, unsafe_allow_html=True)
     
     # タブ
     try:
         tabs = st.tabs([
-            "🏆 SEASON",
-            "👤 PLAYER", 
-            "📋 GAME",
-            "📊 COMPARE",
-            "🏀 TEAM INFO",
-            "🎯 OPPONENTS",
-            "📥 DATA INPUT",
-            "⚙️ ADMIN"
+            "SEASON",
+            "PLAYER", 
+            "GAME",
+            "COMPARE",
+            "TEAM INFO",
+            "OPPONENTS",
+            "DATA INPUT",
+            "ADMIN"
         ])
         
         with tabs[0]:
@@ -189,7 +189,7 @@ def main():
     # フッター
     st.markdown("""
     <div style="text-align: center; margin-top: 50px; padding: 20px; color: #666;">
-        <p>🏀 Tsukuba Basketball Stats System v2.0</p>
+        <p>Tsukuba Basketball Analytics System v2.0</p>
         <p>Powered by Streamlit & Gemini AI</p>
     </div>
     """, unsafe_allow_html=True)
