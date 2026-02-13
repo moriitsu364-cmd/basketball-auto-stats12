@@ -1,4 +1,4 @@
-"""管理者設定ページ - 完全改良版（実用的な設定機能）"""
+"""管理者設定ページ - 完全改良版(実用的な設定機能)"""
 import streamlit as st
 import sys
 from pathlib import Path
@@ -9,7 +9,7 @@ import os
 if str(Path(__file__).parent.parent) not in sys.path:
     sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from src.config import *
+from ..config import *
 
 
 def render(db=None):
