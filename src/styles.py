@@ -120,23 +120,30 @@ def load_css():
             box-shadow: 0 3px 10px rgba(0,0,0,0.08);
             position: relative !important;
             z-index: 999 !important;
+            overflow-x: auto;
+            overflow-y: visible;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
         }
         
         .stTabs [data-baseweb="tab"] {
             background: transparent;
             color: #1a1a1a;
             font-weight: 700;
-            font-size: 0.9rem;
-            padding: 1.8rem 3rem;
+            font-size: 0.85rem;
+            padding: 1.2rem 2rem;
             border: none;
             border-bottom: 4px solid transparent;
-            letter-spacing: 2.5px;
+            letter-spacing: 1.5px;
             text-transform: uppercase;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative !important;
             z-index: 1000 !important;
             cursor: pointer !important;
             pointer-events: auto !important;
+            white-space: nowrap;
+            overflow: visible;
         }
         
         .stTabs [data-baseweb="tab"]::after {
@@ -712,8 +719,9 @@ def load_css():
             }
             
             .stTabs [data-baseweb="tab"] {
-                padding: 1.2rem 1.5rem;
-                font-size: 0.75rem;
+                padding: 1rem 1.2rem;
+                font-size: 0.7rem;
+                letter-spacing: 1px;
             }
         }
         
