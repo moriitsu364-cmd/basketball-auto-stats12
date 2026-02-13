@@ -1,9 +1,9 @@
-"""NBA.com inspired sophisticated design with white center - Tsukuba Basketball"""
+"""NBA.com inspired sophisticated design with enhanced readability - Tsukuba Basketball"""
 import streamlit as st
 
 
 def load_css():
-    """Load sophisticated CSS styles with white center design"""
+    """Load sophisticated CSS styles with maximum readability and visual icons"""
     st.markdown("""
     <style>
         /* ============================================
@@ -16,13 +16,13 @@ def load_css():
         }
         
         .stApp {
-            background: #000000;
+            background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
         }
         
         .main {
             background: #ffffff;
             border-radius: 0;
-            box-shadow: 0 0 60px rgba(0,0,0,0.3);
+            box-shadow: 0 0 80px rgba(0,0,0,0.4);
         }
         
         .block-container {
@@ -32,15 +32,19 @@ def load_css():
         }
         
         /* ============================================
-           Header - Dark with White Content Area
+           Header - Dark with Icons
            ============================================ */
         .nba-header {
-            background: linear-gradient(180deg, #000000 0%, #0a0a0a 50%, #1a1a1a 100%);
-            padding: 4rem 2rem;
+            background: 
+                linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(26,26,26,0.95) 100%),
+                url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><circle cx="10" cy="10" r="2" fill="white" opacity="0.1"/><circle cx="50" cy="50" r="2" fill="white" opacity="0.1"/><circle cx="90" cy="10" r="2" fill="white" opacity="0.1"/><circle cx="30" cy="70" r="2" fill="white" opacity="0.1"/><circle cx="70" cy="30" r="2" fill="white" opacity="0.1"/></svg>');
+            background-size: cover, 100px 100px;
+            padding: 5rem 3rem;
             margin: -2rem -3rem 3rem -3rem;
             position: relative;
             overflow: hidden;
-            border-bottom: 3px solid #c8102e;
+            border-bottom: 4px solid;
+            border-image: linear-gradient(90deg, #1d428a 0%, #c8102e 100%) 1;
         }
         
         .nba-header::before {
@@ -51,23 +55,23 @@ def load_css():
             right: 0;
             bottom: 0;
             background: 
-                radial-gradient(circle at 20% 30%, rgba(200, 16, 46, 0.15) 0%, transparent 50%),
-                radial-gradient(circle at 80% 70%, rgba(29, 66, 138, 0.15) 0%, transparent 50%);
+                radial-gradient(circle at 20% 30%, rgba(200, 16, 46, 0.2) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(29, 66, 138, 0.2) 0%, transparent 50%);
             animation: pulse 8s ease-in-out infinite;
         }
         
         @keyframes pulse {
-            0%, 100% { opacity: 0.6; }
+            0%, 100% { opacity: 0.5; }
             50% { opacity: 1; }
         }
         
         .nba-header h1 {
             color: #ffffff;
             font-family: 'Bebas Neue', sans-serif;
-            font-size: 5rem;
+            font-size: 5.5rem;
             font-weight: 400;
             margin: 0;
-            letter-spacing: 8px;
+            letter-spacing: 12px;
             text-transform: uppercase;
             position: relative;
             z-index: 1;
@@ -75,39 +79,54 @@ def load_css():
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            text-shadow: 0 4px 20px rgba(255,255,255,0.1);
         }
         
         .nba-header .subtitle {
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 1rem;
-            margin-top: 1rem;
-            font-weight: 400;
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 1.1rem;
+            margin-top: 1.5rem;
+            font-weight: 500;
             position: relative;
             z-index: 1;
-            letter-spacing: 3px;
+            letter-spacing: 4px;
             text-transform: uppercase;
         }
         
+        /* Basketball icon in header */
+        .nba-header::after {
+            content: '';
+            position: absolute;
+            right: 5%;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 200px;
+            height: 200px;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="45" fill="none" stroke="white" stroke-width="1" opacity="0.15"/><path d="M 50 5 Q 70 50 50 95" fill="none" stroke="white" stroke-width="1" opacity="0.15"/><path d="M 50 5 Q 30 50 50 95" fill="none" stroke="white" stroke-width="1" opacity="0.15"/><path d="M 5 50 Q 50 30 95 50" fill="none" stroke="white" stroke-width="1" opacity="0.15"/><path d="M 5 50 Q 50 70 95 50" fill="none" stroke="white" stroke-width="1" opacity="0.15"/></svg>') center/contain no-repeat;
+            opacity: 0.6;
+            z-index: 0;
+        }
+        
         /* ============================================
-           Navigation Tabs - Dark on White
+           Navigation Tabs - Enhanced Contrast
            ============================================ */
         .stTabs [data-baseweb="tab-list"] {
             gap: 0;
-            background: linear-gradient(180deg, #f8f9fa 0%, #ffffff 100%);
-            border-bottom: 2px solid #e0e0e0;
+            background: linear-gradient(180deg, #f0f2f5 0%, #ffffff 100%);
+            border-bottom: 3px solid #dee2e6;
             padding: 0;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
         }
         
         .stTabs [data-baseweb="tab"] {
             background: transparent;
-            color: #2c3e50;
-            font-weight: 600;
-            font-size: 0.85rem;
-            padding: 1.5rem 2.5rem;
+            color: #1a1a1a;
+            font-weight: 700;
+            font-size: 0.9rem;
+            padding: 1.8rem 3rem;
             border: none;
-            border-bottom: 3px solid transparent;
-            letter-spacing: 2px;
+            border-bottom: 4px solid transparent;
+            letter-spacing: 2.5px;
             text-transform: uppercase;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
@@ -120,14 +139,14 @@ def load_css():
             left: 50%;
             transform: translateX(-50%) scaleX(0);
             width: 100%;
-            height: 3px;
+            height: 4px;
             background: linear-gradient(90deg, #1d428a 0%, #c8102e 100%);
             transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
         .stTabs [data-baseweb="tab"]:hover {
             color: #c8102e;
-            background: rgba(200, 16, 46, 0.03);
+            background: linear-gradient(180deg, rgba(200, 16, 46, 0.05) 0%, transparent 100%);
         }
         
         .stTabs [data-baseweb="tab"]:hover::after {
@@ -136,8 +155,8 @@ def load_css():
         
         .stTabs [aria-selected="true"] {
             color: #c8102e;
-            background: rgba(200, 16, 46, 0.05);
-            font-weight: 700;
+            background: linear-gradient(180deg, rgba(200, 16, 46, 0.08) 0%, transparent 100%);
+            font-weight: 900;
         }
         
         .stTabs [aria-selected="true"]::after {
@@ -145,16 +164,16 @@ def load_css():
         }
         
         /* ============================================
-           Statistics Cards - White with Shadows
+           Statistics Cards - Maximum Contrast
            ============================================ */
         .stat-card {
-            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-            padding: 2.5rem 2rem;
-            border-radius: 16px;
-            border: 2px solid #e0e0e0;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            background: linear-gradient(135deg, #ffffff 0%, #fafbfc 100%);
+            padding: 3rem 2.5rem;
+            border-radius: 20px;
+            border: 3px solid #e8eaed;
+            box-shadow: 0 6px 25px rgba(0,0,0,0.1);
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            margin-bottom: 1.5rem;
+            margin-bottom: 2rem;
             text-align: center;
             position: relative;
             overflow: hidden;
@@ -166,32 +185,32 @@ def load_css():
             top: 0;
             left: 0;
             right: 0;
-            height: 4px;
+            height: 5px;
             background: linear-gradient(90deg, #1d428a 0%, #c8102e 100%);
         }
         
         .stat-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 12px 40px rgba(200, 16, 46, 0.15);
-            border-color: rgba(200, 16, 46, 0.3);
+            transform: translateY(-10px);
+            box-shadow: 0 15px 50px rgba(200, 16, 46, 0.2);
+            border-color: rgba(200, 16, 46, 0.4);
         }
         
         .stat-card .stat-label {
-            color: #6c757d;
-            font-size: 0.75rem;
-            font-weight: 700;
+            color: #495057;
+            font-size: 0.8rem;
+            font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 3px;
-            margin-bottom: 1rem;
+            margin-bottom: 1.2rem;
         }
         
         .stat-card .stat-value {
-            color: #212529;
+            color: #000000;
             font-family: 'Bebas Neue', sans-serif;
-            font-size: 4rem;
+            font-size: 4.5rem;
             font-weight: 400;
             line-height: 1;
-            letter-spacing: 2px;
+            letter-spacing: 3px;
         }
         
         .stat-card.primary .stat-value {
@@ -210,21 +229,33 @@ def load_css():
         
         .stat-card .stat-subtitle {
             color: #6c757d;
-            font-size: 0.9rem;
-            margin-top: 1rem;
-            font-weight: 500;
+            font-size: 1rem;
+            margin-top: 1.2rem;
+            font-weight: 600;
+        }
+        
+        /* Icon decoration for stat cards */
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            width: 60px;
+            height: 60px;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>') center/contain no-repeat;
+            opacity: 0.05;
         }
         
         /* ============================================
-           Player Cards - Clean White Design
+           Player Cards - Clean Design with Icons
            ============================================ */
         .player-card {
-            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-            padding: 3rem 2.5rem;
-            border-radius: 20px;
-            border: 2px solid #e0e0e0;
-            margin-bottom: 2rem;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            background: linear-gradient(135deg, #ffffff 0%, #fafbfc 100%);
+            padding: 3.5rem 3rem;
+            border-radius: 24px;
+            border: 3px solid #e8eaed;
+            margin-bottom: 2.5rem;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.12);
             position: relative;
             overflow: hidden;
         }
@@ -236,7 +267,20 @@ def load_css():
             right: 0;
             bottom: 0;
             width: 50%;
-            background: radial-gradient(circle at center right, rgba(200, 16, 46, 0.04) 0%, transparent 70%);
+            background: radial-gradient(circle at center right, rgba(200, 16, 46, 0.05) 0%, transparent 70%);
+        }
+        
+        /* Player silhouette icon */
+        .player-card::after {
+            content: '';
+            position: absolute;
+            right: 5%;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 150px;
+            height: 150px;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%23c8102e" stroke-width="0.5" opacity="0.1"><circle cx="12" cy="7" r="4"/><path d="M5 21v-2a7 7 0 0 1 14 0v2"/></svg>') center/contain no-repeat;
+            opacity: 0.8;
         }
         
         .player-card-content {
@@ -245,13 +289,13 @@ def load_css():
         }
         
         .player-card .player-name {
-            color: #212529;
+            color: #000000;
             font-family: 'Bebas Neue', sans-serif;
-            font-size: 3.5rem;
+            font-size: 4rem;
             font-weight: 400;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.8rem;
             text-transform: uppercase;
-            letter-spacing: 4px;
+            letter-spacing: 5px;
         }
         
         .player-card .player-number {
@@ -260,147 +304,177 @@ def load_css():
             -webkit-text-fill-color: transparent;
             background-clip: text;
             font-family: 'Bebas Neue', sans-serif;
-            font-size: 6rem;
+            font-size: 7rem;
             font-weight: 400;
             line-height: 1;
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
         }
         
         .player-card .player-position {
-            color: #6c757d;
-            font-size: 1.2rem;
-            font-weight: 600;
+            color: #495057;
+            font-size: 1.3rem;
+            font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 3px;
             margin-bottom: 2rem;
         }
         
         /* ============================================
-           Ranking Display - White Background
+           Ranking Display - High Contrast
            ============================================ */
         .ranking-row {
-            background: linear-gradient(90deg, #ffffff 0%, #f8f9fa 100%);
-            padding: 1.5rem;
-            margin-bottom: 0.8rem;
-            border-radius: 12px;
-            border: 2px solid #e0e0e0;
-            border-left: 4px solid transparent;
+            background: linear-gradient(90deg, #ffffff 0%, #fafbfc 100%);
+            padding: 2rem;
+            margin-bottom: 1rem;
+            border-radius: 16px;
+            border: 3px solid #e8eaed;
+            border-left: 5px solid transparent;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             display: flex;
             align-items: center;
-            gap: 1.5rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            gap: 2rem;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.06);
         }
         
         .ranking-row:hover {
-            background: rgba(200, 16, 46, 0.02);
+            background: linear-gradient(90deg, rgba(200, 16, 46, 0.03) 0%, #ffffff 100%);
             border-left-color: #c8102e;
-            transform: translateX(5px);
-            box-shadow: 0 4px 16px rgba(200, 16, 46, 0.1);
+            transform: translateX(8px);
+            box-shadow: 0 6px 20px rgba(200, 16, 46, 0.15);
         }
         
         .ranking-row .ranking-number {
-            color: #6c757d;
+            color: #495057;
             font-family: 'Bebas Neue', sans-serif;
-            font-size: 2rem;
-            min-width: 60px;
+            font-size: 2.5rem;
+            min-width: 70px;
             text-align: center;
+            font-weight: 400;
+        }
+        
+        .ranking-row.rank-1 {
+            border-left-color: #FFB800;
+            background: linear-gradient(90deg, rgba(255, 184, 0, 0.05) 0%, #ffffff 100%);
         }
         
         .ranking-row.rank-1 .ranking-number {
             color: #FFB800;
-            text-shadow: 0 2px 8px rgba(255, 184, 0, 0.3);
+            text-shadow: 0 2px 10px rgba(255, 184, 0, 0.4);
+        }
+        
+        .ranking-row.rank-2 {
+            border-left-color: #95A5A6;
         }
         
         .ranking-row.rank-2 .ranking-number {
-            color: #8C8C8C;
-            text-shadow: 0 2px 8px rgba(140, 140, 140, 0.3);
+            color: #7F8C8D;
+            text-shadow: 0 2px 10px rgba(127, 140, 141, 0.4);
+        }
+        
+        .ranking-row.rank-3 {
+            border-left-color: #CD7F32;
         }
         
         .ranking-row.rank-3 .ranking-number {
             color: #CD7F32;
-            text-shadow: 0 2px 8px rgba(205, 127, 50, 0.3);
+            text-shadow: 0 2px 10px rgba(205, 127, 50, 0.4);
+        }
+        
+        /* Trophy icon for top 3 */
+        .ranking-row.rank-1::before,
+        .ranking-row.rank-2::before,
+        .ranking-row.rank-3::before {
+            content: '';
+            position: absolute;
+            left: 10px;
+            width: 40px;
+            height: 40px;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>') center/contain no-repeat;
+            opacity: 0.1;
         }
         
         /* ============================================
-           Section Headers - Bold on White
+           Section Headers - Bold and Clear
            ============================================ */
         .section-header {
-            color: #212529;
+            color: #000000;
             font-family: 'Bebas Neue', sans-serif;
-            font-size: 2.5rem;
+            font-size: 3rem;
             font-weight: 400;
-            margin: 4rem 0 2rem 0;
-            padding-bottom: 1rem;
-            border-bottom: 3px solid #e0e0e0;
+            margin: 5rem 0 2.5rem 0;
+            padding-bottom: 1.5rem;
+            border-bottom: 4px solid #dee2e6;
             text-transform: uppercase;
-            letter-spacing: 6px;
+            letter-spacing: 8px;
             position: relative;
         }
         
         .section-header::after {
             content: '';
             position: absolute;
-            bottom: -3px;
+            bottom: -4px;
             left: 0;
-            width: 120px;
-            height: 3px;
+            width: 150px;
+            height: 4px;
             background: linear-gradient(90deg, #c8102e 0%, #1d428a 100%);
         }
         
         .section-header-jp {
             font-family: 'Noto Sans JP', sans-serif;
-            font-size: 0.9rem;
-            color: #6c757d;
-            font-weight: 500;
-            margin-top: 0.5rem;
+            font-size: 1rem;
+            color: #495057;
+            font-weight: 600;
+            margin-top: 0.8rem;
             letter-spacing: 2px;
         }
         
         /* ============================================
-           Data Tables - Clean White Design
+           Data Tables - High Contrast
            ============================================ */
         .dataframe {
             background: #ffffff !important;
-            border: 2px solid #e0e0e0 !important;
-            border-radius: 12px;
-            font-size: 0.95rem;
+            border: 3px solid #dee2e6 !important;
+            border-radius: 16px;
+            font-size: 1rem;
             overflow: hidden;
         }
         
         .dataframe th {
-            background: linear-gradient(180deg, #f8f9fa 0%, #ffffff 100%) !important;
-            color: #212529 !important;
-            font-weight: 700 !important;
+            background: linear-gradient(180deg, #f0f2f5 0%, #ffffff 100%) !important;
+            color: #000000 !important;
+            font-weight: 800 !important;
             text-transform: uppercase;
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             letter-spacing: 2px;
-            padding: 1.2rem 1rem !important;
-            border-bottom: 2px solid #c8102e !important;
+            padding: 1.5rem 1.2rem !important;
+            border-bottom: 3px solid #c8102e !important;
         }
         
         .dataframe td {
             background: #ffffff !important;
-            color: #212529 !important;
-            border-bottom: 1px solid #f0f0f0 !important;
-            padding: 1rem !important;
+            color: #000000 !important;
+            border-bottom: 2px solid #f0f2f5 !important;
+            padding: 1.2rem !important;
+            font-weight: 500;
         }
         
         .dataframe tr:hover td {
-            background: rgba(200, 16, 46, 0.03) !important;
+            background: rgba(200, 16, 46, 0.04) !important;
+            font-weight: 600;
         }
         
         /* ============================================
-           Input Fields - White Theme
+           Input Fields - Clear Borders
            ============================================ */
         .stSelectbox > div > div,
         .stTextInput > div > div,
         .stNumberInput > div > div,
         .stDateInput > div > div {
             background: #ffffff;
-            border: 2px solid #e0e0e0;
-            color: #212529;
-            border-radius: 8px;
+            border: 3px solid #dee2e6;
+            color: #000000;
+            border-radius: 12px;
+            font-weight: 500;
         }
         
         .stSelectbox > div > div:focus,
@@ -408,63 +482,70 @@ def load_css():
         .stNumberInput > div > div:focus,
         .stDateInput > div > div:focus {
             border-color: #c8102e;
-            box-shadow: 0 0 0 3px rgba(200, 16, 46, 0.1);
+            box-shadow: 0 0 0 4px rgba(200, 16, 46, 0.15);
+        }
+        
+        /* Labels for inputs */
+        label {
+            color: #000000 !important;
+            font-weight: 700 !important;
+            font-size: 0.95rem !important;
         }
         
         /* ============================================
-           Buttons - Bold on White
+           Buttons - Bold Design
            ============================================ */
         .stButton > button {
             background: linear-gradient(135deg, #c8102e 0%, #a00d26 100%);
             color: white;
             border: none;
-            border-radius: 10px;
-            padding: 1rem 2.5rem;
-            font-weight: 700;
-            font-size: 0.9rem;
+            border-radius: 12px;
+            padding: 1.2rem 3rem;
+            font-weight: 800;
+            font-size: 1rem;
             text-transform: uppercase;
-            letter-spacing: 2px;
+            letter-spacing: 2.5px;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 4px 16px rgba(200, 16, 46, 0.3);
+            box-shadow: 0 6px 20px rgba(200, 16, 46, 0.35);
         }
         
         .stButton > button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(200, 16, 46, 0.4);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(200, 16, 46, 0.5);
             background: linear-gradient(135deg, #e01434 0%, #c8102e 100%);
         }
         
         .stButton > button[kind="secondary"] {
             background: transparent;
-            border: 2px solid #c8102e;
+            border: 3px solid #c8102e;
             color: #c8102e;
         }
         
         .stButton > button[kind="secondary"]:hover {
-            background: rgba(200, 16, 46, 0.05);
+            background: rgba(200, 16, 46, 0.08);
         }
         
         /* ============================================
            Graph Containers
            ============================================ */
         .js-plotly-plot {
-            border-radius: 12px;
+            border-radius: 16px;
             background: #ffffff;
-            border: 2px solid #e0e0e0;
-            padding: 1.5rem;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+            border: 3px solid #dee2e6;
+            padding: 2rem;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.06);
         }
         
         /* ============================================
-           Game Cards - White with Color Accents
+           Game Cards - Clear and Bold
            ============================================ */
         .game-card {
-            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-            padding: 3rem 2.5rem;
-            border-radius: 20px;
-            border: 2px solid #e0e0e0;
-            margin-bottom: 2rem;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+            background: linear-gradient(135deg, #ffffff 0%, #fafbfc 100%);
+            padding: 4rem 3rem;
+            border-radius: 24px;
+            border: 3px solid #e8eaed;
+            margin-bottom: 2.5rem;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
             text-align: center;
             position: relative;
             overflow: hidden;
@@ -476,61 +557,61 @@ def load_css():
             top: 0;
             left: 0;
             right: 0;
-            height: 4px;
+            height: 5px;
             background: linear-gradient(90deg, #1d428a 0%, #c8102e 100%);
         }
         
         .game-card .game-date {
-            color: #6c757d;
-            font-size: 0.85rem;
-            font-weight: 700;
+            color: #495057;
+            font-size: 0.95rem;
+            font-weight: 800;
             text-transform: uppercase;
-            margin-bottom: 2rem;
+            margin-bottom: 2.5rem;
             letter-spacing: 3px;
         }
         
         .game-card .teams {
             font-family: 'Bebas Neue', sans-serif;
-            font-size: 2.5rem;
-            color: #212529;
+            font-size: 3rem;
+            color: #000000;
             font-weight: 400;
-            margin-bottom: 2rem;
-            letter-spacing: 4px;
+            margin-bottom: 2.5rem;
+            letter-spacing: 5px;
         }
         
         .game-card .score {
             font-family: 'Bebas Neue', sans-serif;
-            font-size: 5rem;
+            font-size: 6rem;
             font-weight: 400;
             background: linear-gradient(135deg, #1d428a 0%, #c8102e 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            margin: 2rem 0;
-            letter-spacing: 4px;
+            margin: 2.5rem 0;
+            letter-spacing: 5px;
         }
         
         .game-card .result {
-            font-size: 1.2rem;
-            font-weight: 700;
-            padding: 1rem 2.5rem;
+            font-size: 1.4rem;
+            font-weight: 800;
+            padding: 1.2rem 3rem;
             border-radius: 50px;
             display: inline-block;
-            margin-top: 2rem;
+            margin-top: 2.5rem;
             text-transform: uppercase;
-            letter-spacing: 3px;
+            letter-spacing: 4px;
         }
         
         .game-card .result.win {
             background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
             color: white;
-            box-shadow: 0 4px 16px rgba(40, 167, 69, 0.3);
+            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
         }
         
         .game-card .result.loss {
             background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
             color: white;
-            box-shadow: 0 4px 16px rgba(220, 53, 69, 0.3);
+            box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4);
         }
         
         /* ============================================
@@ -538,56 +619,84 @@ def load_css():
            ============================================ */
         .stFileUploader > div {
             background: #ffffff;
-            border: 3px dashed #c8d4e0;
-            border-radius: 12px;
-            padding: 3rem;
+            border: 4px dashed #adb5bd;
+            border-radius: 16px;
+            padding: 3.5rem;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
         .stFileUploader > div:hover {
             border-color: #c8102e;
-            background: rgba(200, 16, 46, 0.02);
+            background: rgba(200, 16, 46, 0.03);
         }
         
         /* ============================================
-           Messages - Light Theme
+           Messages - High Contrast
            ============================================ */
         .stSuccess {
-            background: rgba(40, 167, 69, 0.1);
-            border-left: 4px solid #28a745;
+            background: rgba(40, 167, 69, 0.12);
+            border-left: 5px solid #28a745;
             color: #155724;
-            border-radius: 8px;
+            border-radius: 12px;
+            font-weight: 600;
         }
         
         .stError {
-            background: rgba(220, 53, 69, 0.1);
-            border-left: 4px solid #dc3545;
+            background: rgba(220, 53, 69, 0.12);
+            border-left: 5px solid #dc3545;
             color: #721c24;
-            border-radius: 8px;
+            border-radius: 12px;
+            font-weight: 600;
         }
         
         .stInfo {
-            background: rgba(23, 162, 184, 0.1);
-            border-left: 4px solid #17a2b8;
+            background: rgba(23, 162, 184, 0.12);
+            border-left: 5px solid #17a2b8;
             color: #0c5460;
-            border-radius: 8px;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+        
+        .stWarning {
+            background: rgba(255, 193, 7, 0.12);
+            border-left: 5px solid #ffc107;
+            color: #856404;
+            border-radius: 12px;
+            font-weight: 600;
         }
         
         /* ============================================
            Sidebar Styling
            ============================================ */
         [data-testid="stSidebar"] {
-            background: linear-gradient(180deg, #f8f9fa 0%, #ffffff 100%);
-            border-right: 2px solid #e0e0e0;
+            background: linear-gradient(180deg, #f0f2f5 0%, #ffffff 100%);
+            border-right: 3px solid #dee2e6;
         }
         
         [data-testid="stSidebar"] .stMarkdown {
-            color: #212529;
+            color: #000000;
+            font-weight: 600;
         }
         
         [data-testid="stSidebar"] h3 {
-            color: #212529;
+            color: #000000;
+            font-weight: 800;
+            font-size: 1.1rem;
+        }
+        
+        /* ============================================
+           Metric Components
+           ============================================ */
+        [data-testid="stMetricValue"] {
+            color: #000000;
+            font-size: 2rem;
+            font-weight: 800;
+        }
+        
+        [data-testid="stMetricLabel"] {
+            color: #495057;
             font-weight: 700;
+            font-size: 0.9rem;
         }
         
         /* ============================================
@@ -595,21 +704,21 @@ def load_css():
            ============================================ */
         @media (max-width: 768px) {
             .block-container {
-                padding: 1rem;
+                padding: 1.5rem;
             }
             
             .nba-header {
-                margin: -1rem -1rem 2rem -1rem;
-                padding: 3rem 1.5rem;
+                margin: -1.5rem -1.5rem 2rem -1.5rem;
+                padding: 3rem 2rem;
             }
             
             .nba-header h1 {
-                font-size: 3rem;
-                letter-spacing: 4px;
+                font-size: 3.5rem;
+                letter-spacing: 6px;
             }
             
             .stat-card .stat-value {
-                font-size: 2.5rem;
+                font-size: 3rem;
             }
             
             .player-card .player-name {
@@ -617,34 +726,54 @@ def load_css():
             }
             
             .player-card .player-number {
-                font-size: 4rem;
+                font-size: 5rem;
             }
             
             .score {
-                font-size: 3.5rem;
+                font-size: 4rem;
+            }
+            
+            .stTabs [data-baseweb="tab"] {
+                padding: 1.2rem 1.5rem;
+                font-size: 0.75rem;
             }
         }
         
         /* ============================================
-           Custom Scrollbar - Subtle
+           Custom Scrollbar
            ============================================ */
         ::-webkit-scrollbar {
-            width: 12px;
-            height: 12px;
+            width: 14px;
+            height: 14px;
         }
         
         ::-webkit-scrollbar-track {
-            background: #f8f9fa;
+            background: #f0f2f5;
         }
         
         ::-webkit-scrollbar-thumb {
             background: linear-gradient(180deg, #c8102e 0%, #1d428a 100%);
-            border-radius: 6px;
-            border: 2px solid #f8f9fa;
+            border-radius: 7px;
+            border: 3px solid #f0f2f5;
         }
         
         ::-webkit-scrollbar-thumb:hover {
             background: linear-gradient(180deg, #e01434 0%, #4169e1 100%);
+        }
+        
+        /* ============================================
+           Print Styles
+           ============================================ */
+        @media print {
+            .nba-header {
+                background: white !important;
+                border-bottom: 3px solid #000;
+            }
+            
+            .nba-header h1 {
+                color: #000 !important;
+                -webkit-text-fill-color: #000 !important;
+            }
         }
     </style>
     """, unsafe_allow_html=True)
