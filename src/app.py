@@ -31,7 +31,7 @@ except ImportError as e:
 
 
 def show_splash_screen():
-    """スプラッシュスクリーン（フェイドアウト効果付き）"""
+    """スプラッシュスクリーン（フェイドアウト効果付き・筑波大学附属高校）"""
     import time
     
     splash_placeholder = st.empty()
@@ -42,6 +42,11 @@ def show_splash_screen():
         @keyframes fadeOut {
             from { opacity: 1; }
             to { opacity: 0; }
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
         
         .splash-screen {
@@ -56,40 +61,63 @@ def show_splash_screen():
             align-items: center;
             justify-content: center;
             z-index: 9999;
-            animation: fadeOut 2s ease-in-out forwards;
-            animation-delay: 1s;
+            animation: fadeOut 1.5s ease-in-out forwards;
+            animation-delay: 2s;
         }
         
         .splash-logo {
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: 6rem;
-            color: white;
+            font-size: 8rem;
             margin-bottom: 1rem;
-            letter-spacing: 10px;
-            text-transform: uppercase;
             animation: pulse 2s ease-in-out infinite;
         }
         
-        .splash-subtitle {
-            font-size: 1.5rem;
-            color: rgba(255, 255, 255, 0.9);
-            letter-spacing: 4px;
+        .splash-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 4rem;
+            color: white;
+            margin-bottom: 0.5rem;
+            letter-spacing: 8px;
             text-transform: uppercase;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            animation: slideUp 0.8s ease-out forwards;
+        }
+        
+        .splash-school {
+            font-size: 2rem;
+            color: rgba(255, 255, 255, 0.95);
+            margin-bottom: 2rem;
+            letter-spacing: 4px;
+            font-weight: 500;
+            animation: slideUp 0.8s ease-out forwards;
+            animation-delay: 0.2s;
+            opacity: 0;
+        }
+        
+        .splash-subtitle {
+            font-size: 1.3rem;
+            color: rgba(255, 255, 255, 0.85);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            animation: slideUp 0.8s ease-out forwards;
+            animation-delay: 0.4s;
+            opacity: 0;
         }
         
         @keyframes pulse {
             0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
+            50% { transform: scale(1.1); }
         }
         </style>
         
         <div class="splash-screen">
-            <div class="splash-logo">🏀 BASKETBALL</div>
-            <div class="splash-subtitle">Stats Manager</div>
+            <div class="splash-logo">🏀</div>
+            <div class="splash-title">BASKETBALL</div>
+            <div class="splash-school">筑波大学附属高等学校</div>
+            <div class="splash-subtitle">Statistics Manager</div>
         </div>
         """, unsafe_allow_html=True)
     
-    time.sleep(3)
+    time.sleep(3.5)
     splash_placeholder.empty()
 
 
@@ -136,14 +164,16 @@ def render_sidebar(db):
             "試合統計": "🏀",
             "比較分析": "📊",
             "チーム情報": "👥",
-            "対戦相手統計": "🎯",
+            "対戦相手": "🎯",
             "データ入力": "📝",
             "設定": "⚙️"
         }
         
         for page_name, icon in pages.items():
+            # ボタンのテキストを工夫してタブが切れないように
+            button_text = f"{icon} {page_name}"
             if st.button(
-                f"{icon} {page_name}",
+                button_text,
                 key=f"nav_{page_name}",
                 use_container_width=True,
                 type="primary" if st.session_state.current_page == page_name else "secondary"
@@ -193,7 +223,7 @@ def render_main_content(db):
             compare.render(db)
         elif current_page == "チーム情報":
             team_info.render(db)
-        elif current_page == "対戦相手統計":
+        elif current_page == "対戦相手":
             opponent_stats.render(db)
         elif current_page == "データ入力":
             data_input.render(db)
