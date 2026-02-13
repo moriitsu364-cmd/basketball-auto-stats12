@@ -1,7 +1,8 @@
-"""改良されたグラフ作成 - 棒グラフ、円グラフ対応（白基調）"""
+"""改良されたグラフ作成 - 完全版（正しいグラフタイプと軸、日英対応）"""
 import plotly.graph_objects as go
 import plotly.express as px
 from config import NBA_COLORS
+import pandas as pd
 
 
 def create_nba_chart(data, title: str, x_col: str, y_col: str, chart_type: str = 'line', 
@@ -10,12 +11,12 @@ def create_nba_chart(data, title: str, x_col: str, y_col: str, chart_type: str =
     
     Args:
         data: データフレーム
-        title: グラフタイトル（英語）
+        title: グラフタイトル（日本語）
         x_col: X軸のカラム名
         y_col: Y軸のカラム名
         chart_type: チャートタイプ ('line', 'bar', 'scatter')
         color: 色
-        title_jp: グラフタイトル（日本語）
+        title_jp: グラフタイトル（英語）
     
     Returns:
         Plotlyのfigureオブジェクト
@@ -29,15 +30,15 @@ def create_nba_chart(data, title: str, x_col: str, y_col: str, chart_type: str =
 
 
 def create_line_chart(data, title: str, x_col: str, y_col: str, color: str = None, title_jp: str = ""):
-    """折れ線グラフを作成
+    """折れ線グラフを作成（改良版）
     
     Args:
         data: データフレーム
-        title: グラフタイトル（英語）
+        title: グラフタイトル（日本語）
         x_col: X軸のカラム名
         y_col: Y軸のカラム名
         color: 線の色
-        title_jp: グラフタイトル（日本語）
+        title_jp: グラフタイトル（英語）
     
     Returns:
         Plotlyのfigureオブジェクト
@@ -45,19 +46,33 @@ def create_line_chart(data, title: str, x_col: str, y_col: str, color: str = Non
     if color is None:
         color = NBA_COLORS['primary']
     
-    full_title = f"{title}<br><sub>{title_jp}</sub>" if title_jp else title
+    # タイトルを日英併記
+    full_title = f"{title}<br><sub style='color: #888;'>{title_jp}</sub>" if title_jp else title
     
     fig = go.Figure()
     
+    # データをソート（x軸が数値または日付の場合）
+    try:
+        data_sorted = data.sort_values(by=x_col)
+    except:
+        data_sorted = data
+    
     fig.add_trace(go.Scatter(
-        x=data[x_col],
-        y=data[y_col],
+        x=data_sorted[x_col],
+        y=data_sorted[y_col],
         mode='lines+markers',
         line=dict(color=color, width=4),
         marker=dict(size=10, color=color, line=dict(width=2, color='#ffffff')),
         fill='tozeroy',
         fillcolor=f'rgba{tuple(list(int(color.lstrip("#")[i:i+2], 16) for i in (0, 2, 4)) + [0.1])}'
     ))
+    
+    # X軸のラベル（試合番号の場合）
+    x_axis_title = None
+    if x_col == 'GameNumber':
+        x_axis_title = '試合番号 / Game Number'
+    elif x_col == 'GameDate':
+        x_axis_title = '試合日 / Date'
     
     fig.update_layout(
         title=dict(
@@ -73,9 +88,11 @@ def create_line_chart(data, title: str, x_col: str, y_col: str, color: str = Non
             gridcolor='#dee2e6',
             showgrid=True,
             zeroline=False,
-            tickangle=-45,
-            title=None,
-            color='#212529'
+            tickangle=0,
+            title=x_axis_title,
+            title_font=dict(size=12, color='#666'),
+            color='#212529',
+            dtick=1 if x_col == 'GameNumber' else None  # 試合番号は1刻み
         ),
         yaxis=dict(
             gridcolor='#dee2e6',
@@ -94,15 +111,15 @@ def create_line_chart(data, title: str, x_col: str, y_col: str, color: str = Non
 
 def create_bar_chart(data, title: str, x_col: str, y_col: str, color: str = None, 
                      title_jp: str = "", orientation='v'):
-    """棒グラフを作成
+    """棒グラフを作成（改良版）
     
     Args:
         data: データフレーム
-        title: グラフタイトル（英語）
+        title: グラフタイトル（日本語）
         x_col: X軸のカラム名
         y_col: Y軸のカラム名
         color: 棒の色
-        title_jp: グラフタイトル（日本語）
+        title_jp: グラフタイトル（英語）
         orientation: 'v'（縦）または 'h'（横）
     
     Returns:
@@ -111,34 +128,37 @@ def create_bar_chart(data, title: str, x_col: str, y_col: str, color: str = None
     if color is None:
         color = NBA_COLORS['secondary']
     
-    full_title = f"{title}<br><sub>{title_jp}</sub>" if title_jp else title
+    full_title = f"{title}<br><sub style='color: #888;'>{title_jp}</sub>" if title_jp else title
+    
+    # データをソート（値の大きい順）
+    data_sorted = data.sort_values(by=y_col, ascending=False)
     
     if orientation == 'v':
         fig = go.Figure(go.Bar(
-            x=data[x_col],
-            y=data[y_col],
+            x=data_sorted[x_col],
+            y=data_sorted[y_col],
             marker=dict(
-                color=data[y_col],
+                color=data_sorted[y_col],
                 colorscale=[[0, '#1d428a'], [1, '#c8102e']],
                 line=dict(width=2, color='#ffffff')
             ),
-            text=data[y_col],
+            text=[f'{val:.1f}' for val in data_sorted[y_col]],
             textposition='outside',
-            textfont=dict(color='#212529', size=12)
+            textfont=dict(color='#212529', size=12, weight='bold')
         ))
     else:
         fig = go.Figure(go.Bar(
-            x=data[y_col],
-            y=data[x_col],
+            x=data_sorted[y_col],
+            y=data_sorted[x_col],
             orientation='h',
             marker=dict(
-                color=data[y_col],
+                color=data_sorted[y_col],
                 colorscale=[[0, '#1d428a'], [1, '#c8102e']],
                 line=dict(width=2, color='#ffffff')
             ),
-            text=data[y_col],
+            text=[f'{val:.1f}' for val in data_sorted[y_col]],
             textposition='outside',
-            textfont=dict(color='#212529', size=12)
+            textfont=dict(color='#212529', size=12, weight='bold')
         ))
     
     fig.update_layout(
@@ -162,25 +182,26 @@ def create_bar_chart(data, title: str, x_col: str, y_col: str, color: str = None
             color='#212529'
         ),
         margin=dict(l=60, r=20, t=80, b=80),
-        height=400
+        height=400,
+        showlegend=False
     )
     
     return fig
 
 
 def create_pie_chart(labels, values, title: str, title_jp: str = ""):
-    """円グラフを作成
+    """円グラフを作成（改良版）
     
     Args:
         labels: ラベルリスト
         values: 値リスト
-        title: グラフタイトル（英語）
-        title_jp: グラフタイトル（日本語）
+        title: グラフタイトル（日本語）
+        title_jp: グラフタイトル（英語）
     
     Returns:
         Plotlyのfigureオブジェクト
     """
-    full_title = f"{title}<br><sub>{title_jp}</sub>" if title_jp else title
+    full_title = f"{title}<br><sub style='color: #888;'>{title_jp}</sub>" if title_jp else title
     
     colors = ['#1d428a', '#c8102e', '#ffd700', '#4169e1', '#ff4757', 
               '#20c997', '#6c757d', '#f8d7da', '#5cb85c']
@@ -193,7 +214,7 @@ def create_pie_chart(labels, values, title: str, title_jp: str = ""):
             colors=colors[:len(labels)],
             line=dict(color='#ffffff', width=3)
         ),
-        textfont=dict(size=14, color='#212529'),
+        textfont=dict(size=14, color='#212529', weight='bold'),
         textposition='outside',
         textinfo='label+percent'
     ))
@@ -221,7 +242,7 @@ def create_pie_chart(labels, values, title: str, title_jp: str = ""):
 
 
 def create_comparison_chart(data_list, names: list, x_col: str, y_col: str, 
-                            title: str = "Player Comparison", title_jp: str = "選手比較"):
+                            title: str = "選手比較", title_jp: str = "Player Comparison"):
     """複数選手比較チャートを作成
     
     Args:
@@ -229,13 +250,13 @@ def create_comparison_chart(data_list, names: list, x_col: str, y_col: str,
         names: 選手名のリスト
         x_col: X軸のカラム名
         y_col: Y軸のカラム名
-        title: グラフタイトル
-        title_jp: 日本語タイトル
+        title: グラフタイトル（日本語）
+        title_jp: 英語タイトル
     
     Returns:
         Plotlyのfigureオブジェクト
     """
-    full_title = f"{title}<br><sub>{title_jp}</sub>"
+    full_title = f"{title}<br><sub style='color: #888;'>{title_jp}</sub>"
     
     colors = ['#1d428a', '#c8102e', '#ffd700', '#4169e1', '#ff4757', 
               '#20c997', '#6c757d', '#f8d7da']
@@ -243,14 +264,27 @@ def create_comparison_chart(data_list, names: list, x_col: str, y_col: str,
     fig = go.Figure()
     
     for i, (data, name) in enumerate(zip(data_list, names)):
+        # データをソート
+        try:
+            data_sorted = data.sort_values(by=x_col)
+        except:
+            data_sorted = data
+        
         fig.add_trace(go.Scatter(
-            x=data[x_col],
-            y=data[y_col],
+            x=data_sorted[x_col],
+            y=data_sorted[y_col],
             mode='lines+markers',
             name=name,
             line=dict(color=colors[i % len(colors)], width=3),
             marker=dict(size=8, line=dict(width=2, color='#ffffff'))
         ))
+    
+    # X軸のラベル
+    x_axis_title = None
+    if x_col == 'GameNumber':
+        x_axis_title = '試合番号 / Game Number'
+    elif x_col == 'GameDate':
+        x_axis_title = '試合日 / Date'
     
     fig.update_layout(
         title=dict(
@@ -265,7 +299,9 @@ def create_comparison_chart(data_list, names: list, x_col: str, y_col: str,
         xaxis=dict(
             gridcolor='#dee2e6',
             showgrid=True,
-            color='#212529'
+            color='#212529',
+            title=x_axis_title,
+            title_font=dict(size=12, color='#666')
         ),
         yaxis=dict(
             gridcolor='#dee2e6',
@@ -286,20 +322,21 @@ def create_comparison_chart(data_list, names: list, x_col: str, y_col: str,
     return fig
 
 
-def create_radar_chart(categories, values_list, names: list, title: str = "Stats Radar", title_jp: str = "スタッツレーダー"):
+def create_radar_chart(categories, values_list, names: list, 
+                       title: str = "スタッツレーダー", title_jp: str = "Stats Radar"):
     """レーダーチャートを作成
     
     Args:
         categories: カテゴリリスト
         values_list: 値のリスト（選手ごと）
         names: 選手名リスト
-        title: グラフタイトル
-        title_jp: 日本語タイトル
+        title: グラフタイトル（日本語）
+        title_jp: 英語タイトル
     
     Returns:
         Plotlyのfigureオブジェクト
     """
-    full_title = f"{title}<br><sub>{title_jp}</sub>"
+    full_title = f"{title}<br><sub style='color: #888;'>{title_jp}</sub>"
     
     colors = ['#1d428a', '#c8102e', '#ffd700', '#4169e1']
     
