@@ -3,7 +3,7 @@ import streamlit as st
 import pandas as pd
 from pathlib import Path
 from database import StatsDatabase
-from components_new import section_header, staff_card
+from components import section_header, staff_card
 from config import TEAM_INFO_FILE, TEAM_INFO_COLUMNS, STAFF_IMAGES_DIR
 
 
