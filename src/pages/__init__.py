@@ -1,14 +1,12 @@
-"""ページモジュール"""
-from pages import season_stats
-from pages import player_stats
-from pages import game_stats
-from pages import compare
-from pages import data_input
-
+"""ページモジュール - 修正版"""
+# 循環インポートを避けるため、__init__.pyではインポートを行わない
 __all__ = [
     'season_stats',
     'player_stats', 
     'game_stats',
     'compare',
-    'data_input'
+    'data_input',
+    'team_info',
+    'opponent_stats',
+    'admin_settings'
 ]
