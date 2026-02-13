@@ -41,14 +41,18 @@ def initialize_session_state():
 
 def check_dependencies():
     """必要な依存関係のチェック"""
-    required_modules = ['pandas', 'plotly', 'PIL']
+    required_modules = {
+        'pandas': 'pandas',
+        'plotly': 'plotly',
+        'PIL': 'Pillow'
+    }
     missing = []
     
-    for module in required_modules:
+    for import_name, package_name in required_modules.items():
         try:
-            __import__(module)
+            __import__(import_name)
         except ImportError:
-            missing.append(module)
+            missing.append(package_name)
     
     if missing:
         st.error(f"必要なモジュールがインストールされていません: {', '.join(missing)}")
