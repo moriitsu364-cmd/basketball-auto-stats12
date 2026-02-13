@@ -1,5 +1,12 @@
 """シーズン統計ページ"""
 import streamlit as st
+import sys
+from pathlib import Path
+
+# パスの設定
+if str(Path(__file__).parent.parent) not in sys.path:
+    sys.path.insert(0, str(Path(__file__).parent.parent))
+
 from database import StatsDatabase
 from stats import calculate_season_overview, get_leaders
 from charts import create_nba_chart
