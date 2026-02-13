@@ -11,11 +11,11 @@ from pathlib import Path
 if str(Path(__file__).parent.parent) not in sys.path:
     sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from database import StatsDatabase
-from auth import check_password
-from ai import setup_gemini, analyze_scoresheet
-from components import section_header
-from config import SEASONS, GAME_FORMATS
+from ..database import StatsDatabase
+from ..auth import check_password
+from ..ai import setup_gemini, analyze_scoresheet
+from ..components import section_header
+from ..config import SEASONS, GAME_FORMATS
 
 
 def render(db: StatsDatabase):
