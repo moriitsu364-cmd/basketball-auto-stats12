@@ -45,6 +45,7 @@ def load_css():
             overflow: hidden;
             border-bottom: 4px solid;
             border-image: linear-gradient(90deg, #1d428a 0%, #c8102e 100%) 1;
+            z-index: 1;
         }
         
         .nba-header::before {
@@ -58,6 +59,7 @@ def load_css():
                 radial-gradient(circle at 20% 30%, rgba(200, 16, 46, 0.2) 0%, transparent 50%),
                 radial-gradient(circle at 80% 70%, rgba(29, 66, 138, 0.2) 0%, transparent 50%);
             animation: pulse 8s ease-in-out infinite;
+            z-index: 0;
         }
         
         @keyframes pulse {
@@ -108,7 +110,7 @@ def load_css():
         }
         
         /* ============================================
-           Navigation Tabs - Enhanced Contrast
+           Navigation Tabs - Enhanced Contrast (FIXED FOR CLICKABILITY)
            ============================================ */
         .stTabs [data-baseweb="tab-list"] {
             gap: 0;
@@ -116,8 +118,8 @@ def load_css():
             border-bottom: 3px solid #dee2e6;
             padding: 0;
             box-shadow: 0 3px 10px rgba(0,0,0,0.08);
-            position: relative;
-            z-index: 1;
+            position: relative !important;
+            z-index: 999 !important;
         }
         
         .stTabs [data-baseweb="tab"] {
@@ -131,10 +133,10 @@ def load_css():
             letter-spacing: 2.5px;
             text-transform: uppercase;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            z-index: 2;
-            cursor: pointer;
-            pointer-events: auto;
+            position: relative !important;
+            z-index: 1000 !important;
+            cursor: pointer !important;
+            pointer-events: auto !important;
         }
         
         .stTabs [data-baseweb="tab"]::after {
@@ -147,14 +149,14 @@ def load_css():
             height: 4px;
             background: linear-gradient(90deg, #1d428a 0%, #c8102e 100%);
             transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            pointer-events: none;
+            pointer-events: none !important;
             z-index: -1;
         }
         
         .stTabs [data-baseweb="tab"]:hover {
             color: #c8102e;
             background: linear-gradient(180deg, rgba(200, 16, 46, 0.05) 0%, transparent 100%);
-            cursor: pointer;
+            cursor: pointer !important;
         }
         
         .stTabs [data-baseweb="tab"]:hover::after {
@@ -165,7 +167,7 @@ def load_css():
             color: #c8102e;
             background: linear-gradient(180deg, rgba(200, 16, 46, 0.08) 0%, transparent 100%);
             font-weight: 900;
-            pointer-events: auto;
+            pointer-events: auto !important;
         }
         
         .stTabs [aria-selected="true"]::after {
@@ -174,12 +176,24 @@ def load_css():
         
         /* Ensure tabs container doesn't block clicks */
         .stTabs {
-            position: relative;
-            z-index: auto;
+            position: relative !important;
+            z-index: 998 !important;
         }
         
         .stTabs > div {
-            pointer-events: auto;
+            pointer-events: auto !important;
+        }
+        
+        /* Override any potential blocking elements */
+        .stTabs [role="tablist"] {
+            pointer-events: auto !important;
+            z-index: 999 !important;
+        }
+        
+        .stTabs button[role="tab"] {
+            pointer-events: auto !important;
+            cursor: pointer !important;
+            z-index: 1000 !important;
         }
         
         /* ============================================
