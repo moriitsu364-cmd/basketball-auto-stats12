@@ -1,21 +1,33 @@
 """バスケットボール統計管理システム - メインアプリケーション"""
 import streamlit as st
 import sys
+import os
 from pathlib import Path
 
 # パスの設定
-if str(Path(__file__).parent.parent) not in sys.path:
-    sys.path.insert(0, str(Path(__file__).parent.parent))
+BASE_DIR = Path(__file__).parent.parent
+SRC_DIR = Path(__file__).parent
+
+# sys.pathに追加
+for path in [str(BASE_DIR), str(SRC_DIR)]:
+    if path not in sys.path:
+        sys.path.insert(0, path)
+
+# カレントディレクトリをベースディレクトリに変更
+try:
+    os.chdir(BASE_DIR)
+except Exception:
+    pass
 
 # 必要なモジュールのインポート
 try:
-    from src.config import *
-    from src.database import StatsDatabase
-    from src.auth import check_password
-    from src.styles import load_css
+    from config import *
+    from database import StatsDatabase
+    from auth import check_password
+    from styles import load_css
     
     # ページモジュールのインポート
-    from src.pages import (
+    from pages import (
         season_stats,
         player_stats,
         game_stats,
@@ -27,6 +39,10 @@ try:
     )
 except ImportError as e:
     st.error(f"モジュールのインポートに失敗しました: {e}")
+    st.error(f"カレントディレクトリ: {os.getcwd()}")
+    st.error(f"sys.path: {sys.path}")
+    import traceback
+    st.code(traceback.format_exc())
     st.stop()
 
 
