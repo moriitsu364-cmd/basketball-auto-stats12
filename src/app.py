@@ -247,7 +247,7 @@ def main():
         
         with tabs[7]:
             try:
-                admin_settings.render()
+                admin_settings.render(db)
             except Exception as e:
                 st.error(f"管理者設定の表示エラー: {e}")
                 if DEBUG_MODE:
