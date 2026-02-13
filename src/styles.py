@@ -116,6 +116,8 @@ def load_css():
             border-bottom: 3px solid #dee2e6;
             padding: 0;
             box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+            position: relative;
+            z-index: 1;
         }
         
         .stTabs [data-baseweb="tab"] {
@@ -130,6 +132,9 @@ def load_css():
             text-transform: uppercase;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
+            z-index: 2;
+            cursor: pointer;
+            pointer-events: auto;
         }
         
         .stTabs [data-baseweb="tab"]::after {
@@ -142,11 +147,14 @@ def load_css():
             height: 4px;
             background: linear-gradient(90deg, #1d428a 0%, #c8102e 100%);
             transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
+            z-index: -1;
         }
         
         .stTabs [data-baseweb="tab"]:hover {
             color: #c8102e;
             background: linear-gradient(180deg, rgba(200, 16, 46, 0.05) 0%, transparent 100%);
+            cursor: pointer;
         }
         
         .stTabs [data-baseweb="tab"]:hover::after {
@@ -157,10 +165,21 @@ def load_css():
             color: #c8102e;
             background: linear-gradient(180deg, rgba(200, 16, 46, 0.08) 0%, transparent 100%);
             font-weight: 900;
+            pointer-events: auto;
         }
         
         .stTabs [aria-selected="true"]::after {
             transform: translateX(-50%) scaleX(1);
+        }
+        
+        /* Ensure tabs container doesn't block clicks */
+        .stTabs {
+            position: relative;
+            z-index: auto;
+        }
+        
+        .stTabs > div {
+            pointer-events: auto;
         }
         
         /* ============================================
@@ -238,24 +257,26 @@ def load_css():
         .stat-card::after {
             content: '';
             position: absolute;
-            bottom: 10px;
-            right: 10px;
+            right: 1.5rem;
+            bottom: 1.5rem;
             width: 60px;
             height: 60px;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>') center/contain no-repeat;
-            opacity: 0.05;
+            opacity: 0.08;
+            background-size: contain;
+            background-repeat: no-repeat;
         }
         
         /* ============================================
-           Player Cards - Clean Design with Icons
+           Player Cards - Enhanced Typography
            ============================================ */
         .player-card {
             background: linear-gradient(135deg, #ffffff 0%, #fafbfc 100%);
-            padding: 3.5rem 3rem;
+            padding: 4rem 3rem;
             border-radius: 24px;
             border: 3px solid #e8eaed;
             margin-bottom: 2.5rem;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.12);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            text-align: center;
             position: relative;
             overflow: hidden;
         }
@@ -264,281 +285,223 @@ def load_css():
             content: '';
             position: absolute;
             top: 0;
+            left: 0;
             right: 0;
-            bottom: 0;
-            width: 50%;
-            background: radial-gradient(circle at center right, rgba(200, 16, 46, 0.05) 0%, transparent 70%);
+            height: 5px;
+            background: linear-gradient(90deg, #1d428a 0%, #c8102e 100%);
         }
         
-        /* Player silhouette icon */
-        .player-card::after {
-            content: '';
-            position: absolute;
-            right: 5%;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 150px;
-            height: 150px;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%23c8102e" stroke-width="0.5" opacity="0.1"><circle cx="12" cy="7" r="4"/><path d="M5 21v-2a7 7 0 0 1 14 0v2"/></svg>') center/contain no-repeat;
-            opacity: 0.8;
+        .player-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 60px rgba(200, 16, 46, 0.25);
         }
         
-        .player-card-content {
-            position: relative;
-            z-index: 1;
+        .player-card .player-number {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 8rem;
+            font-weight: 400;
+            background: linear-gradient(135deg, #1d428a 0%, #c8102e 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1;
+            margin-bottom: 1.5rem;
+            letter-spacing: 5px;
         }
         
         .player-card .player-name {
             color: #000000;
             font-family: 'Bebas Neue', sans-serif;
-            font-size: 4rem;
+            font-size: 3.5rem;
             font-weight: 400;
-            margin-bottom: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 5px;
-        }
-        
-        .player-card .player-number {
-            background: linear-gradient(135deg, #1d428a 0%, #c8102e 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: 7rem;
-            font-weight: 400;
-            line-height: 1;
             margin-bottom: 1.5rem;
+            letter-spacing: 8px;
+            text-transform: uppercase;
         }
         
         .player-card .player-position {
             color: #495057;
-            font-size: 1.3rem;
-            font-weight: 700;
+            font-size: 1rem;
+            font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 3px;
-            margin-bottom: 2rem;
+            letter-spacing: 4px;
+            margin-bottom: 3rem;
         }
         
-        /* ============================================
-           Ranking Display - High Contrast (FIXED)
-           ============================================ */
-        .ranking-row {
-            background: linear-gradient(90deg, #ffffff 0%, #fafbfc 100%);
-            padding: 2rem;
-            margin-bottom: 1rem;
-            border-radius: 16px;
-            border: 3px solid #e8eaed;
-            border-left: 5px solid transparent;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        .player-card .player-stats {
             display: flex;
-            align-items: center;
-            gap: 2rem;
-            box-shadow: 0 3px 12px rgba(0,0,0,0.06);
-            position: relative; /* FIXED: Added position relative for ::before positioning */
+            justify-content: space-around;
+            margin-top: 3rem;
+            padding-top: 3rem;
+            border-top: 3px solid #e8eaed;
         }
         
-        .ranking-row:hover {
-            background: linear-gradient(90deg, rgba(200, 16, 46, 0.03) 0%, #ffffff 100%);
-            border-left-color: #c8102e;
-            transform: translateX(8px);
-            box-shadow: 0 6px 20px rgba(200, 16, 46, 0.15);
-        }
-        
-        .ranking-row .ranking-number {
-            color: #495057;
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: 2.5rem;
-            min-width: 70px;
+        .player-card .player-stat-item {
             text-align: center;
-            font-weight: 400;
         }
         
-        .ranking-row.rank-1 {
-            border-left-color: #FFB800;
-            background: linear-gradient(90deg, rgba(255, 184, 0, 0.05) 0%, #ffffff 100%);
-        }
-        
-        .ranking-row.rank-1 .ranking-number {
-            color: #FFB800;
-            text-shadow: 0 2px 10px rgba(255, 184, 0, 0.4);
-        }
-        
-        .ranking-row.rank-2 {
-            border-left-color: #95A5A6;
-        }
-        
-        .ranking-row.rank-2 .ranking-number {
-            color: #7F8C8D;
-            text-shadow: 0 2px 10px rgba(127, 140, 141, 0.4);
-        }
-        
-        .ranking-row.rank-3 {
-            border-left-color: #CD7F32;
-        }
-        
-        .ranking-row.rank-3 .ranking-number {
-            color: #CD7F32;
-            text-shadow: 0 2px 10px rgba(205, 127, 50, 0.4);
-        }
-        
-        /* Trophy icon for top 3 */
-        .ranking-row.rank-1::before,
-        .ranking-row.rank-2::before,
-        .ranking-row.rank-3::before {
-            content: '';
-            position: absolute;
-            left: 10px;
-            width: 40px;
-            height: 40px;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>') center/contain no-repeat;
-            opacity: 0.1;
-        }
-        
-        /* ============================================
-           Section Headers - Bold and Clear
-           ============================================ */
-        .section-header {
-            color: #000000;
+        .player-card .player-stat-value {
             font-family: 'Bebas Neue', sans-serif;
             font-size: 3rem;
+            color: #1d428a;
             font-weight: 400;
-            margin: 5rem 0 2.5rem 0;
-            padding-bottom: 1.5rem;
-            border-bottom: 4px solid #dee2e6;
+            letter-spacing: 3px;
+        }
+        
+        .player-card .player-stat-label {
+            color: #6c757d;
+            font-size: 0.8rem;
+            font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 8px;
-            position: relative;
-        }
-        
-        .section-header::after {
-            content: '';
-            position: absolute;
-            bottom: -4px;
-            left: 0;
-            width: 150px;
-            height: 4px;
-            background: linear-gradient(90deg, #c8102e 0%, #1d428a 100%);
-        }
-        
-        .section-header-jp {
-            font-family: 'Noto Sans JP', sans-serif;
-            font-size: 1rem;
-            color: #495057;
-            font-weight: 600;
-            margin-top: 0.8rem;
             letter-spacing: 2px;
+            margin-top: 0.8rem;
         }
         
         /* ============================================
-           Data Tables - High Contrast
+           Data Tables - Bold & Clear
            ============================================ */
         .dataframe {
-            background: #ffffff !important;
-            border: 3px solid #dee2e6 !important;
+            font-family: 'Space Grotesk', 'Noto Sans JP', sans-serif;
+            border-collapse: separate;
+            border-spacing: 0;
+            width: 100%;
             border-radius: 16px;
-            font-size: 1rem;
             overflow: hidden;
+            box-shadow: 0 6px 25px rgba(0,0,0,0.1);
+            border: 3px solid #e8eaed;
         }
         
-        .dataframe th {
-            background: linear-gradient(180deg, #f0f2f5 0%, #ffffff 100%) !important;
-            color: #000000 !important;
-            font-weight: 800 !important;
-            text-transform: uppercase;
-            font-size: 0.8rem;
-            letter-spacing: 2px;
-            padding: 1.5rem 1.2rem !important;
-            border-bottom: 3px solid #c8102e !important;
-        }
-        
-        .dataframe td {
-            background: #ffffff !important;
-            color: #000000 !important;
-            border-bottom: 2px solid #f0f2f5 !important;
-            padding: 1.2rem !important;
-            font-weight: 500;
-        }
-        
-        .dataframe tr:hover td {
-            background: rgba(200, 16, 46, 0.04) !important;
-            font-weight: 600;
-        }
-        
-        /* ============================================
-           Input Fields - Clear Borders
-           ============================================ */
-        .stSelectbox > div > div,
-        .stTextInput > div > div,
-        .stNumberInput > div > div,
-        .stDateInput > div > div {
-            background: #ffffff;
-            border: 3px solid #dee2e6;
-            color: #000000;
-            border-radius: 12px;
-            font-weight: 500;
-        }
-        
-        .stSelectbox > div > div:focus,
-        .stTextInput > div > div:focus,
-        .stNumberInput > div > div:focus,
-        .stDateInput > div > div:focus {
-            border-color: #c8102e;
-            box-shadow: 0 0 0 4px rgba(200, 16, 46, 0.15);
-        }
-        
-        /* Labels for inputs */
-        label {
-            color: #000000 !important;
-            font-weight: 700 !important;
-            font-size: 0.95rem !important;
-        }
-        
-        /* ============================================
-           Buttons - Bold Design
-           ============================================ */
-        .stButton > button {
-            background: linear-gradient(135deg, #c8102e 0%, #a00d26 100%);
+        .dataframe thead th {
+            background: linear-gradient(135deg, #1d428a 0%, #c8102e 100%);
             color: white;
-            border: none;
-            border-radius: 12px;
-            padding: 1.2rem 3rem;
+            padding: 1.8rem 1.5rem;
             font-weight: 800;
-            font-size: 1rem;
+            font-size: 0.9rem;
             text-transform: uppercase;
             letter-spacing: 2.5px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 6px 20px rgba(200, 16, 46, 0.35);
+            text-align: left;
+            border: none;
+        }
+        
+        .dataframe tbody tr {
+            transition: all 0.3s ease;
+            border-bottom: 2px solid #f0f2f5;
+        }
+        
+        .dataframe tbody tr:hover {
+            background: linear-gradient(90deg, rgba(200, 16, 46, 0.06) 0%, transparent 100%);
+            transform: scale(1.01);
+        }
+        
+        .dataframe tbody td {
+            padding: 1.8rem 1.5rem;
+            color: #1a1a1a;
+            font-size: 1rem;
+            font-weight: 600;
+            border: none;
+        }
+        
+        .dataframe tbody tr:last-child {
+            border-bottom: none;
+        }
+        
+        /* Alternating row colors */
+        .dataframe tbody tr:nth-child(even) {
+            background: #fafbfc;
+        }
+        
+        /* ============================================
+           Buttons - High Visibility
+           ============================================ */
+        .stButton > button {
+            background: linear-gradient(135deg, #c8102e 0%, #1d428a 100%);
+            color: white;
+            border: none;
+            padding: 1.2rem 3.5rem;
+            font-size: 1rem;
+            font-weight: 800;
+            border-radius: 50px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 8px 25px rgba(200, 16, 46, 0.3);
         }
         
         .stButton > button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 30px rgba(200, 16, 46, 0.5);
-            background: linear-gradient(135deg, #e01434 0%, #c8102e 100%);
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(200, 16, 46, 0.5);
+            background: linear-gradient(135deg, #e01434 0%, #4169e1 100%);
         }
         
-        .stButton > button[kind="secondary"] {
-            background: transparent;
-            border: 3px solid #c8102e;
-            color: #c8102e;
-        }
-        
-        .stButton > button[kind="secondary"]:hover {
-            background: rgba(200, 16, 46, 0.08);
+        .stButton > button:active {
+            transform: translateY(-2px);
         }
         
         /* ============================================
-           Graph Containers
+           Input Fields
            ============================================ */
-        .js-plotly-plot {
-            border-radius: 16px;
-            background: #ffffff;
-            border: 3px solid #dee2e6;
-            padding: 2rem;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+        .stTextInput > div > div > input,
+        .stSelectbox > div > div > select,
+        .stNumberInput > div > div > input {
+            border: 3px solid #e8eaed;
+            border-radius: 12px;
+            padding: 1.2rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .stTextInput > div > div > input:focus,
+        .stSelectbox > div > div > select:focus,
+        .stNumberInput > div > div > input:focus {
+            border-color: #c8102e;
+            box-shadow: 0 0 0 3px rgba(200, 16, 46, 0.15);
+            outline: none;
         }
         
         /* ============================================
-           Game Cards - Clear and Bold
+           Dividers
+           ============================================ */
+        hr {
+            border: none;
+            height: 3px;
+            background: linear-gradient(90deg, #1d428a 0%, #c8102e 100%);
+            margin: 3.5rem 0;
+            border-radius: 3px;
+        }
+        
+        /* ============================================
+           Section Headers
+           ============================================ */
+        h1, h2, h3 {
+            font-family: 'Bebas Neue', sans-serif;
+            color: #000000;
+            font-weight: 400;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+        }
+        
+        h1 {
+            font-size: 4rem;
+            margin-bottom: 2.5rem;
+        }
+        
+        h2 {
+            font-size: 3rem;
+            margin-bottom: 2rem;
+            border-bottom: 4px solid;
+            border-image: linear-gradient(90deg, #1d428a 0%, #c8102e 100%) 1;
+            padding-bottom: 1.5rem;
+        }
+        
+        h3 {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            color: #1d428a;
+        }
+        
+        /* ============================================
+           Game Cards
            ============================================ */
         .game-card {
             background: linear-gradient(135deg, #ffffff 0%, #fafbfc 100%);
