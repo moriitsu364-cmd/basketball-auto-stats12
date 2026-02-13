@@ -57,13 +57,13 @@ GAME_FORMATS = {
 NBA_COLORS = {
     'primary': '#1d428a',
     'secondary': '#c8102e',
-    'background': '#0a0a0a',  # より暗い背景
-    'card_bg': '#1a1a1a',     # カード背景
+    'background': '#ffffff',  # 白背景
+    'card_bg': '#f8f9fa',     # カード背景
     'gold': '#ffd700',
     'silver': '#c0c0c0',
     'bronze': '#cd7f32',
-    'dark': '#000000',
-    'light': '#ffffff',
+    'dark': '#212529',
+    'light': '#f8f9fa',
     'gray': '#6c757d',
     'success': '#28a745',
     'danger': '#dc3545',
