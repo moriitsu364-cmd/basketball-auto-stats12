@@ -1,4 +1,4 @@
-"""データ入力ページ - リニューアル版（相手チームデータ登録機能付き）"""
+"""データ入力ページ - リニューアル版(相手チームデータ登録機能付き)"""
 import streamlit as st
 import pandas as pd
 import io
@@ -19,7 +19,7 @@ from ..config import SEASONS, GAME_FORMATS
 
 
 def render(db: StatsDatabase):
-    """データ入力ページを表示（リニューアル版）
+    """データ入力ページを表示(リニューアル版)
     
     Args:
         db: データベースインスタンス
@@ -112,7 +112,7 @@ def render_team_data_input(db: StatsDatabase):
                         df['DataType'] = 'OurTeam'  # データ種別を追加
                         
                         st.session_state['current_stats'] = df
-                        st.success("✅ 分析完了！ / Analysis complete!")
+                        st.success("✅ 分析完了! / Analysis complete!")
                         
                     except Exception as e:
                         st.error(f"❌ エラー / Error: {str(e)}")
@@ -136,7 +136,7 @@ def render_team_data_input(db: StatsDatabase):
             if st.button("💾 データ保存 / SAVE DATA", use_container_width=True, type="primary"):
                 db.add_game(edited_df)
                 if db.save():
-                    st.success("✅ データを保存しました！ / Data saved!")
+                    st.success("✅ データを保存しました! / Data saved!")
                     del st.session_state['current_stats']
                     st.rerun()
         
@@ -244,17 +244,20 @@ def render_opponent_data_input(db: StatsDatabase):
             opponent_df['DataType'] = 'OpponentTeam'  # データ種別
             opponent_df['OriginalTeam'] = opp_team_name  # 元のチーム名を保存
             
-            # パーセンテージ計算
+            # パーセンテージ計算(数値変換を確実に行う)
             opponent_df['3P%'] = opponent_df.apply(
-                lambda row: round(row['3PM'] / row['3PA'], 3) if row['3PA'] > 0 else 0.0,
+                lambda row: round(pd.to_numeric(row['3PM'], errors='coerce') / pd.to_numeric(row['3PA'], errors='coerce'), 3) 
+                if pd.to_numeric(row['3PA'], errors='coerce') > 0 else 0.0,
                 axis=1
             )
             opponent_df['2P%'] = opponent_df.apply(
-                lambda row: round(row['2PM'] / row['2PA'], 3) if row['2PA'] > 0 else 0.0,
+                lambda row: round(pd.to_numeric(row['2PM'], errors='coerce') / pd.to_numeric(row['2PA'], errors='coerce'), 3) 
+                if pd.to_numeric(row['2PA'], errors='coerce') > 0 else 0.0,
                 axis=1
             )
             opponent_df['FT%'] = opponent_df.apply(
-                lambda row: round(row['FTM'] / row['FTA'], 3) if row['FTA'] > 0 else 0.0,
+                lambda row: round(pd.to_numeric(row['FTM'], errors='coerce') / pd.to_numeric(row['FTA'], errors='coerce'), 3) 
+                if pd.to_numeric(row['FTA'], errors='coerce') > 0 else 0.0,
                 axis=1
             )
             
@@ -266,7 +269,7 @@ def render_opponent_data_input(db: StatsDatabase):
             # データベースに保存
             db.add_game(opponent_df)
             if db.save():
-                st.success(f"✅ {opp_team_name}のデータを保存しました！")
+                st.success(f"✅ {opp_team_name}のデータを保存しました!")
                 st.rerun()
 
 
@@ -297,7 +300,7 @@ def render_data_management(db: StatsDatabase):
                 import_df = pd.read_csv(import_file)
                 db.add_game(import_df)
                 if db.save():
-                    st.success("✅ インポート成功！ / Import successful!")
+                    st.success("✅ インポート成功! / Import successful!")
                     st.rerun()
             except Exception as e:
                 st.error(f"❌ エラー / Error: {e}")
