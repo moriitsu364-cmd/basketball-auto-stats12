@@ -7,11 +7,15 @@ BASE_DIR = Path(__file__).parent.parent
 DATA_DIR = BASE_DIR / "data"
 IMAGES_DIR = DATA_DIR / "images"
 
-# ディレクトリを確実に作成
-DATA_DIR.mkdir(parents=True, exist_ok=True)
-IMAGES_DIR.mkdir(parents=True, exist_ok=True)
-(IMAGES_DIR / "players").mkdir(parents=True, exist_ok=True)
-(IMAGES_DIR / "staff").mkdir(parents=True, exist_ok=True)
+# ディレクトリを確実に作成（エラーを無視）
+try:
+    DATA_DIR.mkdir(parents=True, exist_ok=True)
+    IMAGES_DIR.mkdir(parents=True, exist_ok=True)
+    (IMAGES_DIR / "players").mkdir(parents=True, exist_ok=True)
+    (IMAGES_DIR / "staff").mkdir(parents=True, exist_ok=True)
+except (PermissionError, OSError, FileExistsError):
+    # 読み取り専用ファイルシステムの場合はスキップ
+    pass
 
 # データベースファイル
 DATA_FILE = str(DATA_DIR / "basketball_stats.csv")
