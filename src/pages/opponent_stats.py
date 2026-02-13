@@ -1,6 +1,13 @@
 """対戦相手統計ページ - シーズン別対戦相手分析"""
 import streamlit as st
 import pandas as pd
+import sys
+from pathlib import Path
+
+# パスの設定
+if str(Path(__file__).parent.parent) not in sys.path:
+    sys.path.insert(0, str(Path(__file__).parent.parent))
+
 from database import StatsDatabase
 from components import section_header, stat_card
 from charts import create_bar_chart, create_pie_chart
