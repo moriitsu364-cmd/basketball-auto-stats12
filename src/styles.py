@@ -1,4 +1,4 @@
-"""NBA.com inspired sophisticated design with enhanced readability - Tsukuba Basketball"""
+"""NBA.com inspired sophisticated design with enhanced readability - Tsukuba Basketball (FIXED VERSION)"""
 import streamlit as st
 
 
@@ -320,7 +320,7 @@ def load_css():
         }
         
         /* ============================================
-           Ranking Display - High Contrast
+           Ranking Display - High Contrast (FIXED)
            ============================================ */
         .ranking-row {
             background: linear-gradient(90deg, #ffffff 0%, #fafbfc 100%);
@@ -334,6 +334,7 @@ def load_css():
             align-items: center;
             gap: 2rem;
             box-shadow: 0 3px 12px rgba(0,0,0,0.06);
+            position: relative; /* FIXED: Added position relative for ::before positioning */
         }
         
         .ranking-row:hover {
@@ -700,7 +701,7 @@ def load_css():
         }
         
         /* ============================================
-           Responsive Design
+           Responsive Design (FIXED)
            ============================================ */
         @media (max-width: 768px) {
             .block-container {
@@ -729,7 +730,7 @@ def load_css():
                 font-size: 5rem;
             }
             
-            .score {
+            .game-card .score { /* FIXED: Added proper selector */
                 font-size: 4rem;
             }
             
