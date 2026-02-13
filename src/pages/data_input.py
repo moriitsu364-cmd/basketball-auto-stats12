@@ -4,6 +4,13 @@ import pandas as pd
 import io
 from datetime import datetime
 from PIL import Image
+import sys
+from pathlib import Path
+
+# パスの設定
+if str(Path(__file__).parent.parent) not in sys.path:
+    sys.path.insert(0, str(Path(__file__).parent.parent))
+
 from database import StatsDatabase
 from auth import check_password
 from ai import setup_gemini, analyze_scoresheet
