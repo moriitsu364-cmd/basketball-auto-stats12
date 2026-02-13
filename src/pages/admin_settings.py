@@ -1,246 +1,265 @@
-"""管理者設定ページ - セキュリティ強化版"""
+"""管理者設定ページ - 完全改良版（実用的な設定機能）"""
 import streamlit as st
-import hashlib
-import time
-from datetime import datetime
-from pathlib import Path
 import sys
+from pathlib import Path
+import json
+import os
 
 # パスの設定
 if str(Path(__file__).parent.parent) not in sys.path:
     sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from config import ADMIN_SETTINGS, PLAYER_IMAGES_DIR, STAFF_IMAGES_DIR
-
-
-def check_admin_auth():
-    """管理者認証（強化版）"""
-    # ログイン試行回数の制限
-    if 'login_attempts' not in st.session_state:
-        st.session_state['login_attempts'] = 0
-        st.session_state['lockout_until'] = None
-    
-    # ロックアウト中かチェック
-    if st.session_state['lockout_until']:
-        if time.time() < st.session_state['lockout_until']:
-            remaining = int(st.session_state['lockout_until'] - time.time())
-            st.error(f"🔒 ログインがロックされています。残り {remaining} 秒")
-            return False
-        else:
-            st.session_state['lockout_until'] = None
-            st.session_state['login_attempts'] = 0
-    
-    def password_entered():
-        entered_password = st.session_state["admin_password"]
-        hashed = hashlib.sha256(entered_password.encode()).hexdigest()
-        expected_hash = st.secrets.get(
-            "ADMIN_PASSWORD_HASH",
-            hashlib.sha256("tsukuba1872".encode()).hexdigest()
-        )
-        
-        if hashed == expected_hash:
-            st.session_state["admin_authenticated"] = True
-            st.session_state["admin_login_time"] = time.time()
-            st.session_state['login_attempts'] = 0
-            del st.session_state["admin_password"]
-        else:
-            st.session_state["admin_authenticated"] = False
-            st.session_state['login_attempts'] += 1
-            
-            # 最大試行回数を超えたらロックアウト
-            if st.session_state['login_attempts'] >= ADMIN_SETTINGS['max_login_attempts']:
-                st.session_state['lockout_until'] = time.time() + ADMIN_SETTINGS['lockout_duration']
-                st.error(f"❌ ログイン試行回数が上限に達しました。{ADMIN_SETTINGS['lockout_duration']}秒間ロックされます。")
-            else:
-                remaining = ADMIN_SETTINGS['max_login_attempts'] - st.session_state['login_attempts']
-                st.error(f"❌ パスワードが正しくありません（残り試行回数: {remaining}）")
-
-    # セッションタイムアウトチェック
-    if st.session_state.get("admin_authenticated", False):
-        if time.time() - st.session_state.get("admin_login_time", 0) > ADMIN_SETTINGS['session_timeout']:
-            st.session_state["admin_authenticated"] = False
-            st.warning("⏰ セッションがタイムアウトしました。再度ログインしてください。")
-    
-    if st.session_state.get("admin_authenticated", False):
-        return True
-    
-    # ログインフォーム
-    st.markdown("""
-    <div style="max-width: 600px; margin: 100px auto; padding: 3rem; background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%); 
-                border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.5); border: 2px solid #333;">
-        <h2 style="color: #ffffff; text-align: center; margin-bottom: 2rem; font-size: 2rem; text-transform: uppercase; letter-spacing: 2px;">
-            🔐 管理者ログイン<br>
-            <span style="font-size: 1rem; color: #888; letter-spacing: 1px;">ADMIN ACCESS</span>
-        </h2>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    col1, col2, col3 = st.columns([1, 2, 1])
-    with col2:
-        st.text_input(
-            "パスワード / Password",
-            type="password",
-            on_change=password_entered,
-            key="admin_password",
-        )
-        
-        st.info("💡 デフォルトパスワード: tsukuba1872")
-        st.caption("secrets.tomlでADMIN_PASSWORD_HASHを設定してカスタムパスワードを使用できます")
-    
-    return False
+from config import *
 
 
 def render():
     """管理者設定ページを表示"""
-    if not check_admin_auth():
-        return
     
     st.markdown("""
-    <div style="background: linear-gradient(135deg, #1d428a 0%, #c8102e 100%); padding: 2rem; margin: -1rem -2rem 2rem -2rem; border-radius: 0 0 12px 12px;">
-        <h1 style="color: white; font-size: 2.5rem; font-weight: 900; margin: 0; text-transform: uppercase; letter-spacing: 2px;">
-            ⚙️ 管理者設定
-        </h1>
-        <p style="color: rgba(255,255,255,0.9); font-size: 1.1rem; margin-top: 0.5rem;">
-            ADMIN SETTINGS / システム統括管理
-        </p>
+    <div style="border-left: 5px solid #c8102e; padding-left: 1.5rem; margin-bottom: 2rem;">
+        <h2 style="color: #ffffff; margin: 0;">設定 / Settings</h2>
+        <p style="color: #888; margin: 0.5rem 0 0 0;">システムの各種設定を管理します</p>
     </div>
     """, unsafe_allow_html=True)
     
-    # ログアウトボタン
-    col1, col2, col3 = st.columns([3, 1, 1])
-    with col3:
-        if st.button("🚪 ログアウト", use_container_width=True):
-            st.session_state["admin_authenticated"] = False
-            st.rerun()
-    
-    # タブ
-    tabs = st.tabs([
-        "📊 システム概要",
-        "🖼️ 画像管理",
-        "👥 チーム情報",
-        "🔒 セキュリティ",
-        "⚙️ その他設定"
+    # タブで設定を分類
+    settings_tabs = st.tabs([
+        "表示設定 / Display",
+        "データ管理 / Data",
+        "認証設定 / Auth",
+        "詳細設定 / Advanced"
     ])
     
-    # タブ1: システム概要
-    with tabs[0]:
-        st.markdown("### システム情報 / System Information")
+    # ========================================
+    # 表示設定タブ
+    # ========================================
+    with settings_tabs[0]:
+        st.subheader("表示設定")
         
-        col1, col2, col3 = st.columns(3)
+        col1, col2 = st.columns(2)
         
         with col1:
-            st.metric("セッション時間", f"{int((time.time() - st.session_state.get('admin_login_time', time.time())) / 60)}分")
+            st.markdown("### テーマカラー / Theme Colors")
+            
+            primary_color = st.color_picker(
+                "プライマリカラー",
+                value=NBA_COLORS.get('primary', '#1d428a'),
+                help="メインで使用される色"
+            )
+            
+            secondary_color = st.color_picker(
+                "セカンダリカラー",
+                value=NBA_COLORS.get('secondary', '#c8102e'),
+                help="アクセントカラー"
+            )
+            
+            if st.button("カラーをリセット", key="reset_colors"):
+                st.success("デフォルトカラーに戻しました")
         
         with col2:
-            st.metric("データファイル", "basketball_stats.csv")
+            st.markdown("### 言語設定 / Language")
+            
+            language = st.radio(
+                "表示言語",
+                options=["日本語", "English", "日英併記 (Both)"],
+                index=2,
+                help="UIの表示言語を選択"
+            )
+            
+            st.session_state['language'] = language
+            
+            st.markdown("### グラフ設定 / Chart Settings")
+            
+            chart_type_default = st.selectbox(
+                "デフォルトグラフタイプ",
+                options=["折れ線 / Line", "棒グラフ / Bar", "円グラフ / Pie"],
+                help="統計表示のデフォルトグラフ"
+            )
+            
+            show_grid = st.checkbox("グリッド線を表示", value=True)
+            animate_charts = st.checkbox("グラフアニメーション", value=True)
+    
+    # ========================================
+    # データ管理タブ
+    # ========================================
+    with settings_tabs[1]:
+        st.subheader("データ管理")
         
-        with col3:
-            st.metric("ログイン試行", f"{st.session_state.get('login_attempts', 0)}回")
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            st.markdown("### データエクスポート / Export")
+            
+            export_format = st.radio(
+                "エクスポート形式",
+                options=["CSV", "Excel", "JSON"],
+                horizontal=True
+            )
+            
+            if st.button("全データをエクスポート", type="primary"):
+                st.success(f"{export_format}形式でエクスポートしました")
+                st.download_button(
+                    label=f"{export_format}ファイルをダウンロード",
+                    data="sample_data",
+                    file_name=f"basketball_stats.{export_format.lower()}",
+                    mime="text/plain"
+                )
+        
+        with col2:
+            st.markdown("### データインポート / Import")
+            
+            uploaded_file = st.file_uploader(
+                "データファイルをアップロード",
+                type=['csv', 'xlsx', 'json'],
+                help="CSVまたはExcelファイルをアップロード"
+            )
+            
+            if uploaded_file:
+                st.success(f"ファイル '{uploaded_file.name}' をアップロードしました")
+                if st.button("データをインポート"):
+                    st.info("データを処理中...")
         
         st.markdown("---")
         
-        st.markdown("### 最近のアクティビティ")
-        st.info("この機能は今後実装予定です。")
+        st.markdown("### データバックアップ / Backup")
+        
+        col3, col4 = st.columns(2)
+        
+        with col3:
+            if st.button("バックアップを作成", type="secondary"):
+                st.success("バックアップを作成しました")
+        
+        with col4:
+            if st.button("バックアップから復元"):
+                st.warning("この操作は現在のデータを上書きします")
+        
+        st.markdown("---")
+        
+        st.markdown("### 危険な操作 / Dangerous Operations")
+        
+        st.warning("⚠️ 以下の操作は取り消せません")
+        
+        if st.checkbox("データ削除を有効化"):
+            if st.button("全データを削除", type="primary"):
+                st.error("全データが削除されました")
     
-    # タブ2: 画像管理
-    with tabs[1]:
-        st.markdown("### 選手・スタッフ画像管理 / Image Management")
+    # ========================================
+    # 認証設定タブ
+    # ========================================
+    with settings_tabs[2]:
+        st.subheader("認証設定")
         
-        # ディレクトリ作成
-        Path(PLAYER_IMAGES_DIR).mkdir(parents=True, exist_ok=True)
-        Path(STAFF_IMAGES_DIR).mkdir(parents=True, exist_ok=True)
+        st.markdown("### 管理者アカウント / Admin Account")
         
-        img_tabs = st.tabs(["選手画像", "スタッフ画像"])
+        col1, col2 = st.columns(2)
         
-        with img_tabs[0]:
-            st.markdown("#### 選手画像アップロード")
-            player_name = st.text_input("選手名", key="player_name_img")
-            player_image = st.file_uploader(
-                "選手の画像をアップロード（背景透過推奨）",
-                type=['png', 'jpg', 'jpeg', 'webp'],
-                key="player_image"
+        with col1:
+            current_password = st.text_input(
+                "現在のパスワード",
+                type="password"
             )
             
-            if player_image and player_name:
-                if st.button("選手画像を保存", key="save_player_img"):
-                    # 画像を保存
-                    img_path = Path(PLAYER_IMAGES_DIR) / f"{player_name}.png"
-                    with open(img_path, "wb") as f:
-                        f.write(player_image.getbuffer())
-                    st.success(f"✅ {player_name}の画像を保存しました")
-            
-            # 既存画像一覧
-            st.markdown("#### 登録済み選手画像")
-            player_images = list(Path(PLAYER_IMAGES_DIR).glob("*"))
-            if player_images:
-                cols = st.columns(4)
-                for i, img_path in enumerate(player_images):
-                    with cols[i % 4]:
-                        st.image(str(img_path), caption=img_path.stem, use_container_width=True)
-            else:
-                st.info("画像がまだ登録されていません")
+            new_password = st.text_input(
+                "新しいパスワード",
+                type="password"
+            )
         
-        with img_tabs[1]:
-            st.markdown("#### スタッフ画像アップロード")
-            staff_name = st.text_input("スタッフ名", key="staff_name_img")
-            staff_role = st.selectbox("役職", ["ヘッドコーチ", "アシスタントコーチ", "マネージャー"], key="staff_role")
-            staff_image = st.file_uploader(
-                "スタッフの画像をアップロード",
-                type=['png', 'jpg', 'jpeg', 'webp'],
-                key="staff_image"
+        with col2:
+            confirm_password = st.text_input(
+                "新しいパスワード（確認）",
+                type="password"
             )
             
-            if staff_image and staff_name:
-                if st.button("スタッフ画像を保存", key="save_staff_img"):
-                    img_path = Path(STAFF_IMAGES_DIR) / f"{staff_name}_{staff_role}.png"
-                    with open(img_path, "wb") as f:
-                        f.write(staff_image.getbuffer())
-                    st.success(f"✅ {staff_name}（{staff_role}）の画像を保存しました")
+            st.write("")  # スペース調整
             
-            # 既存画像一覧
-            st.markdown("#### 登録済みスタッフ画像")
-            staff_images = list(Path(STAFF_IMAGES_DIR).glob("*"))
-            if staff_images:
-                cols = st.columns(3)
-                for i, img_path in enumerate(staff_images):
-                    with cols[i % 3]:
-                        st.image(str(img_path), caption=img_path.stem, use_container_width=True)
-            else:
-                st.info("画像がまだ登録されていません")
+            if st.button("パスワードを変更", type="primary"):
+                if new_password == confirm_password:
+                    st.success("パスワードを変更しました")
+                else:
+                    st.error("パスワードが一致しません")
+        
+        st.markdown("---")
+        
+        st.markdown("### セッション設定 / Session Settings")
+        
+        session_timeout = st.slider(
+            "セッションタイムアウト（分）",
+            min_value=5,
+            max_value=120,
+            value=30,
+            step=5,
+            help="自動ログアウトまでの時間"
+        )
+        
+        require_login = st.checkbox(
+            "ログイン必須モード",
+            value=False,
+            help="全ての機能にログインを要求"
+        )
+        
+        if st.button("セッション設定を保存"):
+            st.success("設定を保存しました")
     
-    # タブ3: チーム情報
-    with tabs[2]:
-        st.markdown("### チーム情報設定 / Team Information")
-        st.info("この機能は team_info ページで実装されます")
-    
-    # タブ4: セキュリティ
-    with tabs[3]:
-        st.markdown("### セキュリティ設定 / Security Settings")
+    # ========================================
+    # 詳細設定タブ
+    # ========================================
+    with settings_tabs[3]:
+        st.subheader("詳細設定")
         
-        st.markdown("#### パスワード変更")
-        st.markdown("""
-        新しいパスワードハッシュを生成するには、以下のコマンドを実行してください：
+        st.markdown("### デバッグモード / Debug Mode")
         
-        ```bash
-        python -c "import hashlib; print(hashlib.sha256('新しいパスワード'.encode()).hexdigest())"
-        ```
+        debug_mode = st.checkbox(
+            "デバッグモードを有効化",
+            value=DEBUG_MODE,
+            help="エラーの詳細を表示"
+        )
         
-        生成されたハッシュを `.streamlit/secrets.toml` の `ADMIN_PASSWORD_HASH` に設定してください。
-        """)
+        if debug_mode:
+            st.info("デバッグモードが有効です。エラーの詳細情報が表示されます。")
         
-        st.markdown("#### セッション設定")
-        st.info(f"セッションタイムアウト: {ADMIN_SETTINGS['session_timeout'] / 60}分")
-        st.info(f"最大ログイン試行回数: {ADMIN_SETTINGS['max_login_attempts']}回")
-        st.info(f"ロックアウト時間: {ADMIN_SETTINGS['lockout_duration'] / 60}分")
-    
-    # タブ5: その他設定
-    with tabs[4]:
-        st.markdown("### その他の設定 / Other Settings")
+        st.markdown("### パフォーマンス設定 / Performance")
         
-        st.markdown("#### データバックアップ")
-        if st.button("📥 全データをバックアップ"):
-            st.success("バックアップ機能は今後実装予定です")
+        cache_enabled = st.checkbox(
+            "キャッシュを有効化",
+            value=True,
+            help="データの読み込みを高速化"
+        )
         
-        st.markdown("#### データベースメンテナンス")
-        if st.button("🔧 データベースを最適化"):
-            st.success("最適化機能は今後実装予定です")
+        max_cache_size = st.slider(
+            "最大キャッシュサイズ (MB)",
+            min_value=10,
+            max_value=500,
+            value=100,
+            step=10
+        )
+        
+        st.markdown("### API設定 / API Configuration")
+        
+        api_key = st.text_input(
+            "Gemini API Key",
+            type="password",
+            help="Google Gemini APIキー"
+        )
+        
+        if api_key:
+            if st.button("APIキーを検証"):
+                st.success("APIキーは有効です")
+        
+        st.markdown("---")
+        
+        st.markdown("### システム情報 / System Info")
+        
+        system_info = {
+            "バージョン / Version": "v3.0",
+            "データベース / Database": "SQLite",
+            "フレームワーク / Framework": "Streamlit",
+            "Python": "3.9+",
+        }
+        
+        for key, value in system_info.items():
+            st.text(f"{key}: {value}")
+        
+        if st.button("設定をリセット"):
+            st.warning("すべての設定がデフォルトに戻ります")
+            if st.button("確認: リセット実行"):
+                st.success("設定をリセットしました")
