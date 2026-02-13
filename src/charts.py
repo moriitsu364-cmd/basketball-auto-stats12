@@ -1,7 +1,31 @@
-"""改良されたグラフ作成 - 棒グラフ、円グラフ対応"""
+"""改良されたグラフ作成 - 棒グラフ、円グラフ対応（白基調）"""
 import plotly.graph_objects as go
 import plotly.express as px
 from config import NBA_COLORS
+
+
+def create_nba_chart(data, title: str, x_col: str, y_col: str, chart_type: str = 'line', 
+                     color: str = None, title_jp: str = ""):
+    """NBA風チャートを作成（汎用関数）
+    
+    Args:
+        data: データフレーム
+        title: グラフタイトル（英語）
+        x_col: X軸のカラム名
+        y_col: Y軸のカラム名
+        chart_type: チャートタイプ ('line', 'bar', 'scatter')
+        color: 色
+        title_jp: グラフタイトル（日本語）
+    
+    Returns:
+        Plotlyのfigureオブジェクト
+    """
+    if chart_type == 'line':
+        return create_line_chart(data, title, x_col, y_col, color, title_jp)
+    elif chart_type == 'bar':
+        return create_bar_chart(data, title, x_col, y_col, color, title_jp)
+    else:
+        return create_line_chart(data, title, x_col, y_col, color, title_jp)
 
 
 def create_line_chart(data, title: str, x_col: str, y_col: str, color: str = None, title_jp: str = ""):
@@ -38,27 +62,27 @@ def create_line_chart(data, title: str, x_col: str, y_col: str, color: str = Non
     fig.update_layout(
         title=dict(
             text=full_title,
-            font=dict(size=20, color='#ffffff', family='Arial'),
+            font=dict(size=20, color='#212529', family='Arial'),
             x=0.5,
             xanchor='center'
         ),
-        plot_bgcolor='#1a1a1a',
-        paper_bgcolor='#1a1a1a',
-        font=dict(color='#ffffff'),
+        plot_bgcolor='#ffffff',
+        paper_bgcolor='#ffffff',
+        font=dict(color='#212529'),
         xaxis=dict(
-            gridcolor='#333',
+            gridcolor='#dee2e6',
             showgrid=True,
             zeroline=False,
             tickangle=-45,
             title=None,
-            color='#ffffff'
+            color='#212529'
         ),
         yaxis=dict(
-            gridcolor='#333',
+            gridcolor='#dee2e6',
             showgrid=True,
             zeroline=False,
             title=None,
-            color='#ffffff'
+            color='#212529'
         ),
         hovermode='x unified',
         margin=dict(l=40, r=20, t=80, b=80),
@@ -100,7 +124,7 @@ def create_bar_chart(data, title: str, x_col: str, y_col: str, color: str = None
             ),
             text=data[y_col],
             textposition='outside',
-            textfont=dict(color='#ffffff', size=12)
+            textfont=dict(color='#212529', size=12)
         ))
     else:
         fig = go.Figure(go.Bar(
@@ -114,28 +138,28 @@ def create_bar_chart(data, title: str, x_col: str, y_col: str, color: str = None
             ),
             text=data[y_col],
             textposition='outside',
-            textfont=dict(color='#ffffff', size=12)
+            textfont=dict(color='#212529', size=12)
         ))
     
     fig.update_layout(
         title=dict(
             text=full_title,
-            font=dict(size=20, color='#ffffff'),
+            font=dict(size=20, color='#212529'),
             x=0.5,
             xanchor='center'
         ),
-        plot_bgcolor='#1a1a1a',
-        paper_bgcolor='#1a1a1a',
-        font=dict(color='#ffffff'),
+        plot_bgcolor='#ffffff',
+        paper_bgcolor='#ffffff',
+        font=dict(color='#212529'),
         xaxis=dict(
-            gridcolor='#333',
+            gridcolor='#dee2e6',
             showgrid=True,
-            color='#ffffff'
+            color='#212529'
         ),
         yaxis=dict(
-            gridcolor='#333',
+            gridcolor='#dee2e6',
             showgrid=True,
-            color='#ffffff'
+            color='#212529'
         ),
         margin=dict(l=60, r=20, t=80, b=80),
         height=400
@@ -169,7 +193,7 @@ def create_pie_chart(labels, values, title: str, title_jp: str = ""):
             colors=colors[:len(labels)],
             line=dict(color='#ffffff', width=3)
         ),
-        textfont=dict(size=14, color='#ffffff'),
+        textfont=dict(size=14, color='#212529'),
         textposition='outside',
         textinfo='label+percent'
     ))
@@ -177,17 +201,17 @@ def create_pie_chart(labels, values, title: str, title_jp: str = ""):
     fig.update_layout(
         title=dict(
             text=full_title,
-            font=dict(size=20, color='#ffffff'),
+            font=dict(size=20, color='#212529'),
             x=0.5,
             xanchor='center'
         ),
-        plot_bgcolor='#1a1a1a',
-        paper_bgcolor='#1a1a1a',
-        font=dict(color='#ffffff'),
+        plot_bgcolor='#ffffff',
+        paper_bgcolor='#ffffff',
+        font=dict(color='#212529'),
         showlegend=True,
         legend=dict(
-            font=dict(color='#ffffff'),
-            bgcolor='rgba(0,0,0,0)'
+            font=dict(color='#212529'),
+            bgcolor='rgba(255,255,255,0.8)'
         ),
         margin=dict(l=20, r=20, t=80, b=20),
         height=400
@@ -231,28 +255,28 @@ def create_comparison_chart(data_list, names: list, x_col: str, y_col: str,
     fig.update_layout(
         title=dict(
             text=full_title,
-            font=dict(size=20, color='#ffffff'),
+            font=dict(size=20, color='#212529'),
             x=0.5,
             xanchor='center'
         ),
-        plot_bgcolor='#1a1a1a',
-        paper_bgcolor='#1a1a1a',
-        font=dict(color='#ffffff'),
+        plot_bgcolor='#ffffff',
+        paper_bgcolor='#ffffff',
+        font=dict(color='#212529'),
         xaxis=dict(
-            gridcolor='#333',
+            gridcolor='#dee2e6',
             showgrid=True,
-            color='#ffffff'
+            color='#212529'
         ),
         yaxis=dict(
-            gridcolor='#333',
+            gridcolor='#dee2e6',
             showgrid=True,
-            color='#ffffff'
+            color='#212529'
         ),
         hovermode='x unified',
         legend=dict(
-            font=dict(color='#ffffff', size=12),
-            bgcolor='rgba(0,0,0,0.5)',
-            bordercolor='#555',
+            font=dict(color='#212529', size=12),
+            bgcolor='rgba(255,255,255,0.9)',
+            bordercolor='#dee2e6',
             borderwidth=2
         ),
         margin=dict(l=60, r=20, t=80, b=80),
@@ -296,28 +320,28 @@ def create_radar_chart(categories, values_list, names: list, title: str = "Stats
             radialaxis=dict(
                 visible=True,
                 range=[0, 100],
-                color='#ffffff',
-                gridcolor='#333'
+                color='#212529',
+                gridcolor='#dee2e6'
             ),
             angularaxis=dict(
-                color='#ffffff',
-                gridcolor='#333'
+                color='#212529',
+                gridcolor='#dee2e6'
             ),
-            bgcolor='#1a1a1a'
+            bgcolor='#ffffff'
         ),
         showlegend=True,
         legend=dict(
-            font=dict(color='#ffffff'),
-            bgcolor='rgba(0,0,0,0)'
+            font=dict(color='#212529'),
+            bgcolor='rgba(255,255,255,0.9)'
         ),
         title=dict(
             text=full_title,
-            font=dict(size=20, color='#ffffff'),
+            font=dict(size=20, color='#212529'),
             x=0.5,
             xanchor='center'
         ),
-        paper_bgcolor='#1a1a1a',
-        font=dict(color='#ffffff'),
+        paper_bgcolor='#ffffff',
+        font=dict(color='#212529'),
         height=500
     )
     
