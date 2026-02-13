@@ -1,5 +1,40 @@
-"""統計計算 - パーセンテージ修正版"""
+"""統計計算 - パーセンテージ修正版（堅牢性向上）"""
 import pandas as pd
+import numpy as np
+
+
+def safe_numeric(value):
+    """値を安全に数値に変換"""
+    try:
+        if pd.isna(value):
+            return 0
+        if isinstance(value, str):
+            # 文字列から数値を抽出
+            value = value.replace('%', '').replace(',', '').strip()
+            return float(value) if value else 0
+        return float(value)
+    except:
+        return 0
+
+
+def safe_percentage(made, attempted):
+    """安全なパーセンテージ計算（0-100の範囲で返す）"""
+    try:
+        made = safe_numeric(made)
+        attempted = safe_numeric(attempted)
+        
+        if attempted == 0:
+            return 0
+        
+        pct = made / attempted
+        
+        # 既に0-1形式なら100倍、0-100形式ならそのまま
+        if pct <= 1:
+            return pct * 100
+        # 異常に大きい値（100より大きい）はそのまま返す
+        return pct
+    except:
+        return 0
 
 
 def calculate_stats(df: pd.DataFrame, player_name: str = None) -> dict:
@@ -21,32 +56,29 @@ def calculate_stats(df: pd.DataFrame, player_name: str = None) -> dict:
             'FG%': 0, '3P%': 0, 'FT%': 0, 'TO': 0, 'PF': 0
         }
     
-    total_fgm = df['3PM'].sum() + df['2PM'].sum()
-    total_fga = df['3PA'].sum() + df['2PA'].sum()
+    # 安全な数値変換を使用
+    total_3pm = df['3PM'].apply(safe_numeric).sum()
+    total_3pa = df['3PA'].apply(safe_numeric).sum()
+    total_2pm = df['2PM'].apply(safe_numeric).sum()
+    total_2pa = df['2PA'].apply(safe_numeric).sum()
+    total_ftm = df['FTM'].apply(safe_numeric).sum()
+    total_fta = df['FTA'].apply(safe_numeric).sum()
     
-    # パーセンテージは0-1形式で保存されているので、100倍して表示用にする
-    def safe_percentage(made, attempted):
-        """安全なパーセンテージ計算（0-100の範囲で返す）"""
-        if attempted == 0:
-            return 0
-        pct = (made / attempted)
-        # 既に0-1形式なら100倍、0-100形式ならそのまま
-        if pct <= 1:
-            return pct * 100
-        return pct
+    total_fgm = total_3pm + total_2pm
+    total_fga = total_3pa + total_2pa
     
     stats = {
         'GP': len(df),
-        'PTS': df['PTS'].mean(),
-        'REB': df['TOT'].mean(),
-        'AST': df['AST'].mean(),
-        'STL': df['STL'].mean(),
-        'BLK': df['BLK'].mean(),
-        'TO': df['TO'].mean(),
-        'PF': df['PF'].mean(),
+        'PTS': df['PTS'].apply(safe_numeric).mean(),
+        'REB': df['TOT'].apply(safe_numeric).mean(),
+        'AST': df['AST'].apply(safe_numeric).mean(),
+        'STL': df['STL'].apply(safe_numeric).mean(),
+        'BLK': df['BLK'].apply(safe_numeric).mean(),
+        'TO': df['TO'].apply(safe_numeric).mean(),
+        'PF': df['PF'].apply(safe_numeric).mean(),
         'FG%': safe_percentage(total_fgm, total_fga),
-        '3P%': safe_percentage(df['3PM'].sum(), df['3PA'].sum()),
-        'FT%': safe_percentage(df['FTM'].sum(), df['FTA'].sum()),
+        '3P%': safe_percentage(total_3pm, total_3pa),
+        'FT%': safe_percentage(total_ftm, total_fta),
     }
     
     return stats
@@ -63,7 +95,11 @@ def get_leaders(df: pd.DataFrame, stat: str, n: int = 10) -> pd.DataFrame:
     Returns:
         リーダーボードのデータフレーム
     """
-    leaders = df.groupby('PlayerName').agg({
+    # 数値変換してから集計
+    df_clean = df.copy()
+    df_clean[stat] = df_clean[stat].apply(safe_numeric)
+    
+    leaders = df_clean.groupby('PlayerName').agg({
         stat: ['sum', 'mean', 'count']
     }).round(1)
     
@@ -90,27 +126,24 @@ def calculate_team_stats(game_data: pd.DataFrame) -> dict:
     Returns:
         チーム統計の辞書
     """
-    total_fgm = game_data['3PM'].sum() + game_data['2PM'].sum()
-    total_fga = game_data['3PA'].sum() + game_data['2PA'].sum()
+    # 安全な数値変換を使用
+    total_3pm = game_data['3PM'].apply(safe_numeric).sum()
+    total_3pa = game_data['3PA'].apply(safe_numeric).sum()
+    total_2pm = game_data['2PM'].apply(safe_numeric).sum()
+    total_2pa = game_data['2PA'].apply(safe_numeric).sum()
+    total_ftm = game_data['FTM'].apply(safe_numeric).sum()
+    total_fta = game_data['FTA'].apply(safe_numeric).sum()
     
-    # パーセンテージは0-1形式で保存されているので、100倍して表示用にする
-    def safe_percentage(made, attempted):
-        """安全なパーセンテージ計算（0-100の範囲で返す）"""
-        if attempted == 0:
-            return 0
-        pct = (made / attempted)
-        # 既に0-1形式なら100倍、0-100形式ならそのまま
-        if pct <= 1:
-            return pct * 100
-        return pct
+    total_fgm = total_3pm + total_2pm
+    total_fga = total_3pa + total_2pa
     
     return {
-        'total_pts': game_data['PTS'].sum(),
-        'total_reb': game_data['TOT'].sum(),
-        'total_ast': game_data['AST'].sum(),
+        'total_pts': game_data['PTS'].apply(safe_numeric).sum(),
+        'total_reb': game_data['TOT'].apply(safe_numeric).sum(),
+        'total_ast': game_data['AST'].apply(safe_numeric).sum(),
         'fg_pct': safe_percentage(total_fgm, total_fga),
-        '3p_pct': safe_percentage(game_data['3PM'].sum(), game_data['3PA'].sum()),
-        'ft_pct': safe_percentage(game_data['FTM'].sum(), game_data['FTA'].sum()),
+        '3p_pct': safe_percentage(total_3pm, total_3pa),
+        'ft_pct': safe_percentage(total_ftm, total_fta),
     }
 
 
@@ -125,9 +158,16 @@ def calculate_season_overview(season_data: pd.DataFrame) -> dict:
     """
     games = len(season_data['GameDate'].unique())
     players = season_data['PlayerName'].nunique()
-    avg_pts = season_data.groupby('GameDate')['PTS'].sum().mean()
-    wins = len(season_data[season_data['TeamScore'] > season_data['OpponentScore']]['GameDate'].unique())
-    losses = len(season_data[season_data['TeamScore'] < season_data['OpponentScore']]['GameDate'].unique())
+    
+    # 安全な数値変換
+    season_data_clean = season_data.copy()
+    season_data_clean['PTS'] = season_data_clean['PTS'].apply(safe_numeric)
+    season_data_clean['TeamScore'] = season_data_clean['TeamScore'].apply(safe_numeric)
+    season_data_clean['OpponentScore'] = season_data_clean['OpponentScore'].apply(safe_numeric)
+    
+    avg_pts = season_data_clean.groupby('GameDate')['PTS'].sum().mean()
+    wins = len(season_data_clean[season_data_clean['TeamScore'] > season_data_clean['OpponentScore']]['GameDate'].unique())
+    losses = len(season_data_clean[season_data_clean['TeamScore'] < season_data_clean['OpponentScore']]['GameDate'].unique())
     
     return {
         'games': games,
