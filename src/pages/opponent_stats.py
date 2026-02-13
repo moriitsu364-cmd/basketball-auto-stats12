@@ -2,8 +2,8 @@
 import streamlit as st
 import pandas as pd
 from database import StatsDatabase
-from components_new import section_header, stat_card
-from charts_new import create_bar_chart, create_pie_chart
+from components import section_header, stat_card
+from charts import create_bar_chart, create_pie_chart
 from config import NBA_COLORS
 
 
