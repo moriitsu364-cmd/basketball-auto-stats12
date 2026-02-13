@@ -1,9 +1,9 @@
 """メインアプリケーション - NBA.com風デザイン"""
 import streamlit as st
 from database import StatsDatabase
-from styles_new import load_css
+from styles import load_css
 from pages import season_stats, player_stats, game_stats, data_input
-from pages import team_info, opponent_stats, compare_new, admin_settings
+from pages import team_info, opponent_stats, compare, admin_settings
 
 
 # ========================================
@@ -55,7 +55,7 @@ def main():
         game_stats.render(db)
     
     with tabs[3]:
-        compare_new.render(db)
+        compare.render(db)
     
     with tabs[4]:
         team_info.render(db)
