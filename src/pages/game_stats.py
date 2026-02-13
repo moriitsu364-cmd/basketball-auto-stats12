@@ -310,8 +310,13 @@ def render_detailed_analysis(game_data):
     # シューティング効率
     if all(col in efficiency_data.columns for col in ['PTS', '2PA', '3PA', 'FTA']):
         efficiency_data['TS%'] = efficiency_data.apply(
-            lambda row: (row['PTS'] / (2 * (row['2PA'] + row['3PA'] + 0.44 * row['FTA'])) * 100)
-            if (row['2PA'] + row['3PA'] + 0.44 * row['FTA']) > 0 else 0,
+            lambda row: (pd.to_numeric(row['PTS'], errors='coerce') / 
+                        (2 * (pd.to_numeric(row['2PA'], errors='coerce') + 
+                              pd.to_numeric(row['3PA'], errors='coerce') + 
+                              0.44 * pd.to_numeric(row['FTA'], errors='coerce'))) * 100)
+            if (pd.to_numeric(row['2PA'], errors='coerce') + 
+                pd.to_numeric(row['3PA'], errors='coerce') + 
+                0.44 * pd.to_numeric(row['FTA'], errors='coerce')) > 0 else 0,
             axis=1
         )
         
