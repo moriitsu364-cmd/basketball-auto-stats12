@@ -14,7 +14,13 @@ class StatsDatabase:
         # スクリプトの場所を基準にパスを設定
         base_dir = Path(__file__).parent.parent
         self.data_file = base_dir / data_file
-        self.data_file.parent.mkdir(parents=True, exist_ok=True)
+        
+        # ディレクトリを作成（エラーを無視）
+        try:
+            self.data_file.parent.mkdir(parents=True, exist_ok=True)
+        except (PermissionError, OSError, FileExistsError):
+            # 読み取り専用ファイルシステムの場合はスキップ
+            pass
         
         # 必要なカラム定義
         self.stat_columns = [
@@ -153,15 +159,26 @@ class StatsDatabase:
                 st.warning("保存するデータがありません")
                 return False
             
-            # ディレクトリが存在することを確認
-            self.data_file.parent.mkdir(parents=True, exist_ok=True)
+            # ディレクトリが存在することを確認（エラーを無視）
+            try:
+                self.data_file.parent.mkdir(parents=True, exist_ok=True)
+            except (PermissionError, OSError, FileExistsError):
+                pass
             
             # データの最終検証
             df = self._validate_and_convert_types(df)
             df = self._recalculate_percentages(df)
             
             # CSVに保存
-            df.to_csv(self.data_file, index=False)
+            try:
+                df.to_csv(self.data_file, index=False)
+            except (PermissionError, OSError) as e:
+                st.error(f"❌ ファイルへの書き込み権限がありません: {e}")
+                st.info("💡 Streamlit Cloudを使用している場合、データは一時的にセッション内にのみ保存されます")
+                # セッション状態には保存
+                self._df = df
+                st.session_state['database'] = df
+                return False
             
             # メモリ上のデータも更新
             self._df = df
@@ -369,9 +386,9 @@ class StatsDatabase:
                 }
             
             return {
-                'total_games': len(df['GameDate'].unique()),
-                'total_players': len(df['PlayerName'].unique()),
-                'total_seasons': len(df['Season'].unique()),
+                'total_games': len(df['GameDate'].unique()) if 'GameDate' in df.columns else 0,
+                'total_players': len(df['PlayerName'].unique()) if 'PlayerName' in df.columns else 0,
+                'total_seasons': len(df['Season'].unique()) if 'Season' in df.columns else 0,
                 'total_records': len(df)
             }
         except Exception as e:
