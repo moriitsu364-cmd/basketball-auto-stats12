@@ -1,7 +1,8 @@
-"""メインアプリケーション - NBA.com風デザイン（改善版）"""
+"""メインアプリケーション - 改良版（スプラッシュ画面、日英対応）"""
 import streamlit as st
 import sys
 from pathlib import Path
+import time
 
 # パスの設定
 BASE_DIR = Path(__file__).parent.parent
@@ -29,6 +30,63 @@ st.set_page_config(
 )
 
 
+def show_splash_screen():
+    """スプラッシュ画面を表示"""
+    splash_html = """
+    <style>
+    @keyframes fadeIn {
+        from { opacity: 0; transform: scale(0.9); }
+        to { opacity: 1; transform: scale(1); }
+    }
+    @keyframes fadeOut {
+        from { opacity: 1; }
+        to { opacity: 0; }
+    }
+    .splash-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #000000 100%);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+        animation: fadeOut 0.5s ease-out 2s forwards;
+    }
+    .splash-title {
+        font-size: 5rem;
+        font-weight: 900;
+        color: #ffffff;
+        text-transform: uppercase;
+        letter-spacing: 0.3rem;
+        animation: fadeIn 1s ease-out;
+        text-shadow: 0 0 30px rgba(200, 16, 46, 0.5);
+        margin-bottom: 1rem;
+    }
+    .splash-subtitle {
+        font-size: 1.5rem;
+        color: #c8102e;
+        font-weight: 600;
+        animation: fadeIn 1.5s ease-out;
+        letter-spacing: 0.1rem;
+    }
+    </style>
+    <div class="splash-screen" id="splash">
+        <div class="splash-title">TSUKUBA BASKETBALL</div>
+        <div class="splash-subtitle">Advanced Analytics Platform</div>
+    </div>
+    <script>
+        setTimeout(function() {
+            document.getElementById('splash').style.display = 'none';
+        }, 2500);
+    </script>
+    """
+    st.markdown(splash_html, unsafe_allow_html=True)
+
+
 def initialize_session_state():
     """セッション状態の初期化"""
     if 'initialized' not in st.session_state:
@@ -37,6 +95,8 @@ def initialize_session_state():
         st.session_state.admin_logged_in = False
         st.session_state.login_attempts = 0
         st.session_state.last_activity = None
+        st.session_state.show_splash = True
+        st.session_state.language = 'ja'  # デフォルトは日本語
 
 
 def check_dependencies():
@@ -68,6 +128,12 @@ def main():
     # セッション状態の初期化
     initialize_session_state()
     
+    # スプラッシュ画面表示（初回のみ）
+    if st.session_state.show_splash:
+        show_splash_screen()
+        st.session_state.show_splash = False
+        time.sleep(2.5)
+    
     # 依存関係のチェック
     if not check_dependencies():
         st.stop()
@@ -87,34 +153,34 @@ def main():
             stats = db.get_stats_summary()
             # サイドバーに統計情報を表示
             with st.sidebar:
-                st.markdown("### Database Statistics")
-                st.metric("Total Games", stats['total_games'])
-                st.metric("Total Players", stats['total_players'])
-                st.metric("Seasons", stats['total_seasons'])
-                st.metric("Total Records", stats['total_records'])
+                st.markdown("### データベース統計")
+                st.metric("試合数", stats['total_games'])
+                st.metric("選手数", stats['total_players'])
+                st.metric("シーズン数", stats['total_seasons'])
+                st.metric("総レコード数", stats['total_records'])
     except Exception as e:
         st.error(f"データベースの初期化に失敗しました: {e}")
         st.stop()
     
-    # ヘッダー
+    # コンパクトなヘッダー（スプラッシュ後）
     st.markdown("""
-    <div class="nba-header">
-        <h1>TSUKUBA BASKETBALL</h1>
-        <p class="subtitle">Advanced Analytics Platform / 筑波大学附属高校 男子バスケットボール部</p>
+    <div style="background: linear-gradient(90deg, #1d428a 0%, #c8102e 100%); padding: 1.5rem 2rem; border-radius: 8px; margin-bottom: 2rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+        <h2 style="color: #ffffff; margin: 0; font-weight: 900; font-size: 2rem; letter-spacing: 0.1rem;">TSUKUBA BASKETBALL</h2>
+        <p style="color: rgba(255,255,255,0.9); margin: 0.5rem 0 0 0; font-size: 0.9rem; font-weight: 500;">Advanced Analytics Platform / 筑波大学附属高校 男子バスケットボール部</p>
     </div>
     """, unsafe_allow_html=True)
     
-    # タブ
+    # タブ（絵文字削除）
     try:
         tabs = st.tabs([
-            "SEASON",
-            "PLAYER", 
-            "GAME",
-            "COMPARE",
-            "TEAM INFO",
-            "OPPONENTS",
-            "DATA INPUT",
-            "ADMIN"
+            "シーズン / SEASON",
+            "選手 / PLAYER", 
+            "試合 / GAME",
+            "比較 / COMPARE",
+            "チーム / TEAM",
+            "対戦相手 / OPPONENTS",
+            "データ入力 / INPUT",
+            "設定 / SETTINGS"
         ])
         
         with tabs[0]:
@@ -189,8 +255,8 @@ def main():
     # フッター
     st.markdown("""
     <div style="text-align: center; margin-top: 50px; padding: 20px; color: #666;">
-        <p>Tsukuba Basketball Analytics System v2.0</p>
-        <p>Powered by Streamlit & Gemini AI</p>
+        <p>Tsukuba Basketball Analytics System v3.0</p>
+        <p>Powered by Streamlit & Advanced Analytics</p>
     </div>
     """, unsafe_allow_html=True)
 
