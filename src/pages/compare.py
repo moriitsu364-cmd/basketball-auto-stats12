@@ -3,8 +3,8 @@ import streamlit as st
 import pandas as pd
 from database import StatsDatabase
 from stats import calculate_stats
-from charts_new import create_comparison_chart, create_radar_chart, create_bar_chart
-from components_new import section_header, comparison_table
+from charts import create_comparison_chart, create_radar_chart, create_bar_chart
+from components import section_header, comparison_table
 from config import NBA_COLORS, STAT_CATEGORIES
 
 
