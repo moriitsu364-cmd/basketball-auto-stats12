@@ -242,10 +242,12 @@ def render_top_navigation(db):
     /* ナビゲーションバー（白背景） */
     .nav-container {
         background: white;
-        padding: 0.5rem 2rem;
+        padding: 0.8rem 2rem;
         margin: 0 -1rem;
         box-shadow: 0 2px 8px rgba(0,0,0,0.08);
         border-bottom: 1px solid #e0e0e0;
+        display: flex;
+        gap: 1rem;
     }
     
     .nav-wrapper {
@@ -258,10 +260,9 @@ def render_top_navigation(db):
     
     /* ナビゲーションボタンのカスタマイズ */
     .stButton button {
-        border-radius: 0 !important;
-        border: none !important;
-        border-right: 1px solid #e0e0e0 !important;
-        padding: 0.8rem 1.8rem !important;
+        border-radius: 4px !important;
+        border: 1px solid #e0e0e0 !important;
+        padding: 0.6rem 1.5rem !important;
         font-size: 0.9rem !important;
         font-weight: 600 !important;
         letter-spacing: 0.5px !important;
@@ -278,7 +279,7 @@ def render_top_navigation(db):
     .stButton button[kind="primary"] {
         background: #1d428a !important;
         color: white !important;
-        border-bottom: 3px solid #c8102e !important;
+        border: 2px solid #1d428a !important;
     }
     
     .stButton button[kind="secondary"] {
@@ -288,13 +289,22 @@ def render_top_navigation(db):
     
     /* セレクトボックスのカスタマイズ */
     .stSelectbox {
-        margin-top: 0.5rem;
+        margin: 0 !important;
     }
     
     .stSelectbox > div > div {
-        background: #f8f9fa !important;
+        background: white !important;
         border: 1px solid #e0e0e0 !important;
         border-radius: 4px !important;
+        padding: 0.5rem !important;
+        font-size: 0.9rem !important;
+        font-weight: 600 !important;
+        letter-spacing: 0.5px !important;
+    }
+    
+    .stSelectbox > div > div:hover {
+        border-color: #1d428a !important;
+        background: #f8f9fa !important;
     }
     
     /* Streamlitのデフォルトpaddingを調整 */
@@ -348,8 +358,8 @@ def render_top_navigation(db):
     </div>
     """, unsafe_allow_html=True)
     
-    # ナビゲーションバー - 5つのカテゴリー
-    st.markdown('<div class="nav-container"><div class="nav-wrapper">', unsafe_allow_html=True)
+    # ナビゲーションバー - 5つのカテゴリー（プルダウン直接配置）
+    st.markdown('<div class="nav-container">', unsafe_allow_html=True)
     
     # カテゴリーとページのマッピング
     categories = {
@@ -373,32 +383,38 @@ def render_top_navigation(db):
     
     for idx, (category_name, pages_in_category) in enumerate(categories.items()):
         with cols[idx]:
-            # カテゴリーボタン
-            if st.button(
-                category_name,
-                key=f"cat_{category_name}",
-                use_container_width=True,
-                type="primary" if current_category == category_name else "secondary"
-            ):
-                # カテゴリーの最初のページに移動
-                st.session_state.current_page = pages_in_category[0]
-                st.rerun()
-            
-            # そのカテゴリー内に複数のページがある場合はプルダウンを表示
-            if len(pages_in_category) > 1 and current_category == category_name:
-                selected_page = st.selectbox(
-                    "ページを選択",
-                    pages_in_category,
-                    index=pages_in_category.index(st.session_state.current_page) if st.session_state.current_page in pages_in_category else 0,
+            # カテゴリーに1つしかページがない場合はボタンのみ
+            if len(pages_in_category) == 1:
+                if st.button(
+                    category_name,
+                    key=f"cat_{category_name}",
+                    use_container_width=True,
+                    type="primary" if current_category == category_name else "secondary"
+                ):
+                    st.session_state.current_page = pages_in_category[0]
+                    st.rerun()
+            else:
+                # 複数ページがある場合はプルダウンメニューを直接配置
+                # カテゴリー名を含めたオプション表示
+                options = [f"{category_name}: {page}" for page in pages_in_category]
+                current_option = f"{category_name}: {st.session_state.current_page}" if st.session_state.current_page in pages_in_category else options[0]
+                
+                selected = st.selectbox(
+                    category_name,
+                    options,
+                    index=options.index(current_option) if current_option in options else 0,
                     key=f"select_{category_name}",
                     label_visibility="collapsed"
                 )
+                
+                # 選択されたページを抽出
+                selected_page = selected.split(": ", 1)[1]
                 
                 if selected_page != st.session_state.current_page:
                     st.session_state.current_page = selected_page
                     st.rerun()
     
-    st.markdown('</div></div>', unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
 
 
 def render_sidebar(db):
