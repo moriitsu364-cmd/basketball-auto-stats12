@@ -170,73 +170,131 @@ def render_top_navigation(db):
     # ヘッダー部分
     st.markdown("""
     <style>
-    /* ヘッダーとナビゲーションバーのスタイル */
-    .top-header {
-        background: linear-gradient(135deg, #1d428a 0%, #c8102e 100%);
-        padding: 1rem 2rem;
+    /* メインヘッダー（黒背景） */
+    .main-header {
+        background: #000000;
+        padding: 0.8rem 2rem;
         margin: -1rem -1rem 0 -1rem;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        border-bottom: 3px solid #c8102e;
     }
     
-    .top-header-title {
+    .header-left {
         display: flex;
         align-items: center;
-        gap: 1rem;
-        color: white;
+        gap: 1.5rem;
     }
     
-    .top-header-logo {
+    .header-logo {
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+    }
+    
+    .header-logo-icon {
         font-size: 2.5rem;
     }
     
-    .top-header-text h1 {
+    .header-logo-text h1 {
         margin: 0;
-        font-size: 1.8rem;
+        font-size: 1.4rem;
         font-weight: 700;
         color: white;
+        letter-spacing: 1px;
     }
     
-    .top-header-text p {
+    .header-logo-text p {
         margin: 0;
-        font-size: 0.9rem;
-        color: rgba(255, 255, 255, 0.9);
+        font-size: 0.75rem;
+        color: #c8102e;
+        font-weight: 500;
     }
     
-    .top-stats {
+    .header-stats {
         display: flex;
         gap: 2rem;
+        margin-left: 2rem;
+    }
+    
+    .stat-box {
+        text-align: center;
+        padding: 0.3rem 0.8rem;
+        background: rgba(200, 16, 46, 0.1);
+        border-radius: 4px;
+        border-left: 3px solid #c8102e;
+    }
+    
+    .stat-value {
+        font-size: 1.3rem;
+        font-weight: 700;
         color: white;
     }
     
-    .top-stat-item {
-        text-align: center;
+    .stat-label {
+        font-size: 0.7rem;
+        color: #aaa;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
     }
     
-    .top-stat-value {
-        font-size: 1.5rem;
-        font-weight: 700;
-    }
-    
-    .top-stat-label {
-        font-size: 0.8rem;
-        opacity: 0.9;
-    }
-    
-    /* ナビゲーションバーのスタイル */
-    .nav-bar {
+    /* ナビゲーションバー（白背景） */
+    .nav-container {
         background: white;
         padding: 0;
         margin: 0 -1rem;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
         border-bottom: 1px solid #e0e0e0;
+    }
+    
+    .nav-wrapper {
+        display: flex;
+        gap: 0;
+        padding: 0;
+        overflow-x: auto;
+        max-width: 100%;
+    }
+    
+    /* ナビゲーションボタンのカスタマイズ */
+    .stButton button {
+        border-radius: 0 !important;
+        border: none !important;
+        border-right: 1px solid #e0e0e0 !important;
+        padding: 0.8rem 1.5rem !important;
+        font-size: 0.85rem !important;
+        font-weight: 600 !important;
+        letter-spacing: 0.5px !important;
+        text-transform: uppercase !important;
+        transition: all 0.2s ease !important;
+        white-space: nowrap !important;
+    }
+    
+    .stButton button:hover {
+        background: #f5f5f5 !important;
+        transform: translateY(-1px) !important;
+    }
+    
+    .stButton button[kind="primary"] {
+        background: #1d428a !important;
+        color: white !important;
+        border-bottom: 3px solid #c8102e !important;
+    }
+    
+    .stButton button[kind="secondary"] {
+        background: white !important;
+        color: #333 !important;
     }
     
     /* Streamlitのデフォルトpaddingを調整 */
     .block-container {
         padding-top: 1rem !important;
+        max-width: 100% !important;
+    }
+    
+    /* サイドバーを完全に隠す */
+    [data-testid="stSidebar"] {
+        display: none !important;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -252,33 +310,35 @@ def render_top_navigation(db):
         total_records = 0
     
     st.markdown(f"""
-    <div class="top-header">
-        <div class="top-header-title">
-            <div class="top-header-logo">🏀</div>
-            <div class="top-header-text">
-                <h1>Basketball Stats Manager</h1>
-                <p>筑波大学附属高等学校</p>
+    <div class="main-header">
+        <div class="header-left">
+            <div class="header-logo">
+                <div class="header-logo-icon">🏀</div>
+                <div class="header-logo-text">
+                    <h1>BASKETBALL STATS</h1>
+                    <p>筑波大学附属高等学校</p>
+                </div>
             </div>
-        </div>
-        <div class="top-stats">
-            <div class="top-stat-item">
-                <div class="top-stat-value">{total_games}</div>
-                <div class="top-stat-label">試合</div>
-            </div>
-            <div class="top-stat-item">
-                <div class="top-stat-value">{total_players}</div>
-                <div class="top-stat-label">選手</div>
-            </div>
-            <div class="top-stat-item">
-                <div class="top-stat-value">{total_records}</div>
-                <div class="top-stat-label">記録</div>
+            <div class="header-stats">
+                <div class="stat-box">
+                    <div class="stat-value">{total_games}</div>
+                    <div class="stat-label">Games</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value">{total_players}</div>
+                    <div class="stat-label">Players</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value">{total_records}</div>
+                    <div class="stat-label">Records</div>
+                </div>
             </div>
         </div>
     </div>
     """, unsafe_allow_html=True)
     
     # ナビゲーションバー
-    st.markdown('<div class="nav-bar">', unsafe_allow_html=True)
+    st.markdown('<div class="nav-container"><div class="nav-wrapper">', unsafe_allow_html=True)
     
     pages = {
         "シーズン統計": "📈",
@@ -297,9 +357,8 @@ def render_top_navigation(db):
     
     for idx, (page_name, icon) in enumerate(pages.items()):
         with cols[idx]:
-            button_text = f"{icon} {page_name}"
             if st.button(
-                button_text,
+                f"{icon} {page_name}",
                 key=f"nav_{page_name}",
                 use_container_width=True,
                 type="primary" if st.session_state.current_page == page_name else "secondary"
@@ -307,8 +366,7 @@ def render_top_navigation(db):
                 st.session_state.current_page = page_name
                 st.rerun()
     
-    st.markdown('</div>', unsafe_allow_html=True)
-    st.markdown("---")
+    st.markdown('</div></div>', unsafe_allow_html=True)
 
 
 def render_sidebar(db):
