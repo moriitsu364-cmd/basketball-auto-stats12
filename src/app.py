@@ -1,7 +1,7 @@
 """バスケットボール統計管理システム - メインアプリケーション"""
 import streamlit as st
 import sys
-import os
+import os　
 from pathlib import Path
 
 # パスの設定
