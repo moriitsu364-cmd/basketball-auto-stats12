@@ -39,8 +39,8 @@ def load_css():
                 linear-gradient(135deg, rgba(0,0,0,0.95) 0%, rgba(26,26,26,0.95) 100%),
                 url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><circle cx="10" cy="10" r="2" fill="white" opacity="0.1"/><circle cx="50" cy="50" r="2" fill="white" opacity="0.1"/><circle cx="90" cy="10" r="2" fill="white" opacity="0.1"/><circle cx="30" cy="70" r="2" fill="white" opacity="0.1"/><circle cx="70" cy="30" r="2" fill="white" opacity="0.1"/></svg>');
             background-size: cover, 100px 100px;
-            padding: 5rem 3rem;
-            margin: -2rem -3rem 3rem -3rem;
+            padding: 2.5rem 2rem;
+            margin: -2rem -3rem 1.5rem -3rem;
             position: relative;
             overflow: hidden;
             border-bottom: 4px solid;
@@ -70,10 +70,10 @@ def load_css():
         .nba-header h1 {
             color: #ffffff;
             font-family: 'Bebas Neue', sans-serif;
-            font-size: 5.5rem;
+            font-size: 3.5rem;
             font-weight: 400;
             margin: 0;
-            letter-spacing: 12px;
+            letter-spacing: 8px;
             text-transform: uppercase;
             position: relative;
             z-index: 1;
@@ -86,12 +86,12 @@ def load_css():
         
         .nba-header .subtitle {
             color: rgba(255, 255, 255, 0.85);
-            font-size: 1.1rem;
-            margin-top: 1.5rem;
+            font-size: 1rem;
+            margin-top: 0.8rem;
             font-weight: 500;
             position: relative;
             z-index: 1;
-            letter-spacing: 4px;
+            letter-spacing: 2px;
             text-transform: uppercase;
         }
         
@@ -689,39 +689,44 @@ def load_css():
            ============================================ */
         @media (max-width: 768px) {
             .block-container {
-                padding: 1.5rem;
+                padding: 1rem;
             }
             
             .nba-header {
-                margin: -1.5rem -1.5rem 2rem -1.5rem;
-                padding: 3rem 2rem;
+                margin: -1rem -1rem 1rem -1rem;
+                padding: 2rem 1.5rem;
             }
             
             .nba-header h1 {
-                font-size: 3.5rem;
-                letter-spacing: 6px;
+                font-size: 2.5rem;
+                letter-spacing: 4px;
+            }
+            
+            .nba-header .subtitle {
+                font-size: 0.9rem;
+                letter-spacing: 1px;
             }
             
             .stat-card .stat-value {
-                font-size: 3rem;
-            }
-            
-            .player-card .player-name {
                 font-size: 2.5rem;
             }
             
-            .player-card .player-number {
-                font-size: 5rem;
+            .player-card .player-name {
+                font-size: 2rem;
             }
             
-            .game-card .score { /* FIXED: Added proper selector */
+            .player-card .player-number {
                 font-size: 4rem;
             }
             
+            .game-card .score { /* FIXED: Added proper selector */
+                font-size: 3.5rem;
+            }
+            
             .stTabs [data-baseweb="tab"] {
-                padding: 1rem 1.2rem;
+                padding: 0.8rem 1rem;
                 font-size: 0.7rem;
-                letter-spacing: 1px;
+                letter-spacing: 0.5px;
             }
         }
         
