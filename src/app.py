@@ -166,8 +166,8 @@ def initialize_session_state():
 
 
 def render_top_navigation(db):
-    """上部ナビゲーションバーを表示（NBA風）"""
-    # ヘッダー部分
+    """上部ナビゲーションバーを表示（NBA風・5つのメインタブ）"""
+    
     st.markdown("""
     <style>
     /* メインヘッダー（黒背景） */
@@ -239,51 +239,13 @@ def render_top_navigation(db):
         letter-spacing: 0.5px;
     }
     
-    /* ナビゲーションバー（白背景） */
+    /* ナビゲーションバー */
     .nav-container {
         background: white;
         padding: 0;
         margin: 0 -1rem;
         box-shadow: 0 2px 8px rgba(0,0,0,0.08);
         border-bottom: 1px solid #e0e0e0;
-    }
-    
-    .nav-wrapper {
-        display: flex;
-        gap: 0;
-        padding: 0;
-        overflow-x: auto;
-        max-width: 100%;
-    }
-    
-    /* ナビゲーションボタンのカスタマイズ */
-    .stButton button {
-        border-radius: 0 !important;
-        border: none !important;
-        border-right: 1px solid #e0e0e0 !important;
-        padding: 0.8rem 1.5rem !important;
-        font-size: 0.85rem !important;
-        font-weight: 600 !important;
-        letter-spacing: 0.5px !important;
-        text-transform: uppercase !important;
-        transition: all 0.2s ease !important;
-        white-space: nowrap !important;
-    }
-    
-    .stButton button:hover {
-        background: #f5f5f5 !important;
-        transform: translateY(-1px) !important;
-    }
-    
-    .stButton button[kind="primary"] {
-        background: #1d428a !important;
-        color: white !important;
-        border-bottom: 3px solid #c8102e !important;
-    }
-    
-    .stButton button[kind="secondary"] {
-        background: white !important;
-        color: #333 !important;
     }
     
     /* Streamlitのデフォルトpaddingを調整 */
@@ -295,6 +257,20 @@ def render_top_navigation(db):
     /* サイドバーを完全に隠す */
     [data-testid="stSidebar"] {
         display: none !important;
+    }
+    
+    /* セレクトボックスのスタイル調整 */
+    .stSelectbox {
+        margin-top: 0 !important;
+    }
+    
+    .stSelectbox > div > div {
+        border-radius: 0 !important;
+        border: none !important;
+        border-right: 1px solid #e0e0e0 !important;
+        font-weight: 600 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.5px !important;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -337,36 +313,103 @@ def render_top_navigation(db):
     </div>
     """, unsafe_allow_html=True)
     
-    # ナビゲーションバー
-    st.markdown('<div class="nav-container"><div class="nav-wrapper">', unsafe_allow_html=True)
+    # ナビゲーションバー（5つのメインカテゴリ）
+    st.markdown('<div class="nav-container">', unsafe_allow_html=True)
     
-    pages = {
-        "シーズン統計": "📈",
-        "選手統計": "👤", 
-        "試合統計": "🏀",
-        "比較分析": "📊",
-        "チーム情報": "👥",
-        "対戦相手": "🎯",
-        "予定管理": "📅",
-        "出欠管理": "✓",
-        "データ入力": "📝",
-        "設定": "⚙️"
+    # 5つのカラムを作成
+    cols = st.columns(5)
+    
+    # カテゴリとそのサブページの定義
+    categories = {
+        "スタッツ": ["シーズン統計", "選手統計", "試合統計", "比較分析", "対戦相手"],
+        "チーム情報": ["チーム情報"],
+        "予定": ["予定管理", "出欠管理"],
+        "データ入力": ["データ入力"],
+        "設定": ["設定"]
     }
     
-    cols = st.columns(len(pages))
+    # 各カテゴリのセレクトボックスを配置
+    with cols[0]:
+        stats_pages = categories["スタッツ"]
+        current_in_stats = st.session_state.current_page in stats_pages
+        default_stats = stats_pages.index(st.session_state.current_page) if current_in_stats else 0
+        
+        selected_stats = st.selectbox(
+            "stats_label",
+            stats_pages,
+            index=default_stats,
+            key="nav_stats",
+            label_visibility="collapsed"
+        )
+        if selected_stats != st.session_state.current_page:
+            st.session_state.current_page = selected_stats
+            st.rerun()
     
-    for idx, (page_name, icon) in enumerate(pages.items()):
-        with cols[idx]:
-            if st.button(
-                f"{icon} {page_name}",
-                key=f"nav_{page_name}",
-                use_container_width=True,
-                type="primary" if st.session_state.current_page == page_name else "secondary"
-            ):
-                st.session_state.current_page = page_name
-                st.rerun()
+    with cols[1]:
+        team_pages = categories["チーム情報"]
+        current_in_team = st.session_state.current_page in team_pages
+        default_team = team_pages.index(st.session_state.current_page) if current_in_team else 0
+        
+        selected_team = st.selectbox(
+            "team_label",
+            team_pages,
+            index=default_team,
+            key="nav_team",
+            label_visibility="collapsed"
+        )
+        if selected_team != st.session_state.current_page:
+            st.session_state.current_page = selected_team
+            st.rerun()
     
-    st.markdown('</div></div>', unsafe_allow_html=True)
+    with cols[2]:
+        schedule_pages = categories["予定"]
+        current_in_schedule = st.session_state.current_page in schedule_pages
+        default_schedule = schedule_pages.index(st.session_state.current_page) if current_in_schedule else 0
+        
+        selected_schedule = st.selectbox(
+            "schedule_label",
+            schedule_pages,
+            index=default_schedule,
+            key="nav_schedule",
+            label_visibility="collapsed"
+        )
+        if selected_schedule != st.session_state.current_page:
+            st.session_state.current_page = selected_schedule
+            st.rerun()
+    
+    with cols[3]:
+        data_pages = categories["データ入力"]
+        current_in_data = st.session_state.current_page in data_pages
+        default_data = data_pages.index(st.session_state.current_page) if current_in_data else 0
+        
+        selected_data = st.selectbox(
+            "data_label",
+            data_pages,
+            index=default_data,
+            key="nav_data",
+            label_visibility="collapsed"
+        )
+        if selected_data != st.session_state.current_page:
+            st.session_state.current_page = selected_data
+            st.rerun()
+    
+    with cols[4]:
+        settings_pages = categories["設定"]
+        current_in_settings = st.session_state.current_page in settings_pages
+        default_settings = settings_pages.index(st.session_state.current_page) if current_in_settings else 0
+        
+        selected_settings = st.selectbox(
+            "settings_label",
+            settings_pages,
+            index=default_settings,
+            key="nav_settings",
+            label_visibility="collapsed"
+        )
+        if selected_settings != st.session_state.current_page:
+            st.session_state.current_page = selected_settings
+            st.rerun()
+    
+    st.markdown('</div>', unsafe_allow_html=True)
 
 
 def render_sidebar(db):
