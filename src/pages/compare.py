@@ -441,7 +441,7 @@ def render_comparison_charts(db, players, stats_list, season):
         values_list = []
         for stats in stats_list:
             max_vals = {'PTS': 30, 'REB': 15, 'AST': 10, 'STL': 3, 'BLK': 3}
-            values = [
+            
             # 安全な数値変換
             pts = float(stats.get('PTS', 0)) if stats.get('PTS') is not None else 0
             reb = float(stats.get('REB', 0)) if stats.get('REB') is not None else 0
@@ -455,6 +455,8 @@ def render_comparison_charts(db, players, stats_list, season):
                 min(ast / max_vals['AST'] * 100, 100),
                 min(stl / max_vals['STL'] * 100, 100),
                 min(blk / max_vals['BLK'] * 100, 100)
+            ]
+            values_list.append(values)
         
         fig = create_radar_chart(categories, values_list, players, "総合スタッツ比較", "Overall Stats")
         st.plotly_chart(fig, use_container_width=True)
