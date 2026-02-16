@@ -166,7 +166,7 @@ def initialize_session_state():
 
 
 def render_top_navigation(db):
-    """上部ナビゲーションバーを表示（NBA風）"""
+    """上部ナビゲーションバーを表示（5カテゴリー・プルダウン式）"""
     # ヘッダー部分
     st.markdown("""
     <style>
@@ -242,7 +242,7 @@ def render_top_navigation(db):
     /* ナビゲーションバー（白背景） */
     .nav-container {
         background: white;
-        padding: 0;
+        padding: 0.5rem 2rem;
         margin: 0 -1rem;
         box-shadow: 0 2px 8px rgba(0,0,0,0.08);
         border-bottom: 1px solid #e0e0e0;
@@ -261,8 +261,8 @@ def render_top_navigation(db):
         border-radius: 0 !important;
         border: none !important;
         border-right: 1px solid #e0e0e0 !important;
-        padding: 0.8rem 1.5rem !important;
-        font-size: 0.85rem !important;
+        padding: 0.8rem 1.8rem !important;
+        font-size: 0.9rem !important;
         font-weight: 600 !important;
         letter-spacing: 0.5px !important;
         text-transform: uppercase !important;
@@ -284,6 +284,17 @@ def render_top_navigation(db):
     .stButton button[kind="secondary"] {
         background: white !important;
         color: #333 !important;
+    }
+    
+    /* セレクトボックスのカスタマイズ */
+    .stSelectbox {
+        margin-top: 0.5rem;
+    }
+    
+    .stSelectbox > div > div {
+        background: #f8f9fa !important;
+        border: 1px solid #e0e0e0 !important;
+        border-radius: 4px !important;
     }
     
     /* Streamlitのデフォルトpaddingを調整 */
@@ -337,34 +348,55 @@ def render_top_navigation(db):
     </div>
     """, unsafe_allow_html=True)
     
-    # ナビゲーションバー
+    # ナビゲーションバー - 5つのカテゴリー
     st.markdown('<div class="nav-container"><div class="nav-wrapper">', unsafe_allow_html=True)
     
-    pages = {
-        "シーズン統計": "📈",
-        "選手統計": "👤", 
-        "試合統計": "🏀",
-        "比較分析": "📊",
-        "チーム情報": "👥",
-        "対戦相手": "🎯",
-        "予定管理": "📅",
-        "出欠管理": "✓",
-        "データ入力": "📝",
-        "設定": "⚙️"
+    # カテゴリーとページのマッピング
+    categories = {
+        "統計": ["シーズン統計", "選手統計", "試合統計", "比較分析"],
+        "チーム情報": ["チーム情報", "対戦相手"],
+        "予定": ["予定管理", "出欠管理"],
+        "データ入力": ["データ入力"],
+        "設定": ["設定"]
     }
     
-    cols = st.columns(len(pages))
+    # 現在のページがどのカテゴリーに属するかを判定
+    def get_current_category(page):
+        for cat, pages in categories.items():
+            if page in pages:
+                return cat
+        return "統計"
     
-    for idx, (page_name, icon) in enumerate(pages.items()):
+    current_category = get_current_category(st.session_state.current_page)
+    
+    cols = st.columns(5)
+    
+    for idx, (category_name, pages_in_category) in enumerate(categories.items()):
         with cols[idx]:
+            # カテゴリーボタン
             if st.button(
-                f"{icon} {page_name}",
-                key=f"nav_{page_name}",
+                category_name,
+                key=f"cat_{category_name}",
                 use_container_width=True,
-                type="primary" if st.session_state.current_page == page_name else "secondary"
+                type="primary" if current_category == category_name else "secondary"
             ):
-                st.session_state.current_page = page_name
+                # カテゴリーの最初のページに移動
+                st.session_state.current_page = pages_in_category[0]
                 st.rerun()
+            
+            # そのカテゴリー内に複数のページがある場合はプルダウンを表示
+            if len(pages_in_category) > 1 and current_category == category_name:
+                selected_page = st.selectbox(
+                    "ページを選択",
+                    pages_in_category,
+                    index=pages_in_category.index(st.session_state.current_page) if st.session_state.current_page in pages_in_category else 0,
+                    key=f"select_{category_name}",
+                    label_visibility="collapsed"
+                )
+                
+                if selected_page != st.session_state.current_page:
+                    st.session_state.current_page = selected_page
+                    st.rerun()
     
     st.markdown('</div></div>', unsafe_allow_html=True)
 
