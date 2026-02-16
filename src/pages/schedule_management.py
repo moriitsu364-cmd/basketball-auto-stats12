@@ -1,4 +1,4 @@
-"""予定管理ページ - マネージャー・選手・顧問専用"""
+"""予定・出欠管理ページ - 統合カレンダー"""
 import streamlit as st
 import pandas as pd
 from datetime import datetime, timedelta
@@ -7,6 +7,14 @@ import json
 
 # データファイルのパス
 SCHEDULE_FILE = Path(__file__).parent.parent.parent / "data" / "schedule.json"
+ATTENDANCE_FILE = Path(__file__).parent.parent.parent / "data" / "attendance.json"
+
+# チームメンバーリスト
+TEAM_MEMBERS = [
+    "田中太郎", "佐藤次郎", "鈴木三郎", "高橋四郎", "伊藤五郎",
+    "山本六郎", "中村七郎", "小林八郎", "加藤九郎", "吉田十郎",
+    "渡辺十一郎", "山田十二郎", "佐々木十三郎", "松本十四郎", "井上十五郎"
+]
 
 
 def load_schedule_data():
@@ -47,6 +55,21 @@ def load_schedule_data():
         return {"schedules": []}
 
 
+def load_attendance_data():
+    """出欠データを読み込み"""
+    try:
+        ATTENDANCE_FILE.parent.mkdir(parents=True, exist_ok=True)
+        
+        if ATTENDANCE_FILE.exists():
+            with open(ATTENDANCE_FILE, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        else:
+            return {"attendance": {}}
+    except Exception as e:
+        st.error(f"出欠データの読み込みエラー: {e}")
+        return {"attendance": {}}
+
+
 def save_schedule_data(data):
     """予定データを保存"""
     try:
@@ -59,8 +82,20 @@ def save_schedule_data(data):
         return False
 
 
+def save_attendance_data(data):
+    """出欠データを保存"""
+    try:
+        ATTENDANCE_FILE.parent.mkdir(parents=True, exist_ok=True)
+        with open(ATTENDANCE_FILE, 'w', encoding='utf-8') as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+        return True
+    except Exception as e:
+        st.error(f"出欠データの保存エラー: {e}")
+        return False
+
+
 def render(db):
-    """予定管理ページをレンダリング"""
+    """予定・出欠管理ページをレンダリング"""
     
     st.markdown("""
     <style>
@@ -136,83 +171,53 @@ def render(db):
         font-size: 0.85rem;
         font-weight: 500;
     }
+    
+    .attendance-summary {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 12px;
+        margin-top: 12px;
+        border-left: 3px solid #28a745;
+    }
+    
+    .attendance-absent {
+        color: #dc3545;
+        font-weight: 600;
+    }
+    
+    .attendance-present {
+        color: #28a745;
+        font-weight: 600;
+    }
+    
+    .attendance-maybe {
+        color: #ffc107;
+        font-weight: 600;
+    }
     </style>
     """, unsafe_allow_html=True)
     
     # データ読み込み
     schedule_data = load_schedule_data()
     schedules = schedule_data.get("schedules", [])
+    attendance_data = load_attendance_data()
+    attendance_records = attendance_data.get("attendance", {})
     
     # ヘッダー
-    col1, col2 = st.columns([3, 1])
-    
-    with col1:
-        st.markdown("## 📅 予定管理表")
-        st.markdown("チームの練習・試合スケジュールを管理します")
-    
-    with col2:
-        if st.button("➕ 新規予定追加", type="primary", use_container_width=True):
-            st.session_state.show_schedule_form = True
+    st.markdown("## 📅 予定・出欠管理カレンダー")
+    st.markdown("チームの予定を確認し、出欠を登録できます")
     
     st.markdown("---")
     
-    # 新規予定追加フォーム
-    if st.session_state.get('show_schedule_form', False):
-        with st.expander("新規予定を追加", expanded=True):
-            with st.form("new_schedule_form"):
-                col1, col2 = st.columns(2)
-                
-                with col1:
-                    event_name = st.text_input("イベント名 *", placeholder="例: 練習試合 vs 開成高校")
-                    event_date = st.date_input("日付 *", min_value=datetime.now().date())
-                    event_time = st.time_input("時刻", value=datetime.strptime("15:00", "%H:%M").time())
-                
-                with col2:
-                    event_type = st.selectbox("種類 *", ["practice", "tournament", "training"], 
-                                             format_func=lambda x: {"practice": "練習試合", "tournament": "公式戦", "training": "練習"}[x])
-                    event_location = st.text_input("場所 *", placeholder="例: 本校体育館")
-                    event_notes = st.text_area("備考", placeholder="集合時刻などの追加情報")
-                
-                col1, col2, col3 = st.columns([1, 1, 4])
-                
-                with col1:
-                    if st.form_submit_button("追加", type="primary", use_container_width=True):
-                        if event_name and event_date and event_location:
-                            new_schedule = {
-                                "id": max([s["id"] for s in schedules], default=0) + 1,
-                                "date": event_date.strftime("%Y-%m-%d"),
-                                "event": event_name,
-                                "location": event_location,
-                                "type": event_type,
-                                "time": event_time.strftime("%H:%M"),
-                                "notes": event_notes
-                            }
-                            schedules.append(new_schedule)
-                            schedule_data["schedules"] = schedules
-                            
-                            if save_schedule_data(schedule_data):
-                                st.success("✅ 予定を追加しました")
-                                st.session_state.show_schedule_form = False
-                                st.rerun()
-                            else:
-                                st.error("❌ 予定の保存に失敗しました")
-                        else:
-                            st.error("必須項目を入力してください")
-                
-                with col2:
-                    if st.form_submit_button("キャンセル", use_container_width=True):
-                        st.session_state.show_schedule_form = False
-                        st.rerun()
-    
     # タブで表示切り替え
-    tab1, tab2 = st.tabs(["📋 予定一覧", "📊 カレンダー表示"])
+    tab1, tab2, tab3 = st.tabs(["📋 予定一覧・出欠登録", "📊 カレンダー表示", "👥 出欠状況一覧"])
     
     with tab1:
-        # 予定を日付順にソート
-        sorted_schedules = sorted(schedules, key=lambda x: x["date"], reverse=True)
+        # 予定を日付順にソート（未来の予定を優先）
+        sorted_schedules = sorted(schedules, key=lambda x: x["date"])
         
         # フィルター
-        col1, col2, col3 = st.columns(3)
+        col1, col2 = st.columns(2)
         
         with col1:
             filter_type = st.selectbox("種類で絞り込み", 
@@ -245,6 +250,7 @@ def render(db):
             for schedule in filtered_schedules:
                 schedule_date = datetime.strptime(schedule["date"], "%Y-%m-%d").date()
                 is_upcoming = schedule_date >= datetime.now().date()
+                schedule_id = str(schedule['id'])
                 
                 # 種類の表示名
                 type_names = {"practice": "練習試合", "tournament": "公式戦", "training": "練習"}
@@ -268,63 +274,67 @@ def render(db):
                 </div>
                 """, unsafe_allow_html=True)
                 
-                # 編集・削除ボタン
-                col1, col2, col3 = st.columns([1, 1, 8])
-                
-                with col1:
-                    if st.button("✏️ 編集", key=f"edit_{schedule['id']}", use_container_width=True):
-                        st.session_state.editing_schedule = schedule['id']
-                
-                with col2:
-                    if st.button("🗑️ 削除", key=f"delete_{schedule['id']}", use_container_width=True):
-                        schedules = [s for s in schedules if s['id'] != schedule['id']]
-                        schedule_data["schedules"] = schedules
-                        if save_schedule_data(schedule_data):
-                            st.success("✅ 予定を削除しました")
-                            st.rerun()
-                
-                # 編集フォーム
-                if st.session_state.get('editing_schedule') == schedule['id']:
-                    with st.expander("予定を編集", expanded=True):
-                        with st.form(f"edit_form_{schedule['id']}"):
-                            col1, col2 = st.columns(2)
-                            
-                            with col1:
-                                edit_event = st.text_input("イベント名", value=schedule['event'])
-                                edit_date = st.date_input("日付", value=datetime.strptime(schedule['date'], "%Y-%m-%d"))
-                                edit_time = st.time_input("時刻", value=datetime.strptime(schedule.get('time', '15:00'), "%H:%M").time())
-                            
-                            with col2:
-                                edit_type = st.selectbox("種類", ["practice", "tournament", "training"],
-                                                        index=["practice", "tournament", "training"].index(schedule['type']),
-                                                        format_func=lambda x: {"practice": "練習試合", "tournament": "公式戦", "training": "練習"}[x])
-                                edit_location = st.text_input("場所", value=schedule['location'])
-                                edit_notes = st.text_area("備考", value=schedule.get('notes', ''))
-                            
-                            col1, col2, col3 = st.columns([1, 1, 4])
-                            
-                            with col1:
-                                if st.form_submit_button("保存", type="primary", use_container_width=True):
-                                    for s in schedules:
-                                        if s['id'] == schedule['id']:
-                                            s['event'] = edit_event
-                                            s['date'] = edit_date.strftime("%Y-%m-%d")
-                                            s['location'] = edit_location
-                                            s['type'] = edit_type
-                                            s['time'] = edit_time.strftime("%H:%M")
-                                            s['notes'] = edit_notes
-                                            break
+                # 出欠登録フォーム（予定の場合のみ）
+                if is_upcoming:
+                    with st.expander("✍️ 出欠を登録する", expanded=False):
+                        col1, col2, col3 = st.columns([2, 2, 1])
+                        
+                        with col1:
+                            member_name = st.selectbox(
+                                "名前を選択",
+                                options=[""] + TEAM_MEMBERS,
+                                key=f"member_select_{schedule_id}"
+                            )
+                        
+                        with col2:
+                            attendance_status = st.selectbox(
+                                "出欠を選択",
+                                options=["出席", "欠席", "未定"],
+                                key=f"status_select_{schedule_id}"
+                            )
+                        
+                        with col3:
+                            st.write("")
+                            st.write("")
+                            if st.button("登録", key=f"submit_{schedule_id}", type="primary", use_container_width=True):
+                                if member_name:
+                                    if schedule_id not in attendance_records:
+                                        attendance_records[schedule_id] = {}
                                     
-                                    schedule_data["schedules"] = schedules
-                                    if save_schedule_data(schedule_data):
-                                        st.success("✅ 予定を更新しました")
-                                        st.session_state.editing_schedule = None
+                                    attendance_records[schedule_id][member_name] = attendance_status
+                                    attendance_data["attendance"] = attendance_records
+                                    
+                                    if save_attendance_data(attendance_data):
+                                        st.success(f"✅ {member_name}さんの出欠を登録しました")
                                         st.rerun()
-                            
-                            with col2:
-                                if st.form_submit_button("キャンセル", use_container_width=True):
-                                    st.session_state.editing_schedule = None
-                                    st.rerun()
+                                    else:
+                                        st.error("❌ 出欠の保存に失敗しました")
+                                else:
+                                    st.warning("⚠️ 名前を選択してください")
+                
+                # 出欠状況サマリー
+                if schedule_id in attendance_records and attendance_records[schedule_id]:
+                    responses = attendance_records[schedule_id]
+                    present = sum(1 for status in responses.values() if status == "出席")
+                    absent = sum(1 for status in responses.values() if status == "欠席")
+                    maybe = sum(1 for status in responses.values() if status == "未定")
+                    
+                    absent_members = [name for name, status in responses.items() if status == "欠席"]
+                    maybe_members = [name for name, status in responses.items() if status == "未定"]
+                    
+                    st.markdown(f"""
+                    <div class="attendance-summary">
+                        <strong>📊 出欠状況:</strong> 
+                        <span class="attendance-present">出席 {present}名</span> | 
+                        <span class="attendance-absent">欠席 {absent}名</span> | 
+                        <span class="attendance-maybe">未定 {maybe}名</span>
+                        <br>
+                        {f'<span class="attendance-absent">⚠️ 欠席: {", ".join(absent_members)}</span><br>' if absent_members else ''}
+                        {f'<span class="attendance-maybe">❓ 未定: {", ".join(maybe_members)}</span>' if maybe_members else ''}
+                    </div>
+                    """, unsafe_allow_html=True)
+                
+                st.markdown("---")
         else:
             st.info("📭 表示する予定がありません")
     
@@ -344,15 +354,56 @@ def render(db):
             calendar_data = []
             for schedule in sorted(month_schedules, key=lambda x: x["date"]):
                 type_names = {"practice": "練習試合", "tournament": "公式戦", "training": "練習"}
+                schedule_id = str(schedule['id'])
+                
+                # 出欠状況を集計
+                absent_count = 0
+                if schedule_id in attendance_records:
+                    responses = attendance_records[schedule_id]
+                    absent_count = sum(1 for status in responses.values() if status == "欠席")
+                
                 calendar_data.append({
                     "日付": schedule["date"],
                     "時刻": schedule.get("time", "未定"),
                     "イベント": schedule["event"],
                     "種類": type_names.get(schedule["type"], schedule["type"]),
-                    "場所": schedule["location"]
+                    "場所": schedule["location"],
+                    "欠席者数": absent_count
                 })
             
             df = pd.DataFrame(calendar_data)
             st.dataframe(df, use_container_width=True, hide_index=True)
         else:
             st.info(f"📭 {selected_month.year}年{selected_month.month}月の予定はありません")
+    
+    with tab3:
+        st.markdown("### 👥 全体出欠状況")
+        
+        # 全メンバーの出欠状況を集計
+        member_stats = {}
+        for member in TEAM_MEMBERS:
+            member_stats[member] = {"出席": 0, "欠席": 0, "未定": 0}
+        
+        for schedule_id, responses in attendance_records.items():
+            for member, status in responses.items():
+                if member in member_stats:
+                    member_stats[member][status] += 1
+        
+        # データフレームに変換
+        stats_data = []
+        for member, stats in member_stats.items():
+            total = sum(stats.values())
+            if total > 0:
+                stats_data.append({
+                    "名前": member,
+                    "出席": stats["出席"],
+                    "欠席": stats["欠席"],
+                    "未定": stats["未定"],
+                    "回答数": total
+                })
+        
+        if stats_data:
+            df_stats = pd.DataFrame(stats_data)
+            st.dataframe(df_stats, use_container_width=True, hide_index=True)
+        else:
+            st.info("📭 まだ出欠登録がありません")
