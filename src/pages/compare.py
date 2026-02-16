@@ -8,11 +8,11 @@ from pathlib import Path
 if str(Path(__file__).parent.parent) not in sys.path:
     sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from ..database import StatsDatabase
-from ..stats import calculate_stats
-from ..charts import create_comparison_chart, create_radar_chart, create_bar_chart
-from ..components import section_header, comparison_table
-from ..config import NBA_COLORS, STAT_CATEGORIES
+from database import StatsDatabase
+from stats import calculate_stats
+from charts import create_comparison_chart, create_radar_chart, create_bar_chart
+from components import section_header, comparison_table
+from config import NBA_COLORS, STAT_CATEGORIES
 
 
 def calculate_contribution_score(stats_dict):
