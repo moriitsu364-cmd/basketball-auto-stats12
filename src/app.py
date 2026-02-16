@@ -78,7 +78,7 @@ def show_splash_screen():
         justify-content: center;
         z-index: 9999;
         animation: fadeOut 2s ease-in-out forwards;
-        animation-delay: 4s;
+        animation-delay: 6s;
     }
     
     .splash-logo {
@@ -133,13 +133,13 @@ def show_splash_screen():
     </div>
     
     <script>
-    // 6秒後にスプラッシュスクリーンを完全に削除
+    // 8秒後にスプラッシュスクリーンを完全に削除
     setTimeout(function() {
         var splash = document.getElementById('splashScreen');
         if (splash) {
             splash.remove();
         }
-    }, 6000);
+    }, 8000);
     </script>
     """, unsafe_allow_html=True)
     
@@ -154,7 +154,7 @@ def initialize_session_state():
     if 'admin_logged_in' not in st.session_state:
         st.session_state.admin_logged_in = False
     if 'current_page' not in st.session_state:
-        st.session_state.current_page = "シーズン統計"
+        st.session_state.current_page = "予定・出欠管理"
     if 'splash_shown' not in st.session_state:
         st.session_state.splash_shown = False
     if 'db' not in st.session_state:
@@ -374,7 +374,7 @@ def render_top_navigation(db):
     categories = {
         "統計": ["シーズン統計", "選手統計", "試合統計", "対戦相手", "比較分析"],
         "チーム情報": ["チーム情報"],
-        "予定": ["予定管理", "出欠管理"],
+        "予定・出欠": ["予定・出欠管理"],
         "データ入力": ["データ入力"],
         "設定": ["設定"]
     }
@@ -452,54 +452,9 @@ def render_main_content(db):
             team_info.render(db)
         elif current_page == "対戦相手":
             opponent_stats.render(db)
-        elif current_page == "予定管理":
-            # マネージャー・選手・顧問のみアクセス可能
-            if not st.session_state.get('management_access', False):
-                st.warning("⚠️ この機能にアクセスするには認証が必要です")
-                
-                col1, col2, col3 = st.columns([1, 2, 1])
-                with col2:
-                    st.markdown("### 🔐 アクセス認証")
-                    role = st.selectbox("役割を選択", ["マネージャー", "選手", "顧問"])
-                    password = st.text_input("パスワード", type="password", key="management_password")
-                    
-                    if st.button("認証", type="primary", use_container_width=True):
-                        # 簡易認証（実際の運用では適切な認証システムを使用）
-                        if password == "basketball2026":
-                            st.session_state.management_access = True
-                            st.session_state.management_role = role
-                            st.success(f"✅ {role}として認証されました")
-                            st.rerun()
-                        else:
-                            st.error("❌ パスワードが正しくありません")
-                    
-                    st.info("💡 デモ用パスワード: basketball2026")
-            else:
-                schedule_management.render(db)
-        elif current_page == "出欠管理":
-            # マネージャー・選手・顧問のみアクセス可能
-            if not st.session_state.get('management_access', False):
-                st.warning("⚠️ この機能にアクセスするには認証が必要です")
-                
-                col1, col2, col3 = st.columns([1, 2, 1])
-                with col2:
-                    st.markdown("### 🔐 アクセス認証")
-                    role = st.selectbox("役割を選択", ["マネージャー", "選手", "顧問"], key="attendance_role")
-                    password = st.text_input("パスワード", type="password", key="attendance_password")
-                    
-                    if st.button("認証", type="primary", use_container_width=True):
-                        # 簡易認証（実際の運用では適切な認証システムを使用）
-                        if password == "basketball2026":
-                            st.session_state.management_access = True
-                            st.session_state.management_role = role
-                            st.success(f"✅ {role}として認証されました")
-                            st.rerun()
-                        else:
-                            st.error("❌ パスワードが正しくありません")
-                    
-                    st.info("💡 デモ用パスワード: basketball2026")
-            else:
-                attendance_management.render(db)
+        elif current_page == "予定・出欠管理":
+            # パスワード不要で誰でもアクセス可能
+            schedule_management.render(db)
         elif current_page == "データ入力":
             data_input.render(db)
         elif current_page == "設定":
