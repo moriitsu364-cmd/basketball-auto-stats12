@@ -28,11 +28,11 @@ def render(db: StatsDatabase):
         return
     
     st.markdown("""
-    <div style="background: linear-gradient(135deg, #1d428a 0%, #c8102e 100%); padding: 2.5rem 2rem; margin: -1rem -2rem 2rem -2rem; border-radius: 0 0 12px 12px;">
-        <h1 style="color: white; font-size: 3rem; font-weight: 900; margin: 0; text-transform: uppercase; letter-spacing: 2px;">
+    <div style="background: linear-gradient(135deg, #1d428a 0%, #c8102e 100%); padding: 1.5rem 2rem; margin: -1rem -2rem 1.5rem -2rem; border-radius: 0 0 12px 12px;">
+        <h1 style="color: white; font-size: 2rem; font-weight: 900; margin: 0; text-transform: uppercase; letter-spacing: 1px;">
             📝 データ入力
         </h1>
-        <p style="color: rgba(255,255,255,0.9); font-size: 1.2rem; margin-top: 0.5rem;">
+        <p style="color: rgba(255,255,255,0.9); font-size: 1rem; margin-top: 0.5rem;">
             DATA INPUT / 試合データ・相手チームデータの登録
         </p>
     </div>
