@@ -25,6 +25,7 @@ def render(db=None):
     # タブで設定を分類
     settings_tabs = st.tabs([
         "チーム情報 / Team Info",
+        "予定管理 / Schedule",
         "表示設定 / Display",
         "データ管理 / Data",
         "認証設定 / Auth",
@@ -224,13 +225,190 @@ def render(db=None):
                         st.error(f"データベースへの保存に失敗しました: {e}")
                         return
                 
-                st.success("✅ チーム情報を保存しました！")
+                st.success("✅ チーム情報を保存しました!")
                 st.balloons()
+    
+    # ========================================
+    # 予定管理タブ
+    # ========================================
+    with settings_tabs[1]:
+        st.subheader("予定管理 - 管理者専用")
+        st.info("⚠️ この機能は管理者のみアクセス可能です。予定の追加・編集・削除ができます。")
+        
+        # 予定管理用のデータファイルパス
+        SCHEDULE_FILE = Path(__file__).parent.parent.parent / "data" / "schedule.json"
+        
+        def load_schedule_data():
+            """予定データを読み込み"""
+            try:
+                SCHEDULE_FILE.parent.mkdir(parents=True, exist_ok=True)
+                
+                if SCHEDULE_FILE.exists():
+                    with open(SCHEDULE_FILE, 'r', encoding='utf-8') as f:
+                        data = json.load(f)
+                        return data
+                else:
+                    return {
+                        "schedules": [
+                            {
+                                "id": 1,
+                                "date": "2026-02-20",
+                                "event": "練習試合 vs 開成高校",
+                                "location": "本校体育館",
+                                "type": "practice",
+                                "time": "15:00",
+                                "notes": ""
+                            },
+                            {
+                                "id": 2,
+                                "date": "2026-02-23",
+                                "event": "関東大会 1回戦",
+                                "location": "駒沢体育館",
+                                "type": "tournament",
+                                "time": "13:00",
+                                "notes": "集合時刻: 11:00"
+                            }
+                        ]
+                    }
+            except Exception as e:
+                st.error(f"予定データの読み込みエラー: {e}")
+                return {"schedules": []}
+        
+        def save_schedule_data(data):
+            """予定データを保存"""
+            try:
+                SCHEDULE_FILE.parent.mkdir(parents=True, exist_ok=True)
+                with open(SCHEDULE_FILE, 'w', encoding='utf-8') as f:
+                    json.dump(data, f, ensure_ascii=False, indent=2)
+                return True
+            except Exception as e:
+                st.error(f"予定データの保存エラー: {e}")
+                return False
+        
+        # データ読み込み
+        schedule_data = load_schedule_data()
+        schedules = schedule_data.get("schedules", [])
+        
+        # 新規予定追加
+        st.markdown("### ➕ 新規予定を追加")
+        
+        with st.form("admin_new_schedule_form"):
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                event_name = st.text_input("イベント名 *", placeholder="例: 練習試合 vs 開成高校")
+                event_date = st.date_input("日付 *")
+                event_time = st.time_input("時刻")
+            
+            with col2:
+                from datetime import datetime
+                event_type = st.selectbox("種類 *", ["practice", "tournament", "training"], 
+                                         format_func=lambda x: {"practice": "練習試合", "tournament": "公式戦", "training": "練習"}[x])
+                event_location = st.text_input("場所 *", placeholder="例: 本校体育館")
+                event_notes = st.text_area("備考", placeholder="集合時刻などの追加情報")
+            
+            if st.form_submit_button("追加", type="primary", use_container_width=True):
+                if event_name and event_date and event_location:
+                    new_schedule = {
+                        "id": max([s["id"] for s in schedules], default=0) + 1,
+                        "date": event_date.strftime("%Y-%m-%d"),
+                        "event": event_name,
+                        "location": event_location,
+                        "type": event_type,
+                        "time": event_time.strftime("%H:%M"),
+                        "notes": event_notes
+                    }
+                    schedules.append(new_schedule)
+                    schedule_data["schedules"] = schedules
+                    
+                    if save_schedule_data(schedule_data):
+                        st.success("✅ 予定を追加しました")
+                        st.rerun()
+                    else:
+                        st.error("❌ 予定の保存に失敗しました")
+                else:
+                    st.error("必須項目を入力してください")
+        
+        st.markdown("---")
+        st.markdown("### 📋 登録済み予定一覧")
+        
+        # 予定を日付順にソート
+        sorted_schedules = sorted(schedules, key=lambda x: x["date"])
+        
+        if sorted_schedules:
+            for schedule in sorted_schedules:
+                with st.expander(f"{schedule['date']} - {schedule['event']}", expanded=False):
+                    col1, col2 = st.columns([3, 1])
+                    
+                    with col1:
+                        st.write(f"**日時:** {schedule['date']} {schedule.get('time', '未定')}")
+                        st.write(f"**場所:** {schedule['location']}")
+                        type_names = {"practice": "練習試合", "tournament": "公式戦", "training": "練習"}
+                        st.write(f"**種類:** {type_names.get(schedule['type'], schedule['type'])}")
+                        if schedule.get('notes'):
+                            st.write(f"**備考:** {schedule['notes']}")
+                    
+                    with col2:
+                        if st.button("🗑️ 削除", key=f"admin_delete_{schedule['id']}", use_container_width=True):
+                            schedules = [s for s in schedules if s['id'] != schedule['id']]
+                            schedule_data["schedules"] = schedules
+                            if save_schedule_data(schedule_data):
+                                st.success("✅ 予定を削除しました")
+                                st.rerun()
+                        
+                        if st.button("✏️ 編集", key=f"admin_edit_{schedule['id']}", use_container_width=True):
+                            st.session_state.admin_editing_schedule = schedule['id']
+                    
+                    # 編集フォーム
+                    if st.session_state.get('admin_editing_schedule') == schedule['id']:
+                        st.markdown("---")
+                        with st.form(f"admin_edit_form_{schedule['id']}"):
+                            from datetime import datetime
+                            col1, col2 = st.columns(2)
+                            
+                            with col1:
+                                edit_event = st.text_input("イベント名", value=schedule['event'])
+                                edit_date = st.date_input("日付", value=datetime.strptime(schedule['date'], "%Y-%m-%d"))
+                                edit_time = st.time_input("時刻", value=datetime.strptime(schedule.get('time', '15:00'), "%H:%M").time())
+                            
+                            with col2:
+                                edit_type = st.selectbox("種類", ["practice", "tournament", "training"],
+                                                        index=["practice", "tournament", "training"].index(schedule['type']),
+                                                        format_func=lambda x: {"practice": "練習試合", "tournament": "公式戦", "training": "練習"}[x])
+                                edit_location = st.text_input("場所", value=schedule['location'])
+                                edit_notes = st.text_area("備考", value=schedule.get('notes', ''))
+                            
+                            col1, col2 = st.columns(2)
+                            
+                            with col1:
+                                if st.form_submit_button("保存", type="primary", use_container_width=True):
+                                    for s in schedules:
+                                        if s['id'] == schedule['id']:
+                                            s['event'] = edit_event
+                                            s['date'] = edit_date.strftime("%Y-%m-%d")
+                                            s['location'] = edit_location
+                                            s['type'] = edit_type
+                                            s['time'] = edit_time.strftime("%H:%M")
+                                            s['notes'] = edit_notes
+                                            break
+                                    
+                                    schedule_data["schedules"] = schedules
+                                    if save_schedule_data(schedule_data):
+                                        st.success("✅ 予定を更新しました")
+                                        st.session_state.admin_editing_schedule = None
+                                        st.rerun()
+                            
+                            with col2:
+                                if st.form_submit_button("キャンセル", use_container_width=True):
+                                    st.session_state.admin_editing_schedule = None
+                                    st.rerun()
+        else:
+            st.info("📭 登録されている予定はありません")
     
     # ========================================
     # 表示設定タブ
     # ========================================
-    with settings_tabs[1]:
+    with settings_tabs[2]:
         st.subheader("表示設定")
         
         col1, col2 = st.columns(2)
@@ -279,7 +457,7 @@ def render(db=None):
     # ========================================
     # データ管理タブ
     # ========================================
-    with settings_tabs[2]:
+    with settings_tabs[3]:
         st.subheader("データ管理")
         
         col1, col2 = st.columns(2)
@@ -343,7 +521,7 @@ def render(db=None):
     # ========================================
     # 認証設定タブ
     # ========================================
-    with settings_tabs[3]:
+    with settings_tabs[4]:
         st.subheader("認証設定")
         
         st.markdown("### 管理者アカウント / Admin Account")
@@ -400,7 +578,7 @@ def render(db=None):
     # ========================================
     # 詳細設定タブ
     # ========================================
-    with settings_tabs[4]:
+    with settings_tabs[5]:
         st.subheader("詳細設定")
         
         st.markdown("### デバッグモード / Debug Mode")
