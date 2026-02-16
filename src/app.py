@@ -77,8 +77,8 @@ def show_splash_screen():
         align-items: center;
         justify-content: center;
         z-index: 9999;
-        animation: fadeOut 1.5s ease-in-out forwards;
-        animation-delay: 2s;
+        animation: fadeOut 2s ease-in-out forwards;
+        animation-delay: 4s;
     }
     
     .splash-logo {
@@ -133,13 +133,13 @@ def show_splash_screen():
     </div>
     
     <script>
-    // 3.5秒後にスプラッシュスクリーンを完全に削除
+    // 6秒後にスプラッシュスクリーンを完全に削除
     setTimeout(function() {
         var splash = document.getElementById('splashScreen');
         if (splash) {
             splash.remove();
         }
-    }, 3500);
+    }, 6000);
     </script>
     """, unsafe_allow_html=True)
     
@@ -296,15 +296,24 @@ def render_top_navigation(db):
         background: white !important;
         border: 1px solid #e0e0e0 !important;
         border-radius: 4px !important;
-        padding: 0.5rem !important;
+        padding: 0.6rem 1rem !important;
         font-size: 0.9rem !important;
         font-weight: 600 !important;
         letter-spacing: 0.5px !important;
+        text-transform: uppercase !important;
+        transition: all 0.2s ease !important;
+        cursor: pointer !important;
     }
     
     .stSelectbox > div > div:hover {
         border-color: #1d428a !important;
         background: #f8f9fa !important;
+        box-shadow: 0 2px 4px rgba(29, 66, 138, 0.1) !important;
+    }
+    
+    /* ドロップダウンアイコンのスタイル */
+    .stSelectbox svg {
+        color: #1d428a !important;
     }
     
     /* Streamlitのデフォルトpaddingを調整 */
@@ -395,23 +404,26 @@ def render_top_navigation(db):
                     st.rerun()
             else:
                 # 複数ページがある場合はプルダウンメニューを直接配置
-                # カテゴリー名を含めたオプション表示
-                options = [f"{category_name}: {page}" for page in pages_in_category]
-                current_option = f"{category_name}: {st.session_state.current_page}" if st.session_state.current_page in pages_in_category else options[0]
+                # プルダウン用のラベルを表示
+                display_label = category_name
+                if st.session_state.current_page in pages_in_category:
+                    # 現在のページがこのカテゴリーに属する場合、ページ名も表示
+                    display_label = f"{category_name}: {st.session_state.current_page}"
+                
+                # オプションリストを作成
+                options = pages_in_category
+                current_index = options.index(st.session_state.current_page) if st.session_state.current_page in options else 0
                 
                 selected = st.selectbox(
-                    category_name,
+                    display_label,
                     options,
-                    index=options.index(current_option) if current_option in options else 0,
+                    index=current_index,
                     key=f"select_{category_name}",
                     label_visibility="collapsed"
                 )
                 
-                # 選択されたページを抽出
-                selected_page = selected.split(": ", 1)[1]
-                
-                if selected_page != st.session_state.current_page:
-                    st.session_state.current_page = selected_page
+                if selected != st.session_state.current_page:
+                    st.session_state.current_page = selected
                     st.rerun()
     
     st.markdown('</div>', unsafe_allow_html=True)
