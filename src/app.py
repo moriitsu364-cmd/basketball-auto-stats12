@@ -165,40 +165,138 @@ def initialize_session_state():
             st.session_state.db = None
 
 
-def render_sidebar(db):
-    """サイドバーを表示"""
-    with st.sidebar:
-        # タイトル
-        st.markdown("""
-        <div style="text-align: center; padding: 1rem 0;">
-            <h1 style="color: #1d428a; margin: 0;">🏀</h1>
-            <h2 style="color: #c8102e; margin: 0;">Basketball Stats</h2>
-            <p style="color: #888; font-size: 0.9rem; margin: 0.5rem 0 0 0;">
-                筑波大学附属高等学校
-            </p>
+def render_top_navigation(db):
+    """上部ナビゲーションバーを表示（NBA風）"""
+    # ヘッダー部分
+    st.markdown("""
+    <style>
+    /* ヘッダーとナビゲーションバーのスタイル */
+    .top-header {
+        background: linear-gradient(135deg, #1d428a 0%, #c8102e 100%);
+        padding: 1rem 2rem;
+        margin: -1rem -1rem 0 -1rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .top-header-title {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        color: white;
+    }
+    
+    .top-header-logo {
+        font-size: 2.5rem;
+    }
+    
+    .top-header-text h1 {
+        margin: 0;
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: white;
+    }
+    
+    .top-header-text p {
+        margin: 0;
+        font-size: 0.9rem;
+        color: rgba(255, 255, 255, 0.9);
+    }
+    
+    .top-stats {
+        display: flex;
+        gap: 2rem;
+        color: white;
+    }
+    
+    .top-stat-item {
+        text-align: center;
+    }
+    
+    .top-stat-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+    }
+    
+    .top-stat-label {
+        font-size: 0.8rem;
+        opacity: 0.9;
+    }
+    
+    /* ナビゲーションバーのスタイル */
+    .nav-bar {
+        background: white;
+        padding: 0;
+        margin: 0 -1rem;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        border-bottom: 1px solid #e0e0e0;
+    }
+    
+    /* Streamlitのデフォルトpaddingを調整 */
+    .block-container {
+        padding-top: 1rem !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+    
+    # ヘッダー部分
+    if db and db.df is not None and len(db.df) > 0:
+        total_games = len(db.df['GameDate'].unique()) if 'GameDate' in db.df.columns else 0
+        total_players = len(db.df['PlayerName'].unique()) if 'PlayerName' in db.df.columns else 0
+        total_records = len(db.df)
+    else:
+        total_games = 0
+        total_players = 0
+        total_records = 0
+    
+    st.markdown(f"""
+    <div class="top-header">
+        <div class="top-header-title">
+            <div class="top-header-logo">🏀</div>
+            <div class="top-header-text">
+                <h1>Basketball Stats Manager</h1>
+                <p>筑波大学附属高等学校</p>
+            </div>
         </div>
-        """, unsafe_allow_html=True)
-        
-        st.markdown("---")
-        
-        # ナビゲーション
-        st.markdown("### 📊 メニュー")
-        
-        pages = {
-            "シーズン統計": "📈",
-            "選手統計": "👤", 
-            "試合統計": "🏀",
-            "比較分析": "📊",
-            "チーム情報": "👥",
-            "対戦相手": "🎯",
-            "予定管理": "📅",
-            "出欠管理": "✓",
-            "データ入力": "📝",
-            "設定": "⚙️"
-        }
-        
-        for page_name, icon in pages.items():
-            # ボタンのテキストを工夫してタブが切れないように
+        <div class="top-stats">
+            <div class="top-stat-item">
+                <div class="top-stat-value">{total_games}</div>
+                <div class="top-stat-label">試合</div>
+            </div>
+            <div class="top-stat-item">
+                <div class="top-stat-value">{total_players}</div>
+                <div class="top-stat-label">選手</div>
+            </div>
+            <div class="top-stat-item">
+                <div class="top-stat-value">{total_records}</div>
+                <div class="top-stat-label">記録</div>
+            </div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # ナビゲーションバー
+    st.markdown('<div class="nav-bar">', unsafe_allow_html=True)
+    
+    pages = {
+        "シーズン統計": "📈",
+        "選手統計": "👤", 
+        "試合統計": "🏀",
+        "比較分析": "📊",
+        "チーム情報": "👥",
+        "対戦相手": "🎯",
+        "予定管理": "📅",
+        "出欠管理": "✓",
+        "データ入力": "📝",
+        "設定": "⚙️"
+    }
+    
+    cols = st.columns(len(pages))
+    
+    for idx, (page_name, icon) in enumerate(pages.items()):
+        with cols[idx]:
             button_text = f"{icon} {page_name}"
             if st.button(
                 button_text,
@@ -208,32 +306,15 @@ def render_sidebar(db):
             ):
                 st.session_state.current_page = page_name
                 st.rerun()
-        
-        st.markdown("---")
-        
-        # データベース統計
-        if db and db.df is not None and len(db.df) > 0:
-            st.markdown("### 📊 データ統計")
-            
-            total_games = len(db.df['GameDate'].unique()) if 'GameDate' in db.df.columns else 0
-            total_players = len(db.df['PlayerName'].unique()) if 'PlayerName' in db.df.columns else 0
-            total_records = len(db.df)
-            
-            st.metric("総試合数", f"{total_games} 試合")
-            st.metric("登録選手数", f"{total_players} 名")
-            st.metric("総レコード数", f"{total_records} 件")
-        else:
-            st.info("データがまだ登録されていません")
-        
-        st.markdown("---")
-        
-        # フッター
-        st.markdown("""
-        <div style="text-align: center; color: #888; font-size: 0.8rem;">
-            <p>Basketball Stats Manager</p>
-            <p>v3.0</p>
-        </div>
-        """, unsafe_allow_html=True)
+    
+    st.markdown('</div>', unsafe_allow_html=True)
+    st.markdown("---")
+
+
+def render_sidebar(db):
+    """サイドバーを表示（後方互換性のため残す）"""
+    # 上部ナビゲーションに移行したため、空にする
+    pass
 
 
 def render_main_content(db):
@@ -340,7 +421,7 @@ def main():
         page_title="Basketball Stats Manager",
         page_icon="🏀",
         layout="wide",
-        initial_sidebar_state="expanded"
+        initial_sidebar_state="collapsed"  # サイドバーを折りたたむ
     )
     
     # セッション状態の初期化
@@ -368,8 +449,8 @@ def main():
         st.info("アプリケーションを再読み込みしてください")
         st.stop()
     
-    # サイドバーとメインコンテンツを表示
-    render_sidebar(db)
+    # 上部ナビゲーションバーとメインコンテンツを表示
+    render_top_navigation(db)
     render_main_content(db)
 
 
