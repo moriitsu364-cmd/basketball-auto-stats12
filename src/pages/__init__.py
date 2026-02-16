@@ -7,6 +7,8 @@ from . import data_input
 from . import team_info
 from . import opponent_stats
 from . import admin_settings
+from . import schedule_management
+from . import attendance_management
 
 __all__ = [
     'season_stats',
@@ -16,5 +18,7 @@ __all__ = [
     'data_input',
     'team_info',
     'opponent_stats',
-    'admin_settings'
+    'admin_settings',
+    'schedule_management',
+    'attendance_management'
 ]
