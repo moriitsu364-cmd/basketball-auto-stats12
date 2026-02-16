@@ -35,7 +35,9 @@ try:
         team_info,
         opponent_stats,
         data_input,
-        admin_settings
+        admin_settings,
+        schedule_management,
+        attendance_management
     )
 except ImportError as e:
     st.error(f"モジュールのインポートに失敗しました: {e}")
@@ -181,6 +183,8 @@ def render_sidebar(db):
             "比較分析": "📊",
             "チーム情報": "👥",
             "対戦相手": "🎯",
+            "予定管理": "📅",
+            "出欠管理": "✓",
             "データ入力": "📝",
             "設定": "⚙️"
         }
@@ -241,6 +245,54 @@ def render_main_content(db):
             team_info.render(db)
         elif current_page == "対戦相手":
             opponent_stats.render(db)
+        elif current_page == "予定管理":
+            # マネージャー・選手・顧問のみアクセス可能
+            if not st.session_state.get('management_access', False):
+                st.warning("⚠️ この機能にアクセスするには認証が必要です")
+                
+                col1, col2, col3 = st.columns([1, 2, 1])
+                with col2:
+                    st.markdown("### 🔐 アクセス認証")
+                    role = st.selectbox("役割を選択", ["マネージャー", "選手", "顧問"])
+                    password = st.text_input("パスワード", type="password", key="management_password")
+                    
+                    if st.button("認証", type="primary", use_container_width=True):
+                        # 簡易認証（実際の運用では適切な認証システムを使用）
+                        if password == "basketball2026":
+                            st.session_state.management_access = True
+                            st.session_state.management_role = role
+                            st.success(f"✅ {role}として認証されました")
+                            st.rerun()
+                        else:
+                            st.error("❌ パスワードが正しくありません")
+                    
+                    st.info("💡 デモ用パスワード: basketball2026")
+            else:
+                schedule_management.render(db)
+        elif current_page == "出欠管理":
+            # マネージャー・選手・顧問のみアクセス可能
+            if not st.session_state.get('management_access', False):
+                st.warning("⚠️ この機能にアクセスするには認証が必要です")
+                
+                col1, col2, col3 = st.columns([1, 2, 1])
+                with col2:
+                    st.markdown("### 🔐 アクセス認証")
+                    role = st.selectbox("役割を選択", ["マネージャー", "選手", "顧問"], key="attendance_role")
+                    password = st.text_input("パスワード", type="password", key="attendance_password")
+                    
+                    if st.button("認証", type="primary", use_container_width=True):
+                        # 簡易認証（実際の運用では適切な認証システムを使用）
+                        if password == "basketball2026":
+                            st.session_state.management_access = True
+                            st.session_state.management_role = role
+                            st.success(f"✅ {role}として認証されました")
+                            st.rerun()
+                        else:
+                            st.error("❌ パスワードが正しくありません")
+                    
+                    st.info("💡 デモ用パスワード: basketball2026")
+            else:
+                attendance_management.render(db)
         elif current_page == "データ入力":
             data_input.render(db)
         elif current_page == "設定":
