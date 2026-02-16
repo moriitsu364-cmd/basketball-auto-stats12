@@ -528,30 +528,30 @@ def main():
     # セッション状態の初期化
     initialize_session_state()
     
+    # データベースの取得
+    db = st.session_state.get('db')
+    
     # スプラッシュスクリーンを表示（初回のみ）
     if not st.session_state.splash_shown:
         show_splash_screen()
         st.session_state.splash_shown = True
-        st.rerun()  # 再度追加 - これがないとコンテンツが表示されない
-        return
     
     # カスタムCSSを適用
     try:
         load_css()
     except Exception as e:
-        if DEBUG_MODE:
-            st.warning(f"CSSの適用に失敗しました: {e}")
+        pass
     
-    # データベースの取得
-    db = st.session_state.get('db')
+    # 上部ナビゲーションバーを表示（dbがNoneでも表示）
+    render_top_navigation(db)
     
+    # データベースチェック
     if db is None:
         st.error("❌ データベースの初期化に失敗しました")
-        st.info("アプリケーションを再読み込みしてください")
+        st.info("📝 まず「データ入力」からデータを登録してください")
         st.stop()
     
-    # 上部ナビゲーションバーとメインコンテンツを表示
-    render_top_navigation(db)
+    # メインコンテンツを表示
     render_main_content(db)
 
 
