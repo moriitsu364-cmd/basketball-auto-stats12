@@ -8,11 +8,11 @@ import pandas as pd
 if str(Path(__file__).parent.parent) not in sys.path:
     sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from ..database import StatsDatabase
-from ..stats import calculate_team_stats
-from ..components import stat_card, section_header, game_card
-from ..charts import create_bar_chart, create_pie_chart
-from ..config import NBA_COLORS
+from database import StatsDatabase
+from stats import calculate_team_stats
+from components import stat_card, section_header, game_card
+from charts import create_bar_chart, create_pie_chart
+from config import NBA_COLORS
 
 
 def render(db: StatsDatabase):
