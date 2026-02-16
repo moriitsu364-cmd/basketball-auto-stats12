@@ -52,7 +52,7 @@ def show_splash_screen():
     """スプラッシュスクリーン（フェイドアウト効果付き・筑波大学附属高校）"""
     import time
     
-    # スプラッシュスクリーンの表示
+    # スプラッシュスクリーンの表示（JavaScriptで自動削除）
     st.markdown("""
     <style>
     @keyframes fadeOut {
@@ -79,7 +79,6 @@ def show_splash_screen():
         z-index: 9999;
         animation: fadeOut 1.5s ease-in-out forwards;
         animation-delay: 2s;
-        pointer-events: none;
     }
     
     .splash-logo {
@@ -124,29 +123,28 @@ def show_splash_screen():
         0%, 100% { transform: scale(1); }
         50% { transform: scale(1.1); }
     }
-    
-    /* スプラッシュスクリーンを3.5秒後に完全に削除 */
-    @keyframes hideCompletely {
-        0% { opacity: 0; }
-        100% { opacity: 0; display: none; visibility: hidden; }
-    }
-    
-    .splash-screen {
-        animation: fadeOut 1.5s ease-in-out forwards, hideCompletely 0s forwards;
-        animation-delay: 2s, 3.5s;
-    }
     </style>
     
-    <div class="splash-screen">
+    <div class="splash-screen" id="splashScreen">
         <div class="splash-logo">🏀</div>
         <div class="splash-title">BASKETBALL</div>
         <div class="splash-school">筑波大学附属高等学校</div>
         <div class="splash-subtitle">Statistics Manager</div>
     </div>
+    
+    <script>
+    // 3.5秒後にスプラッシュスクリーンを完全に削除
+    setTimeout(function() {
+        var splash = document.getElementById('splashScreen');
+        if (splash) {
+            splash.remove();
+        }
+    }, 3500);
+    </script>
     """, unsafe_allow_html=True)
     
-    # スプラッシュスクリーンが完全に消えるまで待つ
-    time.sleep(3.6)
+    # スプラッシュスクリーンが表示される時間だけ待つ
+    time.sleep(0.1)
 
 
 def initialize_session_state():
@@ -352,7 +350,8 @@ def main():
     if not st.session_state.splash_shown:
         show_splash_screen()
         st.session_state.splash_shown = True
-        # rerunを削除 - スプラッシュ後にそのまま続行
+        st.rerun()  # 再度追加 - これがないとコンテンツが表示されない
+        return
     
     # カスタムCSSを適用
     try:
