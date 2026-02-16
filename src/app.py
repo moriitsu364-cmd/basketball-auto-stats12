@@ -52,91 +52,101 @@ def show_splash_screen():
     """スプラッシュスクリーン（フェイドアウト効果付き・筑波大学附属高校）"""
     import time
     
-    splash_placeholder = st.empty()
+    # スプラッシュスクリーンの表示
+    st.markdown("""
+    <style>
+    @keyframes fadeOut {
+        from { opacity: 1; }
+        to { opacity: 0; }
+    }
     
-    with splash_placeholder.container():
-        st.markdown("""
-        <style>
-        @keyframes fadeOut {
-            from { opacity: 1; }
-            to { opacity: 0; }
-        }
-        
-        @keyframes slideUp {
-            from { transform: translateY(30px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-        
-        .splash-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: linear-gradient(135deg, #1d428a 0%, #c8102e 100%);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-            animation: fadeOut 1.5s ease-in-out forwards;
-            animation-delay: 2s;
-        }
-        
-        .splash-logo {
-            font-size: 8rem;
-            margin-bottom: 1rem;
-            animation: pulse 2s ease-in-out infinite;
-        }
-        
-        .splash-title {
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: 4rem;
-            color: white;
-            margin-bottom: 0.5rem;
-            letter-spacing: 8px;
-            text-transform: uppercase;
-            text-shadow: 0 4px 20px rgba(0,0,0,0.3);
-            animation: slideUp 0.8s ease-out forwards;
-        }
-        
-        .splash-school {
-            font-size: 2rem;
-            color: rgba(255, 255, 255, 0.95);
-            margin-bottom: 2rem;
-            letter-spacing: 4px;
-            font-weight: 500;
-            animation: slideUp 0.8s ease-out forwards;
-            animation-delay: 0.2s;
-            opacity: 0;
-        }
-        
-        .splash-subtitle {
-            font-size: 1.3rem;
-            color: rgba(255, 255, 255, 0.85);
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            animation: slideUp 0.8s ease-out forwards;
-            animation-delay: 0.4s;
-            opacity: 0;
-        }
-        
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-        }
-        </style>
-        
-        <div class="splash-screen">
-            <div class="splash-logo">🏀</div>
-            <div class="splash-title">BASKETBALL</div>
-            <div class="splash-school">筑波大学附属高等学校</div>
-            <div class="splash-subtitle">Statistics Manager</div>
-        </div>
-        """, unsafe_allow_html=True)
+    @keyframes slideUp {
+        from { transform: translateY(30px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
     
-    time.sleep(3.5)
-    splash_placeholder.empty()
+    .splash-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: linear-gradient(135deg, #1d428a 0%, #c8102e 100%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        animation: fadeOut 1.5s ease-in-out forwards;
+        animation-delay: 2s;
+        pointer-events: none;
+    }
+    
+    .splash-logo {
+        font-size: 8rem;
+        margin-bottom: 1rem;
+        animation: pulse 2s ease-in-out infinite;
+    }
+    
+    .splash-title {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 4rem;
+        color: white;
+        margin-bottom: 0.5rem;
+        letter-spacing: 8px;
+        text-transform: uppercase;
+        text-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        animation: slideUp 0.8s ease-out forwards;
+    }
+    
+    .splash-school {
+        font-size: 2rem;
+        color: rgba(255, 255, 255, 0.95);
+        margin-bottom: 2rem;
+        letter-spacing: 4px;
+        font-weight: 500;
+        animation: slideUp 0.8s ease-out forwards;
+        animation-delay: 0.2s;
+        opacity: 0;
+    }
+    
+    .splash-subtitle {
+        font-size: 1.3rem;
+        color: rgba(255, 255, 255, 0.85);
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        animation: slideUp 0.8s ease-out forwards;
+        animation-delay: 0.4s;
+        opacity: 0;
+    }
+    
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+    }
+    
+    /* スプラッシュスクリーンを3.5秒後に完全に削除 */
+    @keyframes hideCompletely {
+        0% { opacity: 0; }
+        100% { opacity: 0; display: none; visibility: hidden; }
+    }
+    
+    .splash-screen {
+        animation: fadeOut 1.5s ease-in-out forwards, hideCompletely 0s forwards;
+        animation-delay: 2s, 3.5s;
+    }
+    </style>
+    
+    <div class="splash-screen">
+        <div class="splash-logo">🏀</div>
+        <div class="splash-title">BASKETBALL</div>
+        <div class="splash-school">筑波大学附属高等学校</div>
+        <div class="splash-subtitle">Statistics Manager</div>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # スプラッシュスクリーンが完全に消えるまで待つ
+    time.sleep(3.6)
 
 
 def initialize_session_state():
@@ -342,7 +352,7 @@ def main():
     if not st.session_state.splash_shown:
         show_splash_screen()
         st.session_state.splash_shown = True
-        st.rerun()
+        # rerunを削除 - スプラッシュ後にそのまま続行
     
     # カスタムCSSを適用
     try:
