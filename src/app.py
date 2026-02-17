@@ -288,7 +288,7 @@ def render_top_navigation(db):
         font-weight: 600 !important;
         letter-spacing: 1px !important;
         text-transform: uppercase !important;
-        color: rgba(255,255,255,0.85) !important;
+        color: rgba(0,0,0,0.85) !important;
         transition: all 0.2s ease !important;
         white-space: nowrap !important;
         margin-bottom: 0 !important;
@@ -296,7 +296,7 @@ def render_top_navigation(db):
     }}
     
     .stButton button:hover {{
-        color: white !important;
+        color: #000000 !important;
         background: rgba(200, 16, 46, 0.15) !important;
         border-bottom: 3px solid #c8102e !important;
         transform: none !important;
@@ -304,7 +304,7 @@ def render_top_navigation(db):
     }}
     
     .stButton button[kind="primary"] {{
-        color: white !important;
+        color: #000000 !important;
         background: rgba(200, 16, 46, 0.25) !important;
         border-bottom: 3px solid #c8102e !important;
         font-weight: 700 !important;
