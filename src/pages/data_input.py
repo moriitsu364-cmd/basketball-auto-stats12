@@ -134,7 +134,7 @@ def render_team_data_input(db: StatsDatabase):
         
         with col1:
             if st.button("💾 データ保存 / SAVE DATA", use_container_width=True, type="primary"):
-                db.add_game(edited_df)
+                db.add_game_stats(edited_df)
                 if db.save():
                     st.success("✅ データを保存しました! / Data saved!")
                     del st.session_state['current_stats']
@@ -267,7 +267,7 @@ def render_opponent_data_input(db: StatsDatabase):
                     opponent_df[col] = 0 if col != 'MIN' else '00:00'
             
             # データベースに保存
-            db.add_game(opponent_df)
+            db.add_game_stats(opponent_df)
             if db.save():
                 st.success(f"✅ {opp_team_name}のデータを保存しました!")
                 st.rerun()
@@ -298,7 +298,7 @@ def render_data_management(db: StatsDatabase):
         if import_file and st.button("インポート実行 / IMPORT DATA"):
             try:
                 import_df = pd.read_csv(import_file)
-                db.add_game(import_df)
+                db.add_game_stats(import_df)
                 if db.save():
                     st.success("✅ インポート成功! / Import successful!")
                     st.rerun()
