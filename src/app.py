@@ -166,170 +166,9 @@ def initialize_session_state():
 
 
 def render_top_navigation(db):
-    """上部ナビゲーションバーを表示（5カテゴリー・プルダウン式）"""
-    # ヘッダー部分
-    st.markdown("""
-    <style>
-    /* メインヘッダー（黒背景） */
-    .main-header {
-        background: #000000;
-        padding: 0.8rem 2rem;
-        margin: -1rem -1rem 0 -1rem;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        border-bottom: 3px solid #c8102e;
-    }
+    """統合ナビゲーションバーを表示（ヘッダー＋ナビゲーション一体型）"""
     
-    .header-left {
-        display: flex;
-        align-items: center;
-        gap: 1.5rem;
-    }
-    
-    .header-logo {
-        display: flex;
-        align-items: center;
-        gap: 0.8rem;
-    }
-    
-    .header-logo-icon {
-        font-size: 2.5rem;
-    }
-    
-    .header-logo-text h1 {
-        margin: 0;
-        font-size: 1.4rem;
-        font-weight: 700;
-        color: white;
-        letter-spacing: 1px;
-    }
-    
-    .header-logo-text p {
-        margin: 0;
-        font-size: 0.75rem;
-        color: #c8102e;
-        font-weight: 500;
-    }
-    
-    .header-stats {
-        display: flex;
-        gap: 2rem;
-        margin-left: 2rem;
-    }
-    
-    .stat-box {
-        text-align: center;
-        padding: 0.3rem 0.8rem;
-        background: rgba(200, 16, 46, 0.1);
-        border-radius: 4px;
-        border-left: 3px solid #c8102e;
-    }
-    
-    .stat-value {
-        font-size: 1.3rem;
-        font-weight: 700;
-        color: white;
-    }
-    
-    .stat-label {
-        font-size: 0.7rem;
-        color: #aaa;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-    
-    /* ナビゲーションバー（白背景） */
-    .nav-container {
-        background: white;
-        padding: 0.8rem 2rem;
-        margin: 0 -1rem;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-        border-bottom: 1px solid #e0e0e0;
-        display: flex;
-        gap: 1rem;
-    }
-    
-    .nav-wrapper {
-        display: flex;
-        gap: 0;
-        padding: 0;
-        overflow-x: auto;
-        max-width: 100%;
-    }
-    
-    /* ナビゲーションボタンのカスタマイズ */
-    .stButton button {
-        border-radius: 4px !important;
-        border: 1px solid #e0e0e0 !important;
-        padding: 0.6rem 1.5rem !important;
-        font-size: 0.9rem !important;
-        font-weight: 600 !important;
-        letter-spacing: 0.5px !important;
-        text-transform: uppercase !important;
-        transition: all 0.2s ease !important;
-        white-space: nowrap !important;
-    }
-    
-    .stButton button:hover {
-        background: #f5f5f5 !important;
-        transform: translateY(-1px) !important;
-    }
-    
-    .stButton button[kind="primary"] {
-        background: #1d428a !important;
-        color: white !important;
-        border: 2px solid #1d428a !important;
-    }
-    
-    .stButton button[kind="secondary"] {
-        background: white !important;
-        color: #333 !important;
-    }
-    
-    /* セレクトボックスのカスタマイズ */
-    .stSelectbox {
-        margin: 0 !important;
-    }
-    
-    .stSelectbox > div > div {
-        background: white !important;
-        border: 1px solid #e0e0e0 !important;
-        border-radius: 4px !important;
-        padding: 0.6rem 1rem !important;
-        font-size: 0.9rem !important;
-        font-weight: 600 !important;
-        letter-spacing: 0.5px !important;
-        text-transform: uppercase !important;
-        transition: all 0.2s ease !important;
-        cursor: pointer !important;
-    }
-    
-    .stSelectbox > div > div:hover {
-        border-color: #1d428a !important;
-        background: #f8f9fa !important;
-        box-shadow: 0 2px 4px rgba(29, 66, 138, 0.1) !important;
-    }
-    
-    /* ドロップダウンアイコンのスタイル */
-    .stSelectbox svg {
-        color: #1d428a !important;
-    }
-    
-    /* Streamlitのデフォルトpaddingを調整 */
-    .block-container {
-        padding-top: 1rem !important;
-        max-width: 100% !important;
-    }
-    
-    /* サイドバーを完全に隠す */
-    [data-testid="stSidebar"] {
-        display: none !important;
-    }
-    </style>
-    """, unsafe_allow_html=True)
-    
-    # ヘッダー部分
+    # データ集計
     if db and db.df is not None and len(db.df) > 0:
         total_games = len(db.df['GameDate'].unique()) if 'GameDate' in db.df.columns else 0
         total_players = len(db.df['PlayerName'].unique()) if 'PlayerName' in db.df.columns else 0
@@ -340,37 +179,227 @@ def render_top_navigation(db):
         total_records = 0
     
     st.markdown(f"""
-    <div class="main-header">
-        <div class="header-left">
-            <div class="header-logo">
-                <div class="header-logo-icon">🏀</div>
-                <div class="header-logo-text">
-                    <h1>BASKETBALL STATS</h1>
+    <style>
+    /* ================================================
+       統合ヘッダー＋ナビゲーションバー
+       ================================================ */
+    
+    /* サイドバーを完全に隠す */
+    [data-testid="stSidebar"] {{
+        display: none !important;
+    }}
+    
+    /* ページ上部の余白をリセット */
+    .block-container {{
+        padding-top: 0.5rem !important;
+        max-width: 100% !important;
+    }}
+    
+    /* ===== 統合バー本体（黒背景） ===== */
+    .unified-bar {{
+        background: #000000;
+        margin: -1rem -1rem 0 -1rem;
+        border-bottom: 3px solid #c8102e;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+    }}
+    
+    /* ===== 上段：ロゴ＋統計 ===== */
+    .bar-top {{
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.6rem 2rem;
+        border-bottom: 1px solid rgba(200, 16, 46, 0.3);
+    }}
+    
+    .bar-logo {{
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+    }}
+    
+    .bar-logo-icon {{
+        font-size: 2rem;
+        line-height: 1;
+    }}
+    
+    .bar-logo-text h1 {{
+        margin: 0;
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: white;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+    }}
+    
+    .bar-logo-text p {{
+        margin: 0;
+        font-size: 0.7rem;
+        color: #c8102e;
+        font-weight: 600;
+        letter-spacing: 1px;
+    }}
+    
+    .bar-metrics {{
+        display: flex;
+        gap: 1.5rem;
+    }}
+    
+    .bar-metric {{
+        text-align: center;
+        padding: 0.2rem 0.8rem;
+        background: rgba(200, 16, 46, 0.1);
+        border-radius: 4px;
+        border-left: 3px solid #c8102e;
+    }}
+    
+    .bar-metric-value {{
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: white;
+        line-height: 1.2;
+    }}
+    
+    .bar-metric-label {{
+        font-size: 0.6rem;
+        color: #aaa;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }}
+    
+    /* ===== 下段：ナビゲーション ===== */
+    .bar-nav {{
+        padding: 0 1rem;
+        display: flex;
+        align-items: stretch;
+        gap: 0;
+    }}
+    
+    /* ナビボタン共通スタイル */
+    .stButton button {{
+        background: transparent !important;
+        border: none !important;
+        border-radius: 0 !important;
+        border-bottom: 3px solid transparent !important;
+        padding: 0.7rem 1.2rem !important;
+        font-size: 0.82rem !important;
+        font-weight: 600 !important;
+        letter-spacing: 1px !important;
+        text-transform: uppercase !important;
+        color: rgba(255,255,255,0.7) !important;
+        transition: all 0.2s ease !important;
+        white-space: nowrap !important;
+        margin-bottom: 0 !important;
+    }}
+    
+    .stButton button:hover {{
+        color: white !important;
+        background: rgba(200, 16, 46, 0.1) !important;
+        border-bottom-color: #c8102e !important;
+        transform: none !important;
+    }}
+    
+    .stButton button[kind="primary"] {{
+        color: white !important;
+        background: rgba(200, 16, 46, 0.15) !important;
+        border-bottom: 3px solid #c8102e !important;
+        font-weight: 700 !important;
+    }}
+    
+    .stButton button[kind="secondary"] {{
+        color: rgba(255,255,255,0.7) !important;
+    }}
+    
+    /* ナビ内セレクトボックス */
+    .stSelectbox {{
+        margin: 0 !important;
+    }}
+    
+    .stSelectbox > div > div {{
+        background: transparent !important;
+        border: none !important;
+        border-radius: 0 !important;
+        border-bottom: 3px solid transparent !important;
+        padding: 0.7rem 1.2rem !important;
+        font-size: 0.82rem !important;
+        font-weight: 600 !important;
+        letter-spacing: 1px !important;
+        text-transform: uppercase !important;
+        color: rgba(255,255,255,0.7) !important;
+        cursor: pointer !important;
+        min-height: unset !important;
+    }}
+    
+    .stSelectbox > div > div:hover {{
+        color: white !important;
+        background: rgba(200, 16, 46, 0.1) !important;
+        border-bottom-color: #c8102e !important;
+    }}
+    
+    /* アクティブなセレクトボックス */
+    div[data-active-nav="true"] .stSelectbox > div > div {{
+        color: white !important;
+        background: rgba(200, 16, 46, 0.15) !important;
+        border-bottom: 3px solid #c8102e !important;
+        font-weight: 700 !important;
+    }}
+    
+    .stSelectbox svg {{
+        color: #c8102e !important;
+        opacity: 0.8;
+    }}
+    
+    /* ドロップダウンオプション */
+    .stSelectbox [data-baseweb="popover"] {{
+        background: #1a1a1a !important;
+        border: 1px solid #333 !important;
+    }}
+    
+    .stSelectbox li {{
+        color: white !important;
+        background: #1a1a1a !important;
+    }}
+    
+    .stSelectbox li:hover {{
+        background: rgba(200, 16, 46, 0.2) !important;
+    }}
+    </style>
+    
+    <div class="unified-bar">
+        <!-- 上段：ロゴ＋統計情報 -->
+        <div class="bar-top">
+            <div class="bar-logo">
+                <div class="bar-logo-icon">🏀</div>
+                <div class="bar-logo-text">
+                    <h1>Basketball Stats</h1>
                     <p>筑波大学附属高等学校</p>
                 </div>
             </div>
-            <div class="header-stats">
-                <div class="stat-box">
-                    <div class="stat-value">{total_games}</div>
-                    <div class="stat-label">Games</div>
+            <div class="bar-metrics">
+                <div class="bar-metric">
+                    <div class="bar-metric-value">{total_games}</div>
+                    <div class="bar-metric-label">Games</div>
                 </div>
-                <div class="stat-box">
-                    <div class="stat-value">{total_players}</div>
-                    <div class="stat-label">Players</div>
+                <div class="bar-metric">
+                    <div class="bar-metric-value">{total_players}</div>
+                    <div class="bar-metric-label">Players</div>
                 </div>
-                <div class="stat-box">
-                    <div class="stat-value">{total_records}</div>
-                    <div class="stat-label">Records</div>
+                <div class="bar-metric">
+                    <div class="bar-metric-value">{total_records}</div>
+                    <div class="bar-metric-label">Records</div>
                 </div>
             </div>
         </div>
     </div>
     """, unsafe_allow_html=True)
     
-    # ナビゲーションバー - 5つのカテゴリー（プルダウン直接配置）
-    st.markdown('<div class="nav-container">', unsafe_allow_html=True)
+    # ===== 下段ナビゲーション（Streamlitコンポーネント） =====
+    st.markdown('<div class="bar-nav">', unsafe_allow_html=True)
     
     # カテゴリーとページのマッピング
+    # ※「対戦相手」を統計に移動、「チーム情報」カテゴリーはチーム情報のみ
     categories = {
         "統計": ["シーズン統計", "選手統計", "試合統計", "対戦相手", "比較分析"],
         "チーム情報": ["チーム情報"],
@@ -379,7 +408,6 @@ def render_top_navigation(db):
         "設定": ["設定"]
     }
     
-    # 現在のページがどのカテゴリーに属するかを判定
     def get_current_category(page):
         for cat, pages in categories.items():
             if page in pages:
@@ -392,7 +420,6 @@ def render_top_navigation(db):
     
     for idx, (category_name, pages_in_category) in enumerate(categories.items()):
         with cols[idx]:
-            # カテゴリーに1つしかページがない場合はボタンのみ
             if len(pages_in_category) == 1:
                 if st.button(
                     category_name,
@@ -403,19 +430,11 @@ def render_top_navigation(db):
                     st.session_state.current_page = pages_in_category[0]
                     st.rerun()
             else:
-                # 複数ページがある場合はプルダウンメニューを直接配置
-                # プルダウン用のラベルを表示
-                display_label = category_name
-                if st.session_state.current_page in pages_in_category:
-                    # 現在のページがこのカテゴリーに属する場合、ページ名も表示
-                    display_label = f"{category_name}: {st.session_state.current_page}"
-                
-                # オプションリストを作成
                 options = pages_in_category
                 current_index = options.index(st.session_state.current_page) if st.session_state.current_page in options else 0
                 
                 selected = st.selectbox(
-                    display_label,
+                    category_name,
                     options,
                     index=current_index,
                     key=f"select_{category_name}",
