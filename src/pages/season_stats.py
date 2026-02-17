@@ -58,7 +58,7 @@ def render(db: StatsDatabase):
         st.write("")
     with col3:
         if st.button("データエクスポート / EXPORT"):
-            csv = db.get_season_data(selected_season).to_csv(index=False)
+            csv = db.get_season_stats(selected_season).to_csv(index=False)
             st.download_button(
                 label="CSV ダウンロード",
                 data=csv,
@@ -69,7 +69,7 @@ def render(db: StatsDatabase):
     if not selected_season:
         return
     
-    season_data = db.get_season_data(selected_season)
+    season_data = db.get_season_stats(selected_season)
     
     if season_data.empty:
         st.warning(f"{selected_season}シーズンのデータがありません")
