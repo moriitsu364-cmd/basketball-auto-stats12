@@ -72,7 +72,7 @@ def render_head_to_head_summary(db: StatsDatabase):
     if selected_season == "全シーズン / ALL":
         season_data = db.df
     else:
-        season_data = db.get_season_data(selected_season)
+        season_data = db.get_season_stats(selected_season)
     
     if season_data.empty:
         st.warning("⚠️ データがありません")
@@ -175,7 +175,7 @@ def render_game_comparison(db: StatsDatabase):
         key='game_comp_season'
     )
     
-    season_data = db.get_season_data(selected_season)
+    season_data = db.get_season_stats(selected_season)
     
     if season_data.empty:
         st.warning("⚠️ データがありません")
