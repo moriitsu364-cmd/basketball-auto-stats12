@@ -63,14 +63,14 @@ def render(db: StatsDatabase):
         return
     
     # 選手データ取得
-    player_data = db.get_player_data(selected_player, season=season_filter)
+    player_data = db.get_player_stats(selected_player, season=season_filter)
     
     if player_data.empty:
         st.warning(f"⚠️ {selected_player}のデータがありません")
         return
     
     # 選手情報カード
-    stats = calculate_stats(db.df if season_filter is None else db.get_season_data(season_filter), selected_player)
+    stats = calculate_stats(db.df if season_filter is None else db.get_season_stats(season_filter), selected_player)
     player_number = player_data['No'].iloc[0] if len(player_data) > 0 else "N/A"
     
     player_card(selected_player, player_number)
