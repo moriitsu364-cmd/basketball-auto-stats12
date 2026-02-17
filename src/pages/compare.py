@@ -137,7 +137,7 @@ def render_player_comparison(db: StatsDatabase):
         return
     
     # 統計データ取得
-    season_df = db.get_season_data(selected_season)
+    season_df = db.get_season_stats(selected_season)
     stats_list = [calculate_stats(season_df, player) for player in selected_players]
     
     # 貢献度スコアを計算
@@ -216,7 +216,7 @@ def render_player_season_comparison(db: StatsDatabase):
     )
     
     # その選手がプレーしたシーズンを取得
-    player_data = db.get_player_data(selected_player)
+    player_data = db.get_player_stats(selected_player)
     player_seasons = sorted(player_data['Season'].unique().tolist(), reverse=True)
     
     if len(player_seasons) < 2:
@@ -240,8 +240,8 @@ def render_player_season_comparison(db: StatsDatabase):
         return
     
     # 各シーズンの統計を取得
-    stats1 = calculate_stats(db.get_season_data(season1), selected_player)
-    stats2 = calculate_stats(db.get_season_data(season2), selected_player)
+    stats1 = calculate_stats(db.get_season_stats(season1), selected_player)
+    stats2 = calculate_stats(db.get_season_stats(season2), selected_player)
     
     stats1['Contribution'] = calculate_contribution_score(stats1)
     stats2['Contribution'] = calculate_contribution_score(stats2)
@@ -324,8 +324,8 @@ def render_season_comparison(db: StatsDatabase):
         season2 = st.selectbox("シーズン 2", remaining_seasons, key='season_cmp2')
     
     if season1 and season2:
-        data1 = db.get_season_data(season1)
-        data2 = db.get_season_data(season2)
+        data1 = db.get_season_stats(season1)
+        data2 = db.get_season_stats(season2)
         
         # チーム統計比較
         team_stats1 = {
@@ -382,7 +382,7 @@ def render_contribution_ranking(db: StatsDatabase):
         key='contrib_season'
     )
     
-    season_data = db.get_season_data(selected_season)
+    season_data = db.get_season_stats(selected_season)
     players = db.get_all_players(season=selected_season)
     
     # 各選手の貢献度を計算
