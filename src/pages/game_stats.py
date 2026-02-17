@@ -59,7 +59,7 @@ def render(db: StatsDatabase):
     if selected_season == "全シーズン / ALL":
         season_data = db.df
     else:
-        season_data = db.get_season_data(selected_season)
+        season_data = db.get_season_stats(selected_season)
     
     if season_data.empty:
         st.warning(f"{selected_season}の試合データがありません")
