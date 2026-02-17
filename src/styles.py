@@ -433,30 +433,33 @@ def load_css():
         
         /* ============================================
            Buttons - High Visibility
-           (ナビゲーションバー外のボタンのみ適用)
+           (メインコンテンツ内のボタン：ナビバーより後に読み込まれるので上書きできる)
            ============================================ */
-        .main .block-container .stButton > button {
-            background: linear-gradient(135deg, #c8102e 0%, #1d428a 100%);
-            color: white;
-            border: none;
-            padding: 1.2rem 3.5rem;
-            font-size: 1rem;
-            font-weight: 800;
-            border-radius: 50px;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 8px 25px rgba(200, 16, 46, 0.3);
+        section[data-testid="stVerticalBlock"] .stButton > button,
+        div[data-testid="column"] .stButton > button {
+            background: linear-gradient(135deg, #c8102e 0%, #1d428a 100%) !important;
+            color: white !important;
+            border: none !important;
+            padding: 1.2rem 3.5rem !important;
+            font-size: 1rem !important;
+            font-weight: 800 !important;
+            border-radius: 50px !important;
+            text-transform: uppercase !important;
+            letter-spacing: 3px !important;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            box-shadow: 0 8px 25px rgba(200, 16, 46, 0.3) !important;
         }
         
-        .main .block-container .stButton > button:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 40px rgba(200, 16, 46, 0.5);
-            background: linear-gradient(135deg, #e01434 0%, #4169e1 100%);
+        section[data-testid="stVerticalBlock"] .stButton > button:hover,
+        div[data-testid="column"] .stButton > button:hover {
+            transform: translateY(-5px) !important;
+            box-shadow: 0 15px 40px rgba(200, 16, 46, 0.5) !important;
+            background: linear-gradient(135deg, #e01434 0%, #4169e1 100%) !important;
         }
         
-        .main .block-container .stButton > button:active {
-            transform: translateY(-2px);
+        section[data-testid="stVerticalBlock"] .stButton > button:active,
+        div[data-testid="column"] .stButton > button:active {
+            transform: translateY(-2px) !important;
         }
         
         /* ============================================
