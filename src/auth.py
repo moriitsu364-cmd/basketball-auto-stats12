@@ -3,12 +3,30 @@ import streamlit as st
 import hashlib
 
 
-def check_password() -> bool:
+def check_password(password: str = None) -> bool:
     """編集者権限の確認
+    
+    Args:
+        password: 確認するパスワード（Noneの場合はセッション状態から取得）
     
     Returns:
         認証が成功した場合True
     """
+    # 引数でパスワードが渡された場合は直接チェック
+    if password is not None:
+        hashed = hashlib.sha256(password.encode()).hexdigest()
+        expected_hash = hashlib.sha256("tsukuba1872".encode()).hexdigest()
+        
+        # secrets.tomlからカスタムハッシュを取得（存在する場合）
+        try:
+            if hasattr(st, 'secrets') and "ADMIN_PASSWORD_HASH" in st.secrets:
+                expected_hash = st.secrets["ADMIN_PASSWORD_HASH"]
+        except Exception:
+            pass
+        
+        return hashed == expected_hash
+    
+    # 以下は元の実装（セッション状態ベース）
     def password_entered():
         """パスワードが入力されたかチェック"""
         entered_password = st.session_state["password"]
