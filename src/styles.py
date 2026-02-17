@@ -433,8 +433,9 @@ def load_css():
         
         /* ============================================
            Buttons - High Visibility
+           (ナビゲーションバー外のボタンのみ適用)
            ============================================ */
-        .stButton > button {
+        .main .block-container .stButton > button {
             background: linear-gradient(135deg, #c8102e 0%, #1d428a 100%);
             color: white;
             border: none;
@@ -448,13 +449,13 @@ def load_css():
             box-shadow: 0 8px 25px rgba(200, 16, 46, 0.3);
         }
         
-        .stButton > button:hover {
+        .main .block-container .stButton > button:hover {
             transform: translateY(-5px);
             box-shadow: 0 15px 40px rgba(200, 16, 46, 0.5);
             background: linear-gradient(135deg, #e01434 0%, #4169e1 100%);
         }
         
-        .stButton > button:active {
+        .main .block-container .stButton > button:active {
             transform: translateY(-2px);
         }
         
