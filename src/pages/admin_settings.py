@@ -73,7 +73,7 @@ def render(db=None):
             if 'team_category' not in st.session_state:
                 st.session_state.team_category = "高校男子"
             if 'team_level' not in st.session_state:
-                st.session_state.team_level = "インターハイ出場レベル"
+                st.session_state.team_level = ""
             if 'current_season' not in st.session_state:
                 st.session_state.current_season = "2024-2025"
             
@@ -83,10 +83,11 @@ def render(db=None):
                 index=["高校男子", "高校女子", "中学男子", "中学女子", "一般男子", "一般女子"].index(st.session_state.team_category)
             )
             
-            team_level = st.selectbox(
-                "競技レベル",
-                options=["インターハイ出場レベル", "都道府県大会レベル", "地区大会レベル", "その他"],
-                index=["インターハイ出場レベル", "都道府県大会レベル", "地区大会レベル", "その他"].index(st.session_state.team_level)
+            team_level = st.text_area(
+                "チーム目標",
+                value=st.session_state.team_level,
+                help="チームの目標を自由に入力してください",
+                height=100
             )
             
             current_season = st.text_input(
