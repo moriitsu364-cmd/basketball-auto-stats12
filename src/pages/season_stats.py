@@ -243,10 +243,10 @@ def render_leader_section(season_data, stat_col, avg_label, stat_name, color):
         # ランキング行を表示
         ranking_row(
             rank=idx + 1,
-            player_name=player_name,
+            player=player_name,
             stat_value=f"{avg_val:.1f}",
-            games=int(gp),
-            card_type=color
+            stat_label=avg_label,
+            color=color
         )
 
 
