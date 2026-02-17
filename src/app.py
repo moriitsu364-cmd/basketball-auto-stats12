@@ -277,7 +277,7 @@ def render_top_navigation(db):
         gap: 0;
     }}
     
-    /* ナビボタン共通スタイル */
+    /* ナビボタン（全ボタンに適用、ページ本文は別途上書き） */
     .stButton button {{
         background: transparent !important;
         border: none !important;
@@ -288,82 +288,34 @@ def render_top_navigation(db):
         font-weight: 600 !important;
         letter-spacing: 1px !important;
         text-transform: uppercase !important;
-        color: rgba(255,255,255,0.7) !important;
+        color: rgba(255,255,255,0.85) !important;
         transition: all 0.2s ease !important;
         white-space: nowrap !important;
         margin-bottom: 0 !important;
+        box-shadow: none !important;
     }}
     
     .stButton button:hover {{
         color: white !important;
-        background: rgba(200, 16, 46, 0.1) !important;
-        border-bottom-color: #c8102e !important;
+        background: rgba(200, 16, 46, 0.15) !important;
+        border-bottom: 3px solid #c8102e !important;
         transform: none !important;
+        box-shadow: none !important;
     }}
     
     .stButton button[kind="primary"] {{
         color: white !important;
-        background: rgba(200, 16, 46, 0.15) !important;
+        background: rgba(200, 16, 46, 0.25) !important;
         border-bottom: 3px solid #c8102e !important;
         font-weight: 700 !important;
     }}
     
-    .stButton button[kind="secondary"] {{
-        color: rgba(255,255,255,0.7) !important;
-    }}
-    
-    /* ナビ内セレクトボックス */
-    .stSelectbox {{
-        margin: 0 !important;
-    }}
-    
-    .stSelectbox > div > div {{
-        background: transparent !important;
-        border: none !important;
-        border-radius: 0 !important;
-        border-bottom: 3px solid transparent !important;
-        padding: 0.7rem 1.2rem !important;
-        font-size: 0.82rem !important;
-        font-weight: 600 !important;
-        letter-spacing: 1px !important;
-        text-transform: uppercase !important;
-        color: rgba(255,255,255,0.7) !important;
-        cursor: pointer !important;
-        min-height: unset !important;
-    }}
-    
-    .stSelectbox > div > div:hover {{
-        color: white !important;
-        background: rgba(200, 16, 46, 0.1) !important;
-        border-bottom-color: #c8102e !important;
-    }}
-    
-    /* アクティブなセレクトボックス */
-    div[data-active-nav="true"] .stSelectbox > div > div {{
-        color: white !important;
-        background: rgba(200, 16, 46, 0.15) !important;
-        border-bottom: 3px solid #c8102e !important;
-        font-weight: 700 !important;
-    }}
-    
-    .stSelectbox svg {{
-        color: #c8102e !important;
-        opacity: 0.8;
-    }}
-    
-    /* ドロップダウンオプション */
-    .stSelectbox [data-baseweb="popover"] {{
-        background: #1a1a1a !important;
-        border: 1px solid #333 !important;
-    }}
-    
-    .stSelectbox li {{
-        color: white !important;
-        background: #1a1a1a !important;
-    }}
-    
-    .stSelectbox li:hover {{
-        background: rgba(200, 16, 46, 0.2) !important;
+    /* サブナビ行（統計のサブメニュー） */
+    .sub-nav-row {{
+        background: #111111;
+        padding: 0 1rem;
+        margin: 0 -1rem;
+        border-bottom: 2px solid #333;
     }}
     </style>
     
@@ -395,11 +347,11 @@ def render_top_navigation(db):
     </div>
     """, unsafe_allow_html=True)
     
-    # ===== 下段ナビゲーション（Streamlitコンポーネント） =====
+    # ===== ナビゲーション（Streamlitコンポーネント） =====
     st.markdown('<div class="bar-nav">', unsafe_allow_html=True)
     
     # カテゴリーとページのマッピング
-    # ※「対戦相手」を統計に移動、「チーム情報」カテゴリーはチーム情報のみ
+    # ※「対戦相手」を統計に、「チーム情報」カテゴリーはチーム情報のみ
     categories = {
         "統計": ["シーズン統計", "選手統計", "試合統計", "対戦相手", "比較分析"],
         "チーム情報": ["チーム情報"],
@@ -420,32 +372,35 @@ def render_top_navigation(db):
     
     for idx, (category_name, pages_in_category) in enumerate(categories.items()):
         with cols[idx]:
-            if len(pages_in_category) == 1:
-                if st.button(
-                    category_name,
-                    key=f"cat_{category_name}",
-                    use_container_width=True,
-                    type="primary" if current_category == category_name else "secondary"
-                ):
-                    st.session_state.current_page = pages_in_category[0]
-                    st.rerun()
-            else:
-                options = pages_in_category
-                current_index = options.index(st.session_state.current_page) if st.session_state.current_page in options else 0
-                
-                selected = st.selectbox(
-                    category_name,
-                    options,
-                    index=current_index,
-                    key=f"select_{category_name}",
-                    label_visibility="collapsed"
-                )
-                
-                if selected != st.session_state.current_page:
-                    st.session_state.current_page = selected
-                    st.rerun()
+            # 全カテゴリーをボタンで表示（統計も含む）
+            if st.button(
+                category_name,
+                key=f"cat_{category_name}",
+                use_container_width=True,
+                type="primary" if current_category == category_name else "secondary"
+            ):
+                # クリックしたら最初のページへ
+                st.session_state.current_page = pages_in_category[0]
+                st.rerun()
     
     st.markdown('</div>', unsafe_allow_html=True)
+    
+    # 統計カテゴリーが選択中の場合のみサブメニューを表示
+    if current_category == "統計":
+        st.markdown('<div class="sub-nav-row">', unsafe_allow_html=True)
+        stat_pages = categories["統計"]
+        sub_cols = st.columns(len(stat_pages))
+        for i, page_name in enumerate(stat_pages):
+            with sub_cols[i]:
+                if st.button(
+                    page_name,
+                    key=f"sub_{page_name}",
+                    use_container_width=True,
+                    type="primary" if st.session_state.current_page == page_name else "secondary"
+                ):
+                    st.session_state.current_page = page_name
+                    st.rerun()
+        st.markdown('</div>', unsafe_allow_html=True)
 
 
 def render_sidebar(db):
