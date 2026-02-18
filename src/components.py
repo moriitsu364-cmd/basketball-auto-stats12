@@ -28,7 +28,7 @@ def stat_card(label: str, value, subtitle: str = "", card_type: str = "", label_
     """, unsafe_allow_html=True)
 
 
-def ranking_row(rank: int, player: str, stat_value: float, stat_label: str, 
+def ranking_row(rank: int, player: str, stat_value, stat_label: str, 
                 color: str = "#1d428a", image_path: str = None, player_number: str = ""):
     """ランキング行を表示（完全改良版: 画像、背番号、名前を正しく表示）
     
@@ -41,6 +41,13 @@ def ranking_row(rank: int, player: str, stat_value: float, stat_label: str,
         image_path: 選手画像のパス（オプション）
         player_number: 背番号（オプション）
     """
+    # stat_valueを安全にfloatへ変換
+    try:
+        stat_value_f = float(stat_value)
+        stat_value_str = f"{stat_value_f:.1f}"
+    except (ValueError, TypeError):
+        stat_value_str = str(stat_value)
+
     rank_class = f"rank-{rank}" if rank <= 3 else ""
     
     # 画像があれば表示、なければデフォルトアバター
@@ -99,7 +106,7 @@ def ranking_row(rank: int, player: str, stat_value: float, stat_label: str,
             </div>
         </div>
         <div style="text-align: right;">
-            <div style="color: {color}; font-size: 2.5rem; font-weight: 900; line-height: 1;">{stat_value:.1f}</div>
+            <div style="color: {color}; font-size: 2.5rem; font-weight: 900; line-height: 1;">{stat_value_str}</div>
             <div style="color: #888; font-size: 1rem; margin-top: 0.3rem; font-weight: 600;">{stat_label}</div>
         </div>
     </div>
