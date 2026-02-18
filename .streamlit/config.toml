@@ -1,5 +1,5 @@
 [theme]
-primaryColor = "#c8102e"
+primaryColor = "#1d428a"
 backgroundColor = "#f5f5f5"
 secondaryBackgroundColor = "#ffffff"
 textColor = "#212529"
@@ -11,7 +11,3 @@ port = 8501
 
 [browser]
 gatherUsageStats = false
-
-[client]
-toolbarMode = "minimal"
-showErrorDetails = false
