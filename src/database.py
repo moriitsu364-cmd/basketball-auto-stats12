@@ -417,3 +417,37 @@ class StatsDatabase:
             if DEBUG_MODE:
                 print(f"⚠️ 試合リスト取得エラー: {e}")
             return []
+    
+    def get_stats_summary(self) -> dict:
+        """データベースの統計サマリーを取得"""
+        try:
+            df = self.df.copy()
+            
+            if df.empty:
+                return {
+                    'total_games': 0,
+                    'total_players': 0,
+                    'total_seasons': 0,
+                    'total_records': 0
+                }
+            
+            total_games = len(df['GameDate'].unique()) if 'GameDate' in df.columns else 0
+            total_players = len(df['PlayerName'].unique()) if 'PlayerName' in df.columns else 0
+            total_seasons = len(df['Season'].unique()) if 'Season' in df.columns else 0
+            total_records = len(df)
+            
+            return {
+                'total_games': total_games,
+                'total_players': total_players,
+                'total_seasons': total_seasons,
+                'total_records': total_records
+            }
+        except Exception as e:
+            if DEBUG_MODE:
+                print(f"⚠️ 統計サマリー取得エラー: {e}")
+            return {
+                'total_games': 0,
+                'total_players': 0,
+                'total_seasons': 0,
+                'total_records': 0
+            }
